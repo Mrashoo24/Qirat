@@ -58,7 +58,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyA5rmXn2Fa_b8S5PU5wPVmihzAVWEB_JOc',
-    appId: '1:530001069485:android:bdd328663268a38eb34d24',
+    appId: '1:530001069485:android:5e1891cec1ba894fb34d24',
     messagingSenderId: '530001069485',
     projectId: 'qiratperfumes',
     storageBucket: 'qiratperfumes.appspot.com',
@@ -66,10 +66,13 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyBC0pTv8QTDXu6oENUF14l2WJmw0FjG1pg',
-    appId: '1:530001069485:ios:5375c95f29d2da17b34d24',
+    appId: '1:530001069485:ios:c9c74f7708e1cb54b34d24',
     messagingSenderId: '530001069485',
     projectId: 'qiratperfumes',
     storageBucket: 'qiratperfumes.appspot.com',
-    iosBundleId: 'com.example.eshop.eshop',
+    androidClientId: '530001069485-gd07hvdrbev67ckfmd1q0sa5ukfis1u5.apps.googleusercontent.com',
+    iosClientId: '530001069485-6g20bpgr9ji7pk7vsgm1adm9m4086gb0.apps.googleusercontent.com',
+    iosBundleId: 'com.ak.qiratshop',
   );
+
 }
