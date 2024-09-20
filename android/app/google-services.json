@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "530001069485",
+    "project_id": "qiratperfumes",
+    "storage_bucket": "qiratperfumes.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:530001069485:android:bdd328663268a38eb34d24",
+        "android_client_info": {
+          "package_name": "com.example.eshop.eshop"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA5rmXn2Fa_b8S5PU5wPVmihzAVWEB_JOc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
