@@ -3,11 +3,12 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/error/exceptions.dart';
+import '../../models/product/product_model.dart';
 import '../../models/product/product_response_model.dart';
 
 abstract class ProductLocalDataSource {
-  Future<ProductResponseModel> getLastProducts();
-  Future<void> saveProducts(ProductResponseModel productsToCache);
+  Future<List<ProductModel>> getLastProducts();
+  Future<void> saveProducts(List<ProductModel> productsToCache);
 }
 
 const cachedProducts = 'CACHED_PRODUCTS';
@@ -17,20 +18,20 @@ class ProductLocalDataSourceImpl implements ProductLocalDataSource {
   ProductLocalDataSourceImpl({required this.sharedPreferences});
 
   @override
-  Future<ProductResponseModel> getLastProducts() {
+  Future<List<ProductModel>> getLastProducts() {
     final jsonString = sharedPreferences.getString(cachedProducts);
     if (jsonString != null) {
-      return Future.value(productResponseModelFromJson(jsonDecode(jsonString)));
+      return Future.value( List<ProductModel>.from(jsonDecode(jsonString).map((e) => ProductModel.fromJson(e))));
     } else {
-      throw CacheException();
+     return  Future.value([]);
     }
   }
 
   @override
-  Future<void> saveProducts(ProductResponseModel productsToCache) {
+  Future<void> saveProducts(List<ProductModel> productsToCache) {
     return sharedPreferences.setString(
       cachedProducts,
-      json.encode(productResponseModelToJson(productsToCache)),
+      json.encode(productsToCache),
     );
   }
 }

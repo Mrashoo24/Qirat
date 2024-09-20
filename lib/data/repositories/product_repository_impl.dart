@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:eshop/data/models/product/product_model.dart';
 
 import '../../../../core/error/failures.dart';
 import '../../../../core/error/exceptions.dart';
@@ -10,7 +11,7 @@ import '../data_sources/local/product_local_data_source.dart';
 import '../data_sources/remote/product_remote_data_source.dart';
 import '../models/product/product_response_model.dart';
 
-typedef _ConcreteOrProductChooser = Future<ProductResponse> Function();
+typedef _ConcreteOrProductChooser = Future<List<ProductModel>> Function();
 
 class ProductRepositoryImpl implements ProductRepository {
   final ProductRemoteDataSource remoteDataSource;
@@ -24,30 +25,47 @@ class ProductRepositoryImpl implements ProductRepository {
   });
 
   @override
-  Future<Either<Failure, ProductResponse>> getProducts(FilterProductParams params) async {
+  Future<Either<Failure, List<ProductModel>>> getProducts(FilterProductParams params) async {
     return await _getProduct(() {
       return remoteDataSource.getProducts(params);
     });
   }
 
-  Future<Either<Failure, ProductResponse>> _getProduct(
+  Future<Either<Failure, List<ProductModel>>> _getProduct(
     _ConcreteOrProductChooser getConcreteOrProducts,
   ) async {
-    if (await networkInfo.isConnected) {
+    final localProducts = await localDataSource.getLastProducts();
+
+    if (localProducts.isEmpty) {
       try {
         final remoteProducts = await getConcreteOrProducts();
-        localDataSource.saveProducts(remoteProducts as ProductResponseModel);
+        localDataSource.saveProducts(remoteProducts);
         return Right(remoteProducts);
-      } on ServerException {
+      } catch(e){
+        print(e.toString());
         return Left(ServerFailure());
       }
-    } else {
+      // on ServerException {
+      //   return Left(ServerFailure());
+      // }
+    } 
+    else {
       try {
-        final localProducts = await localDataSource.getLastProducts();
+        getRemoteProducts(getConcreteOrProducts);
         return Right(localProducts);
       } on CacheException {
         return Left(CacheFailure());
       }
     }
   }
+
+  getRemoteProducts(getConcreteOrProducts) async {
+    try {
+      final remoteProducts = await getConcreteOrProducts();
+      localDataSource.saveProducts(remoteProducts);
+    } catch(e){
+      print(e.toString());
+    }
+  }
+
 }

@@ -1,4 +1,5 @@
 import 'package:eshop/presentation/views/main/home/filter/filter_view.dart';
+import 'package:eshop/presentation/views/main/home/productview.dart';
 import 'package:flutter/material.dart';
 
 import '../../domain/entities/cart/cart_item.dart';
@@ -34,6 +35,7 @@ class AppRouter {
   static const String notifications = '/notifications';
   static const String about = '/about';
   static const String filter = '/filter';
+  static const String productPage = '/product-page';
 
   static Route<dynamic> onGenerateRoute(RouteSettings routeSettings) {
     switch (routeSettings.name) {
@@ -71,6 +73,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const AboutView());
       case filter:
         return MaterialPageRoute(builder: (_) => const FilterView());
+      case productPage:
+        return MaterialPageRoute(builder: (_) => const ProductPageView());
       default:
         throw const RouteException('Route not found!');
     }

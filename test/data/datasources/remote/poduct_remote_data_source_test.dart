@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:eshop/core/constant/strings.dart';
 import 'package:eshop/core/error/exceptions.dart';
 import 'package:eshop/data/data_sources/remote/product_remote_data_source.dart';
+import 'package:eshop/data/firebase/firebase_services.dart';
 import 'package:eshop/data/models/product/product_response_model.dart';
 import 'package:eshop/domain/usecases/product/get_product_usecase.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -10,7 +11,7 @@ import 'package:mocktail/mocktail.dart';
 
 import '../../../fixtures/fixture_reader.dart';
 
-class MockHttpClient extends Mock implements http.Client {}
+class MockHttpClient extends Mock implements FirebaseService {}
 
 void main() {
   late ProductRemoteDataSourceImpl dataSource;

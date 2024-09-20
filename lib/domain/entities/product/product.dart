@@ -8,10 +8,12 @@ class Product extends Equatable {
   final String name;
   final String description;
   final List<PriceTag> priceTags;
-  final List<Category> categories;
+  final  List<String> categories;
   final List<String> images;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final  List<String> tags;
+
 
   const Product({
     required this.id,
@@ -22,6 +24,8 @@ class Product extends Equatable {
     required this.images,
     required this.createdAt,
     required this.updatedAt,
+    required this.tags,
+
   });
 
   @override

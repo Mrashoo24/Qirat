@@ -1,8 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:eshop/data/firebase/firebase_services.dart';
 import 'package:eshop/domain/usecases/delivery_info/clear_local_delivery_info_usecase.dart';
 import 'package:eshop/domain/usecases/delivery_info/edit_delivery_info_usecase.dart';
 import 'package:eshop/domain/usecases/delivery_info/get_selected_delivery_info_usecase.dart';
 import 'package:eshop/domain/usecases/delivery_info/select_delivery_info_usecase.dart';
 import 'package:eshop/domain/usecases/order/clear_local_order_usecase.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:firebase_performance/firebase_performance.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
@@ -65,6 +71,18 @@ final sl = GetIt.instance;
 
 Future<void> init() async {
   //Features - Product
+
+
+  //Firebase
+  sl.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
+  sl.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
+  sl.registerLazySingleton<FirebaseAnalytics>(() => FirebaseAnalytics.instance);
+  sl.registerLazySingleton<FirebaseCrashlytics>(() => FirebaseCrashlytics.instance);
+  sl.registerLazySingleton<FirebasePerformance>(() => FirebasePerformance.instance);
+
+  sl.registerLazySingleton<FirebaseService>(() => FirebaseService(firebaseAuth: sl<FirebaseAuth>(), firestore: sl<FirebaseFirestore>()));
+
+
   // Bloc
   sl.registerFactory(
     () => ProductBloc(sl()),
@@ -240,4 +258,5 @@ Future<void> init() async {
   sl.registerLazySingleton(() => secureStorage);
   sl.registerLazySingleton(() => http.Client());
   sl.registerLazySingleton(() => InternetConnectionChecker());
+
 }

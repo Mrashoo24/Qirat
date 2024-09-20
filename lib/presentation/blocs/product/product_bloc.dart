@@ -33,6 +33,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         params: event.params,
       ));
       final result = await _getProductUseCase(event.params);
+
       result.fold(
         (failure) => emit(ProductError(
           products: state.products,
@@ -41,8 +42,8 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
           params: event.params,
         )),
         (productResponse) => emit(ProductLoaded(
-          metaData: productResponse.paginationMetaData,
-          products: productResponse.products,
+          metaData: PaginationMetaData(limit: 0, pageSize: 0, total: 0),
+          products: productResponse,
           params: event.params,
         )),
       );
@@ -82,7 +83,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
           )),
           (productResponse) {
             List<Product> products = state.products;
-            products.addAll(productResponse.products);
+            products.addAll(productResponse);
             emit(ProductLoaded(
               metaData: state.metaData,
               products: products,

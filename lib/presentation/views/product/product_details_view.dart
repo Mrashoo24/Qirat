@@ -7,6 +7,7 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../../../../../domain/entities/cart/cart_item.dart';
 import '../../../../../domain/entities/product/price_tag.dart';
 import '../../../../../domain/entities/product/product.dart';
+import '../../../core/constant/colors.dart';
 import '../../../core/router/app_router.dart';
 import '../../blocs/cart/cart_bloc.dart';
 import '../../widgets/input_form_button.dart';
@@ -162,9 +163,34 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                 right: 10,
                 top: 16,
                 bottom: MediaQuery.of(context).padding.bottom),
-            child: Text(
-              widget.product.description,
-              style: const TextStyle(fontSize: 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  spacing: 8.0,
+                  runSpacing: 4.0,
+                  children: widget.product.tags.map<Widget>((tag) {
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.circle,
+                          size: 8,
+                          color: kLightPrimaryColor, // Custom bullet point color
+                        ),
+                        const SizedBox(width: 4),
+                        Text(tag, style: const TextStyle(fontSize: 14)),
+                      ],
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 12), // Space between description and tags
+                Text(
+                  widget.product.description,
+                  style: const TextStyle(fontSize: 14),
+                ),
+
+              ],
             ),
           )
         ],
