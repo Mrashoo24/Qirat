@@ -4,6 +4,7 @@ import 'package:eshop/core/error/failures.dart';
 import 'package:eshop/data/firebase/firebase_services.dart';
 import 'package:eshop/data/models/user/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:http/http.dart' as http;
 
@@ -61,13 +62,15 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
   Future<UserModel> updateUser(UserModel params) async {
     // Trigger the authentication flow
     try {
+    var toklen =  await FirebaseMessaging.instance.getToken(vapidKey: "BDhxFp_Vov1qHsjtF65y5Q7s54DHrdclkT9vh_vTtzlE7LbMwZlegW4DDz4roGNnUndtpzOZT15Zs9fmmjtTjm8");
+
       UserModel userModel = UserModel(
           id: params.id ?? "",
           firstName: params.firstName,
           lastName: params.lastName,
-          email: params.email,deliveryInfos: params.deliveryInfos);
+          email: params.email,deliveryInfos: params.deliveryInfos, token:toklen.toString());
 
-      await client.setDocument(collectionPath: "users", data: params.toJson(),merge: true,documentId:userModel.id );
+      await client.setDocument(collectionPath: "users", data: userModel.toJson(),merge: true,documentId:userModel.id );
 
       return userModel;
     } catch (e) {

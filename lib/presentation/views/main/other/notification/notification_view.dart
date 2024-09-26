@@ -51,7 +51,6 @@ class ContactUsView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Contact Us"),
-        backgroundColor: Colors.black87,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

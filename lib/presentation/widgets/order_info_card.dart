@@ -57,7 +57,7 @@ class OrderInfoCard extends StatelessWidget {
                 ),
                 CopyableTextWidget(
                   text:
-                  "Information: ${orderDetails!.info}xciokgvjxciojvxcijvcuixnvxciujvnicxnvijxcnvjcxnvxcnivjxcnvxcvnxcijvnxcjvni",
+                  "Information: ${orderDetails!.info}",
                 ),
 
                 Column(

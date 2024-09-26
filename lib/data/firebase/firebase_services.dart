@@ -1,5 +1,10 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../presentation/blocs/user/user_bloc.dart';
 
 class FirebaseService {
   final FirebaseAuth firebaseAuth;
@@ -164,4 +169,20 @@ class FirebaseService {
       throw Exception('Failed to delete document: $e');
     }
   }
+
+  logEvent(BuildContext context,String eventname,Map<String,String>params) async {
+   var curretnstate =  context.read<UserBloc>().state;
+  if(curretnstate is UserLogged)  {
+
+    params["uid"] = curretnstate.user.token.toString();
+
+
+    await  FirebaseAnalytics.instance.logEvent(name:eventname,parameters: params);
+
+  }else{
+    await  FirebaseAnalytics.instance.logEvent(name:eventname,parameters: params);
+  }
+
+  }
+
 }

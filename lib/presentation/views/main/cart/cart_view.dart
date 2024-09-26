@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constant/images.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/router/app_router.dart';
+import '../../../../core/services/services_locator.dart';
+import '../../../../data/firebase/firebase_services.dart';
 import '../../../../domain/entities/cart/cart_item.dart';
 import '../../../blocs/cart/cart_bloc.dart';
 import '../../../widgets/cart_item_card.dart';
@@ -156,6 +158,11 @@ class _CartViewState extends State<CartView> {
                           cornerRadius: 36,
                           padding: EdgeInsets.zero,
                           onClick: () {
+                            var firebaseService =  sl.get<FirebaseService>(
+
+                            );
+
+                            firebaseService.logEvent(context, "Checkout_Clicked",{});
                             Navigator.of(context).pushNamed(
                                 AppRouter.orderCheckout,
                                 arguments: state.cart);

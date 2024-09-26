@@ -1,5 +1,6 @@
 import 'package:eshop/presentation/views/main/home/filter/filter_view.dart';
 import 'package:eshop/presentation/views/main/home/productview.dart';
+import 'package:eshop/presentation/views/main/home/searchView.dart';
 import 'package:flutter/material.dart';
 
 import '../../domain/entities/cart/cart_item.dart';
@@ -37,8 +38,8 @@ class AppRouter {
   static const String about = '/about';
   static const String filter = '/filter';
   static const String productPage = '/product-page';
-  static const String deletePage = 'DeleteAccountView';
-
+  static const String deletePage = '/deleteAccountView';
+static const String searchView = "/searchView";
   static Route<dynamic> onGenerateRoute(RouteSettings routeSettings) {
     switch (routeSettings.name) {
       case home:
@@ -79,6 +80,8 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const ProductPageView());
       case deletePage:
         return MaterialPageRoute(builder: (_) => const DeleteAccountView());
+      case searchView:
+        return MaterialPageRoute(builder: (_) => const SearchView());
 
       default:
         throw const RouteException('Route not found!');

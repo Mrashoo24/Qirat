@@ -10,6 +10,8 @@ import '../../../../../domain/entities/product/price_tag.dart';
 import '../../../../../domain/entities/product/product.dart';
 import '../../../core/constant/colors.dart';
 import '../../../core/router/app_router.dart';
+import '../../../core/services/services_locator.dart';
+import '../../../data/firebase/firebase_services.dart';
 import '../../blocs/cart/cart_bloc.dart';
 import '../../blocs/home/navbar_cubit.dart';
 import '../../widgets/counterButton.dart';
@@ -279,6 +281,13 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                               2,
                               duration: const Duration(milliseconds: 400),
                               curve: Curves.linear);
+                          var firebaseService =  sl.get<FirebaseService>(
+
+                          );
+
+                          firebaseService.logEvent(context, "Add_to_cart", {"product" : widget.product.id +
+                              _selectedPriceTag.id});
+
                           Navigator.pop(context);
                         },
                         titleText: "Add to Cart",

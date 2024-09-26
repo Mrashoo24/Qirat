@@ -1,5 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:eshop/data/firebase/firebase_services.dart';
 import 'package:eshop/presentation/blocs/category/category_bloc.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
@@ -7,6 +9,7 @@ import 'package:shimmer/shimmer.dart';
 import '../../../../core/constant/images.dart';
 import '../../../../core/error/failures.dart';
 import '../../../../core/router/app_router.dart';
+import '../../../../core/services/services_locator.dart';
 import '../../../../data/models/product/product_model.dart';
 import '../../../../domain/entities/product/product.dart';
 import '../../../../domain/usecases/product/get_product_usecase.dart';
@@ -62,7 +65,7 @@ class _HomeViewState extends State<HomeView> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        Navigator.of(context).pushNamed(AppRouter.userProfile);
+                        throw Exception();
                       },
                       child: Text(
                         "${state.user.firstName} ${state.user.lastName}",
@@ -73,25 +76,25 @@ class _HomeViewState extends State<HomeView> {
                     const SizedBox(
                       width: 8,
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).pushNamed(AppRouter.userProfile);
-                      },
-                      child: state.user.image != null
-                          ? CachedNetworkImage(
-                              imageUrl: state.user.image!,
-                              imageBuilder: (context, image) => CircleAvatar(
-                                radius: 24.0,
-                                backgroundImage: image,
-                                backgroundColor: Colors.transparent,
-                              ),
-                            )
-                          : const CircleAvatar(
-                              radius: 24.0,
-                              backgroundImage: AssetImage(kUserAvatar),
-                              backgroundColor: Colors.transparent,
-                            ),
-                    )
+                    // GestureDetector(
+                    //   onTap: () {
+                    //     Navigator.of(context).pushNamed(AppRouter.userProfile);
+                    //   },
+                    //   child: state.user.image != null
+                    //       ? CachedNetworkImage(
+                    //           imageUrl: state.user.image!,
+                    //           imageBuilder: (context, image) => CircleAvatar(
+                    //             radius: 24.0,
+                    //             backgroundImage: image,
+                    //             backgroundColor: Colors.transparent,
+                    //           ),
+                    //         )
+                    //       : const CircleAvatar(
+                    //           radius: 24.0,
+                    //           backgroundImage: AssetImage(kUserAvatar),
+                    //           backgroundColor: Colors.transparent,
+                    //         ),
+                    // )
                   ],
                 );
               } else {
@@ -146,52 +149,62 @@ class _HomeViewState extends State<HomeView> {
                 Expanded(
                   child: BlocBuilder<FilterCubit, FilterProductParams>(
                     builder: (context, state) {
-                      return TextField(
-                        autofocus: false,
-                        controller: context.read<FilterCubit>().searchController,
-                        onChanged: (val) => setState(() {}),
-                        onSubmitted: (val) => context.read<ProductBloc>().add(
-                            GetProducts(FilterProductParams(keyword: val))),
-                        decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.only(
-                                left: 20, bottom: 22, top: 22),
-                            prefixIcon: const Padding(
-                              padding: EdgeInsets.only(left: 8),
-                              child: Icon(Icons.search),
-                            ),
-                            suffixIcon: context
-                                    .read<FilterCubit>()
-                                    .searchController
-                                    .text
-                                    .isNotEmpty
-                                ? Padding(
-                                    padding: const EdgeInsets.only(right: 8),
-                                    child: IconButton(
-                                        onPressed: () {
-                                          context
-                                              .read<FilterCubit>()
-                                              .searchController
-                                              .clear();
-                                          context
-                                              .read<FilterCubit>()
-                                              .update(keyword: '');
-                                        },
-                                        icon: const Icon(Icons.clear)),
-                                  )
-                                : null,
-                            border: const OutlineInputBorder(),
-                            hintText: "Search Product",
-                            fillColor: Colors.grey.shade100,
-                            filled: true,
-                            focusedBorder: OutlineInputBorder(
+                      return InkWell(
+                        onTap: (){
+                          FirebaseAnalytics.instance.logEvent(name:"SearchClicked");
+                          Navigator.pushNamed(context, AppRouter.searchView);
+                        },
+                        child: TextField(
+                          autofocus: false,
+                          enabled: false,
+                          controller: context.read<FilterCubit>().searchController,
+                          onChanged: (val) => setState(() {}),
+                          onSubmitted: (val) => context.read<ProductBloc>().add(
+                              GetProducts(FilterProductParams(keyword: val))),
+                          decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.only(
+                                  left: 20, bottom: 22, top: 22),
+                              prefixIcon: const Padding(
+                                padding: EdgeInsets.only(left: 8),
+                                child: Icon(Icons.search),
+                              ),
+                              suffixIcon: context
+                                      .read<FilterCubit>()
+                                      .searchController
+                                      .text
+                                      .isNotEmpty
+                                  ? Padding(
+                                      padding: const EdgeInsets.only(right: 8),
+                                      child: IconButton(
+                                          onPressed: () {
+                                            context
+                                                .read<FilterCubit>()
+                                                .searchController
+                                                .clear();
+                                            context
+                                                .read<FilterCubit>()
+                                                .update(keyword: '');
+                                          },
+                                          icon: const Icon(Icons.clear)),
+                                    )
+                                  : null,
+                              border: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                      color: Colors.white, width: 3.0),
+                                  borderRadius: BorderRadius.circular(26)),
+                              hintText: "Search Product",
+                              fillColor: Colors.grey.shade100,
+                              filled: true,
+                              focusedBorder: OutlineInputBorder(
+                                  borderSide: const BorderSide(
+                                      color: Colors.white, width: 3.0),
+                                  borderRadius: BorderRadius.circular(26)),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(26),
                                 borderSide: const BorderSide(
                                     color: Colors.white, width: 3.0),
-                                borderRadius: BorderRadius.circular(26)),
-                            enabledBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(26),
-                              borderSide: const BorderSide(
-                                  color: Colors.white, width: 3.0),
-                            )),
+                              )),
+                        ),
                       );
                     },
                   ),
@@ -333,6 +346,13 @@ class _HomeViewState extends State<HomeView> {
                                           ),
                                           InkWell(
                                             onTap: (){
+
+                                            var firebaseService =  sl.get<FirebaseService>(
+
+                                             );
+
+                                            firebaseService.logEvent(context, "View_All", {"categoryName" : categoryName});
+
                                               context.read<FilterCubit>().update(
                                                   category: catstate.categories.firstWhere((element) => element.name == categoryName)
                                               );

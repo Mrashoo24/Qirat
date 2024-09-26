@@ -71,7 +71,7 @@ class UserRepositoryImpl implements UserRepository {
             id: remoteResponse.user?.uid ?? "",
             firstName: userName.length > 1 ? userName[0] : "",
             lastName: userName.length > 1 ? userName[1] : "",
-            email: remoteResponse.user?.email ?? "");
+            email: remoteResponse.user?.email ?? "",token: "");
 
         var gettingUser = await getUser(remoteResponse.user!.uid);
 

@@ -15,6 +15,7 @@ class UserModel extends User {
     required String lastName,
     required String email,
     String? image,
+    required String token,
     List<DeliveryInfoModel> deliveryInfos = const [], // Include deliveryInfos
   }) : super(
     id: id,
@@ -22,7 +23,7 @@ class UserModel extends User {
     lastName: lastName,
     email: email,
     image: image,
-    deliveryInfos: deliveryInfos, // Assign deliveryInfos
+    deliveryInfos: deliveryInfos,token: token // Assign deliveryInfos
   );
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
@@ -31,6 +32,7 @@ class UserModel extends User {
     lastName: json["lastName"],
     email: json["email"],
     image: json["image"],
+    token: json["token"],
     deliveryInfos: List<DeliveryInfoModel>.from(
       json["deliveryInfos"]?.map((x) => DeliveryInfoModel.fromJson(x)) ??
           [], // Parse deliveryInfos
@@ -43,6 +45,7 @@ class UserModel extends User {
     "lastName": lastName,
     "email": email,
     "image": image,
+    "token": token,
     "deliveryInfos": List<dynamic>.from(
         deliveryInfos.map((x) => (x as DeliveryInfoModel).toJson())), // Convert deliveryInfos to JSON
   };
@@ -53,6 +56,7 @@ class UserModel extends User {
     lastName: entity.lastName,
     email: entity.email,
     image: entity.image,
+    token: entity.token,
     deliveryInfos: List<DeliveryInfoModel>.from(
       entity.deliveryInfos.map((e) => DeliveryInfoModel.fromEntity(e)),
     ),

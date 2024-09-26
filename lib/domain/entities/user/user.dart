@@ -8,6 +8,7 @@ class User extends Equatable {
   final String lastName;
   final String? image;
   final String email;
+  final String token;
   final List<DeliveryInfoModel> deliveryInfos; // Add list of DeliveryInfo
 
   const User({
@@ -16,6 +17,7 @@ class User extends Equatable {
     required this.lastName,
     this.image,
     required this.email,
+    required this.token,
     this.deliveryInfos = const [], // Default empty list
   });
 

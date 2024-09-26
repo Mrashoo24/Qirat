@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:eshop/data/models/user/user_model.dart';
 import 'package:eshop/presentation/blocs/home/navbar_cubit.dart';
 import 'package:eshop/presentation/blocs/order/order_fetch/order_fetch_cubit.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -35,6 +38,9 @@ class _SignInViewState extends State<SignInView> {
         if (state is UserLoading) {
           EasyLoading.show(status: 'Loading...');
         } else if (state is UserLogged) {
+
+          FirebaseAnalytics.instance.logSignUp(signUpMethod: Platform.isAndroid ? "Android" : "Ios");
+
            context.read<CartBloc>().add(const GetCart());
           // context.read<DeliveryInfoFetchCubit>().fetchDeliveryInfo();
           // context.read<OrderFetchCubit>().getOrders();
@@ -59,28 +65,28 @@ class _SignInViewState extends State<SignInView> {
             child: Form(
               key: _formKey,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const SizedBox(
                     height: 50,
                   ),
                   SizedBox(
-                      height: 80,
+                      height: 150,
                       child: Image.asset(
                         kAppLogo,
-                        color: Colors.black,
                       )),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  const Text(
-                    "Please enter your e-mail address and password to sign-in",
-                    style: TextStyle(fontSize: 16, color: Colors.black54),
-                    textAlign: TextAlign.center,
-                  ),
-                  const Spacer(
-                    flex: 2,
-                  ),
+                  // const SizedBox(
+                  //   height: 20,
+                  // ),
+                  // const Text(
+                  //   "Please enter your e-mail address and password to sign-in",
+                  //   style: TextStyle(fontSize: 16, color: Colors.black54),
+                  //   textAlign: TextAlign.center,
+                  // ),
+                  // const Spacer(
+                  //   flex: 2,
+                  // ),
                   const SizedBox(
                     height: 24,
                   ),
@@ -155,7 +161,7 @@ class _SignInViewState extends State<SignInView> {
                   // ),
                  InkWell(
                    onTap: (){
-                       context.read<UserBloc>().add(SignInUser(UserModel(id: "id", firstName: "firstName", lastName: "lastName", email: "email")));
+                       context.read<UserBloc>().add(SignInUser(UserModel(id: "id", firstName: "firstName", lastName: "lastName", email: "email",token: "")));
                    },
                    child: Container(
                      height: 70,
@@ -173,34 +179,6 @@ class _SignInViewState extends State<SignInView> {
                       Navigator.of(context).pop();
                     },
                     titleText: 'Back',
-                  ),
-                  const Spacer(),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
-                          'Don\'t have an account! ',
-                          style: TextStyle(
-                            fontSize: 14,
-                          ),
-                        ),
-                        InkWell(
-                          onTap: () {
-                            Navigator.pushNamed(context, AppRouter.signUp);
-                          },
-                          child: const Text(
-                            'Register',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
                   ),
                 ],
               ),

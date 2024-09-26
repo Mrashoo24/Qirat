@@ -124,7 +124,7 @@ class _DeliveryInfoViewState extends State<DeliveryInfoView> {
         firstName: userModel.firstName,
         lastName: userModel.lastName,
         email: userModel.email,
-        deliveryInfos: updateDeliveryInfoList)));
+        deliveryInfos: updateDeliveryInfoList, token: userModel.token,)));
     Navigator.pop(context);
   }
 
@@ -413,7 +413,7 @@ class _DeliveryInfoFormState extends State<DeliveryInfoForm> {
         firstName: userModel.firstName,
         lastName: userModel.lastName,
         email: userModel.email,
-        deliveryInfos: updateDeliveryInfoList)));
+        deliveryInfos: updateDeliveryInfoList,token: userModel.token)));
 
     Navigator.pop(context);
   }
