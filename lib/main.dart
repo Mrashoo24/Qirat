@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -88,12 +87,12 @@ Future<void> main() async {
     await di.init();
     runApp(const MyApp());
     configLoading();
-    FirebaseAnalytics.instance.logEvent(name:"AppOpenedCustom",parameters: {"signUpMethod": Platform.isAndroid ? "Android" : "Ios"});
+    FirebaseAnalytics.instance.logEvent(name:"AppOpenedCustom",parameters: {"signUpMethod":"Web"});
   }, (error, stackTrace) async {
     // Log errors to Crashlytics
-    await FirebaseCrashlytics.instance.recordError(error, stackTrace);
-    await FirebaseCrashlytics.instance.recordFlutterFatalError(FlutterErrorDetails(exception: error,stack: stackTrace));
-    await FirebaseCrashlytics.instance.recordFlutterError(FlutterErrorDetails(exception: error,stack: stackTrace));
+    // await FirebaseCrashlytics.instance.recordError(error, stackTrace);
+    // await FirebaseCrashlytics.instance.recordFlutterFatalError(FlutterErrorDetails(exception: error,stack: stackTrace));
+    // await FirebaseCrashlytics.instance.recordFlutterError(FlutterErrorDetails(exception: error,stack: stackTrace));
 
   });
 
