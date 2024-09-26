@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:eshop/core/util/cartCalc.dart';
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../domain/entities/order/order_details.dart';
+import 'copyTextWidget.dart';
 import 'outline_label_card.dart';
 
 class OrderInfoCard extends StatelessWidget {
@@ -36,7 +38,7 @@ class OrderInfoCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  "Order Price : ${orderDetails!.orderItems.fold(0.0, (previousValue, element) => (previousValue + (element.price * element.quantity)))}",
+                  "Order Price : ₹${orderDetails?.total.toString()}",
                   style: const TextStyle(
                     fontSize: 14,
                   ),
@@ -47,6 +49,17 @@ class OrderInfoCard extends StatelessWidget {
                     fontSize: 14,
                   ),
                 ),
+                Text(
+                  "Status : ${orderDetails!.status}",
+                  style: const TextStyle(
+                    fontSize: 14,
+                  ),
+                ),
+                CopyableTextWidget(
+                  text:
+                  "Information: ${orderDetails!.info}xciokgvjxciojvxcijvcuixnvxciujvnicxnvijxcnvjcxnvxcnivjxcnvxcvnxcijvnxcjvni",
+                ),
+
                 Column(
                   children: orderDetails!.orderItems
                       .map((product) => Padding(
@@ -87,8 +100,36 @@ class OrderInfoCard extends StatelessWidget {
                               const SizedBox(
                                 height: 4,
                               ),
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(4, 4, 4, 0),
+                                child: Row(
+                                  children: [
+                                    SizedBox(
+                                      height: 24,
+                                      child:  Text(
+                                        product.priceTag.name.toString(),
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(width: 10,),
+                                    SizedBox(
+                                      height: 24,
+                                      child: Text(
+                                        "Quantity: " + product.quantity.toString(),
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
                               Text(
-                                  '\$${product.priceTag.price.toStringAsFixed(2)}')
+                                  'Unit Rate: ₹${product.priceTag.price.toStringAsFixed(2)}')
                             ],
                           ),
                         )

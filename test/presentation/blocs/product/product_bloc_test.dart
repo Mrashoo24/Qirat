@@ -100,7 +100,7 @@ void main() {
       'emits [ProductLoading, ProductLoaded] when GetMoreProducts is added and there are no more products to load',
       build: () {
         when(() => mockGetProductUseCase(tFilterProductParams))
-            .thenAnswer((_) async => Right(tProductResponseModel));
+            .thenAnswer((_) async => Right(ProductResponseModel));
         return productBloc;
       },
       act: (bloc) => bloc.add(const GetMoreProducts()),

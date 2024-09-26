@@ -69,6 +69,7 @@ dependencies:
   firebase_performance: ^0.10.0+5
   cloud_firestore: ^5.3.0
   google_sign_in: ^6.2.1
+  url_launcher:
 
 dev_dependencies:
   flutter_test:

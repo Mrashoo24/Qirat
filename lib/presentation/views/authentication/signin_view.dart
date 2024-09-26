@@ -1,3 +1,4 @@
+import 'package:eshop/data/models/user/user_model.dart';
 import 'package:eshop/presentation/blocs/home/navbar_cubit.dart';
 import 'package:eshop/presentation/blocs/order/order_fetch/order_fetch_cubit.dart';
 import 'package:flutter/material.dart';
@@ -34,9 +35,9 @@ class _SignInViewState extends State<SignInView> {
         if (state is UserLoading) {
           EasyLoading.show(status: 'Loading...');
         } else if (state is UserLogged) {
-          context.read<CartBloc>().add(const GetCart());
-          context.read<DeliveryInfoFetchCubit>().fetchDeliveryInfo();
-          context.read<OrderFetchCubit>().getOrders();
+           context.read<CartBloc>().add(const GetCart());
+          // context.read<DeliveryInfoFetchCubit>().fetchDeliveryInfo();
+          // context.read<OrderFetchCubit>().getOrders();
           context.read<NavbarCubit>().update(0);
           Navigator.of(context).pushNamedAndRemoveUntil(
             AppRouter.home,
@@ -83,74 +84,88 @@ class _SignInViewState extends State<SignInView> {
                   const SizedBox(
                     height: 24,
                   ),
-                  InputTextFormField(
-                    controller: emailController,
-                    textInputAction: TextInputAction.next,
-                    hint: 'Email',
-                    validation: (String? val) {
-                      if (val == null || val.isEmpty) {
-                        return 'This field can\'t be empty';
-                      }
-                      return null;
-                    },
-                  ),
-                  const SizedBox(
-                    height: 12,
-                  ),
-                  InputTextFormField(
-                    controller: passwordController,
-                    textInputAction: TextInputAction.go,
-                    hint: 'Password',
-                    isSecureField: true,
-                    validation: (String? val) {
-                      if (val == null || val.isEmpty) {
-                        return 'This field can\'t be empty';
-                      }
-                      return null;
-                    },
-                    onFieldSubmitted: (_) {
-                      if (_formKey.currentState!.validate()) {
-                        context.read<UserBloc>().add(SignInUser(SignInParams(
-                              username: emailController.text,
-                              password: passwordController.text,
-                            )));
-                      }
-                    },
-                  ),
-                  const SizedBox(
-                    height: 10,
-                  ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: InkWell(
-                      onTap: () {
-                        // Navigator.pushNamed(context, AppRouter.forgotPassword);
-                      },
-                      child: const Text(
-                        'Forgot Password?',
-                        style: TextStyle(
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                  ),
+                  // InputTextFormField(
+                  //   controller: emailController,
+                  //   textInputAction: TextInputAction.next,
+                  //   hint: 'Email',
+                  //   validation: (String? val) {
+                  //     if (val == null || val.isEmpty) {
+                  //       return 'This field can\'t be empty';
+                  //     }
+                  //     return null;
+                  //   },
+                  // ),
+                  // const SizedBox(
+                  //   height: 12,
+                  // ),
+                  // InputTextFormField(
+                  //   controller: passwordController,
+                  //   textInputAction: TextInputAction.go,
+                  //   hint: 'Password',
+                  //   isSecureField: true,
+                  //   validation: (String? val) {
+                  //     if (val == null || val.isEmpty) {
+                  //       return 'This field can\'t be empty';
+                  //     }
+                  //     return null;
+                  //   },
+                  //   onFieldSubmitted: (_) {
+                  //     if (_formKey.currentState!.validate()) {
+                  //       context.read<UserBloc>().add(SignInUser(SignInParams(
+                  //             username: emailController.text,
+                  //             password: passwordController.text,
+                  //           )));
+                  //     }
+                  //   },
+                  // ),
+                  // const SizedBox(
+                  //   height: 10,
+                  // ),
+                  // Align(
+                  //   alignment: Alignment.centerRight,
+                  //   child: InkWell(
+                  //     onTap: () {
+                  //       // Navigator.pushNamed(context, AppRouter.forgotPassword);
+                  //     },
+                  //     child: const Text(
+                  //       'Forgot Password?',
+                  //       style: TextStyle(
+                  //         fontSize: 14,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  // const SizedBox(
+                  //   height: 24,
+                  // ),
+                  // InputFormButton(
+                  //   color: Colors.black87,
+                  //   onClick: () {
+                  //     if (_formKey.currentState!.validate()) {
+                  //       context.read<UserBloc>().add(SignInUser(SignInParams(
+                  //             username: emailController.text,
+                  //             password: passwordController.text,
+                  //           )));
+                  //     }
+                  //   },
+                  //   titleText: 'Sign In',
+                  // ),
+                  // const SizedBox(
+                  //   height: 10,
+                  // ),
+                 InkWell(
+                   onTap: (){
+                       context.read<UserBloc>().add(SignInUser(UserModel(id: "id", firstName: "firstName", lastName: "lastName", email: "email")));
+                   },
+                   child: Container(
+                     height: 70,
+                     child: ClipRRect(
+                       child: Image.asset("assets/other_images/google_signin.png"),
+                     ),
+                   ),
+                 ),
                   const SizedBox(
                     height: 24,
-                  ),
-                  InputFormButton(
-                    color: Colors.black87,
-                    onClick: () {
-                      if (_formKey.currentState!.validate()) {
-                        context.read<UserBloc>().add(SignInUser(SignInParams(
-                              username: emailController.text,
-                              password: passwordController.text,
-                            )));
-                      }
-                    },
-                    titleText: 'Sign In',
-                  ),
-                  const SizedBox(
-                    height: 10,
                   ),
                   InputFormButton(
                     color: Colors.black87,

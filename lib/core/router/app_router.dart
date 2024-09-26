@@ -9,6 +9,7 @@ import '../../presentation/views/authentication/signin_view.dart';
 import '../../presentation/views/authentication/signup_view.dart';
 import '../../presentation/views/main/main_view.dart';
 import '../../presentation/views/main/other/about/about_view.dart';
+import '../../presentation/views/main/other/deleteAccount.dart';
 import '../../presentation/views/main/other/delivery_info/delivery_info.dart';
 import '../../presentation/views/main/other/notification/notification_view.dart';
 import '../../presentation/views/main/other/orders/order_view.dart';
@@ -36,6 +37,7 @@ class AppRouter {
   static const String about = '/about';
   static const String filter = '/filter';
   static const String productPage = '/product-page';
+  static const String deletePage = 'DeleteAccountView';
 
   static Route<dynamic> onGenerateRoute(RouteSettings routeSettings) {
     switch (routeSettings.name) {
@@ -66,15 +68,18 @@ class AppRouter {
       case orders:
         return MaterialPageRoute(builder: (_) => const OrderView());
       case settings:
-        return MaterialPageRoute(builder: (_) => const SettingsView());
+        return MaterialPageRoute(builder: (_) => const PrivacyPolicyView());
       case notifications:
-        return MaterialPageRoute(builder: (_) => const NotificationView());
+        return MaterialPageRoute(builder: (_) => const ContactUsView());
       case about:
         return MaterialPageRoute(builder: (_) => const AboutView());
       case filter:
         return MaterialPageRoute(builder: (_) => const FilterView());
       case productPage:
         return MaterialPageRoute(builder: (_) => const ProductPageView());
+      case deletePage:
+        return MaterialPageRoute(builder: (_) => const DeleteAccountView());
+
       default:
         throw const RouteException('Route not found!');
     }

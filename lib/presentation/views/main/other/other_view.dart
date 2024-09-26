@@ -93,23 +93,23 @@ class OtherView extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 25),
-          BlocBuilder<UserBloc, UserState>(
-            builder: (context, state) {
-              return OtherItemCard(
-                onClick: () {
-                  if (state is UserLogged) {
-                    Navigator.of(context).pushNamed(
-                      AppRouter.userProfile,
-                      arguments: state.user,
-                    );
-                  } else {
-                    Navigator.of(context).pushNamed(AppRouter.signIn);
-                  }
-                },
-                title: "Profile",
-              );
-            },
-          ),
+          // BlocBuilder<UserBloc, UserState>(
+          //   builder: (context, state) {
+          //     return OtherItemCard(
+          //       onClick: () {
+          //         if (state is UserLogged) {
+          //           Navigator.of(context).pushNamed(
+          //             AppRouter.userProfile,
+          //             arguments: state.user,
+          //           );
+          //         } else {
+          //           Navigator.of(context).pushNamed(AppRouter.signIn);
+          //         }
+          //       },
+          //       title: "Profile",
+          //     );
+          //   },
+          // ),
           BlocBuilder<UserBloc, UserState>(
             builder: (context, state) {
               if (state is UserLogged) {
@@ -150,14 +150,21 @@ class OtherView extends StatelessWidget {
             onClick: () {
               Navigator.of(context).pushNamed(AppRouter.settings);
             },
-            title: "Settings",
+            title: "Privacy Policy",
+          ),
+          const SizedBox(height: 6),
+          OtherItemCard(
+            onClick: () {
+              Navigator.of(context).pushNamed(AppRouter.deletePage);
+            },
+            title: "Delete Account",
           ),
           const SizedBox(height: 6),
           OtherItemCard(
             onClick: () {
               Navigator.of(context).pushNamed(AppRouter.notifications);
             },
-            title: "Notifications",
+            title: "Contact Us",
           ),
           const SizedBox(height: 6),
           OtherItemCard(

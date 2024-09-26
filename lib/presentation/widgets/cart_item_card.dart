@@ -135,7 +135,51 @@ class CartItemCard extends StatelessWidget {
                       child: Row(
                         children: [
                           SizedBox(
-                            height: 18,
+                            height: 24,
+                            child: cartItem == null
+                                ? Container(
+                              width: 100,
+                              decoration: BoxDecoration(
+                                color: Colors.grey,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            )
+                                : Text(
+                              cartItem!.priceTag.name.toString(),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 10,),
+                          SizedBox(
+                            height: 24,
+                            child: cartItem == null
+                                ? Container(
+                              width: 100,
+                              decoration: BoxDecoration(
+                                color: Colors.grey,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            )
+                                : Text(
+                              "Quantity: " + cartItem!.quantity.toString(),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(4, 4, 4, 0),
+                      child: Row(
+                        children: [
+                          SizedBox(
+                            height: 24,
                             child: cartItem == null
                                 ? Container(
                                     width: 100,
@@ -145,7 +189,7 @@ class CartItemCard extends StatelessWidget {
                                     ),
                                   )
                                 : Text(
-                                    r'$' + cartItem!.priceTag.price.toString(),
+                                    '₹' + cartItem!.priceTag.price.toString(),
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
@@ -155,6 +199,7 @@ class CartItemCard extends StatelessWidget {
                         ],
                       ),
                     ),
+
                   ],
                 ),
               )

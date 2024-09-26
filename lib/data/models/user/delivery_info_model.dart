@@ -32,6 +32,7 @@ class DeliveryInfoModel extends DeliveryInfo {
     required String city,
     required String zipCode,
     required String contactNumber,
+    required bool isSelected,
   }) : super(
           id: id,
           firstName: firstName,
@@ -41,6 +42,7 @@ class DeliveryInfoModel extends DeliveryInfo {
           city: city,
           zipCode: zipCode,
           contactNumber: contactNumber,
+    isSelected: isSelected,
         );
 
   factory DeliveryInfoModel.fromJson(Map<String, dynamic> json) =>
@@ -53,6 +55,7 @@ class DeliveryInfoModel extends DeliveryInfo {
         city: json["city"],
         zipCode: json["zipCode"],
         contactNumber: json["contactNumber"],
+        isSelected: json["isSelected"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -64,6 +67,7 @@ class DeliveryInfoModel extends DeliveryInfo {
         "city": city,
         "zipCode": zipCode,
         "contactNumber": contactNumber,
+    "isSelected": isSelected,
       };
 
   factory DeliveryInfoModel.fromEntity(DeliveryInfo entity) =>
@@ -76,5 +80,31 @@ class DeliveryInfoModel extends DeliveryInfo {
         city: entity.city,
         zipCode: entity.zipCode,
         contactNumber: entity.contactNumber,
+        isSelected: entity.isSelected,
       );
+
+  // Add copyWith method to create a new instance with updated fields
+  DeliveryInfoModel copyWith({
+    String? id,
+    String? firstName,
+    String? lastName,
+    String? addressLineOne,
+    String? addressLineTwo,
+    String? city,
+    String? zipCode,
+    String? contactNumber,
+    bool? isSelected,
+  }) {
+    return DeliveryInfoModel(
+      id: id ?? this.id,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      addressLineOne: addressLineOne ?? this.addressLineOne,
+      addressLineTwo: addressLineTwo ?? this.addressLineTwo,
+      city: city ?? this.city,
+      zipCode: zipCode ?? this.zipCode,
+      contactNumber: contactNumber ?? this.contactNumber,
+      isSelected: isSelected ?? this.isSelected,
+    );
+  }
 }

@@ -1,3 +1,4 @@
+import 'package:eshop/data/firebase/firebase_services.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../../core/error/exceptions.dart';
@@ -17,56 +18,59 @@ abstract class DeliveryInfoRemoteDataSource {
 }
 
 class DeliveryInfoRemoteDataSourceImpl implements DeliveryInfoRemoteDataSource {
-  final http.Client client;
+  final FirebaseService client;
   DeliveryInfoRemoteDataSourceImpl({required this.client});
 
   @override
   Future<List<DeliveryInfoModel>> getDeliveryInfo(token) async {
-    final response = await client.get(
-      Uri.parse('$baseUrl/users/delivery-info'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
-    if (response.statusCode == 200) {
-      return deliveryInfoModelListFromRemoteJson(response.body);
-    } else {
-      throw ServerException();
-    }
+
+
+    //
+    // final response = await client.get(
+    //   Uri.parse('$baseUrl/users/delivery-info'),
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'Authorization': 'Bearer $token',
+    //   },
+    // );
+    // if (response.statusCode == 200) {
+    //   return deliveryInfoModelListFromRemoteJson(response.body);
+    // } else {
+       throw ServerException();
+    // }
   }
 
   @override
   Future<DeliveryInfoModel> addDeliveryInfo(params, token) async {
-    final response = await client.post(
-      Uri.parse('$baseUrl/users/delivery-info'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: deliveryInfoModelToJson(params),
-    );
-    if (response.statusCode == 200) {
-      return deliveryInfoModelFromRemoteJson(response.body);
-    } else {
+    // final response = await client.post(
+    //   Uri.parse('$baseUrl/users/delivery-info'),
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'Authorization': 'Bearer $token',
+    //   },
+    //   body: deliveryInfoModelToJson(params),
+    // );
+    // if (response.statusCode == 200) {
+    //   return deliveryInfoModelFromRemoteJson(response.body);
+    // } else {
       throw ServerException();
-    }
+    // }
   }
 
   @override
   Future<DeliveryInfoModel> editDeliveryInfo(DeliveryInfoModel params, String token) async {
-    final response = await client.put(
-      Uri.parse('$baseUrl/users/delivery-info'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: deliveryInfoModelToJson(params),
-    );
-    if (response.statusCode == 200) {
-      return deliveryInfoModelFromRemoteJson(response.body);
-    } else {
+    // final response = await client.put(
+    //   Uri.parse('$baseUrl/users/delivery-info'),
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //     'Authorization': 'Bearer $token',
+    //   },
+    //   body: deliveryInfoModelToJson(params),
+    // );
+    // if (response.statusCode == 200) {
+    //   return deliveryInfoModelFromRemoteJson(response.body);
+    // } else {
       throw ServerException();
-    }
+    // }
   }
 }

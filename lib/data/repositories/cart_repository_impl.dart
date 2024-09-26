@@ -39,9 +39,21 @@ class CartRepositoryImpl implements CartRepository {
   }
 
   @override
-  Future<Either<Failure, bool>> deleteFormCart() {
-    // TODO: implement deleteFormCart
-    throw UnimplementedError();
+  Future<Either<Failure, bool>> deleteFormCart(CartItem params) async {
+    if (await userLocalDataSource.isTokenAvailable()) {
+    await localDataSource.deleteCartItem(CartItemModel.fromParent(params));
+    final String token = await userLocalDataSource.getToken();
+
+    final remoteProduct = await remoteDataSource.deleteCart(
+    CartItemModel.fromParent(params),
+    token,
+    );
+
+    return const Right(true);
+    } else {
+    await localDataSource.deleteCartItem(CartItemModel.fromParent(params));
+    return const Right(true);
+    }
   }
 
   @override
@@ -64,6 +76,7 @@ class CartRepositoryImpl implements CartRepository {
         } on Failure catch (_) {}
         try {
           final String token = await userLocalDataSource.getToken();
+
           final syncedResult = await remoteDataSource.syncCart(
             localCartItems,
             token,

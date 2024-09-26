@@ -4,7 +4,7 @@ part of 'user_bloc.dart';
 abstract class UserEvent {}
 
 class SignInUser extends UserEvent {
-  final SignInParams params;
+  final UserModel params;
   SignInUser(this.params);
 }
 
@@ -16,3 +16,8 @@ class SignUpUser extends UserEvent {
 class SignOutUser extends UserEvent {}
 
 class CheckUser extends UserEvent {}
+
+class UpdateUser extends UserEvent {
+  final UserModel params;
+  UpdateUser(this.params);
+}

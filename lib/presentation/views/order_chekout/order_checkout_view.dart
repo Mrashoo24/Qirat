@@ -1,7 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:eshop/core/constant/strings.dart';
 import 'package:eshop/core/extension/string_extension.dart';
+import 'package:eshop/core/util/cartCalc.dart';
 import 'package:eshop/presentation/blocs/cart/cart_bloc.dart';
 import 'package:eshop/presentation/blocs/home/navbar_cubit.dart';
+import 'package:eshop/presentation/blocs/user/user_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -15,6 +18,7 @@ import '../../blocs/delivery_info/delivery_info_fetch/delivery_info_fetch_cubit.
 import '../../blocs/order/order_add/order_add_cubit.dart';
 import '../../widgets/input_form_button.dart';
 import '../../widgets/outline_label_card.dart';
+import 'package:collection/collection.dart';
 
 class OrderCheckoutView extends StatelessWidget {
   final List<CartItem> items;
@@ -58,34 +62,47 @@ class OrderCheckoutView extends StatelessWidget {
                       padding: const EdgeInsets.only(top: 8),
                       child: OutlineLabelCard(
                         title: 'Delivery Details',
-                        child: BlocBuilder<DeliveryInfoFetchCubit,
-                            DeliveryInfoFetchState>(
+                        child: BlocBuilder<UserBloc,
+                            UserState>(
                           builder: (context, state) {
-                            if (state.deliveryInformation.isNotEmpty &&
-                                state.selectedDeliveryInformation != null) {
-                              return Container(
-                                padding: const EdgeInsets.only(
-                                    top: 16, bottom: 12, left: 4, right: 10),
-                                child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "${state.selectedDeliveryInformation!.firstName.capitalize()} ${state.selectedDeliveryInformation!.lastName}, ${state.selectedDeliveryInformation!.contactNumber}",
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                        ),
-                                      ),
-                                      Text(
-                                        "${state.selectedDeliveryInformation!.addressLineOne}, ${state.selectedDeliveryInformation!.addressLineTwo}, ${state.selectedDeliveryInformation!.city}, ${state.selectedDeliveryInformation!.zipCode}",
-                                        style: const TextStyle(
+                            if (state is UserLogged) {
+
+                              var selectedDeliveryInfo = state.user.deliveryInfos.firstWhereOrNull((element) => element.isSelected);
+
+                             if(selectedDeliveryInfo != null) {
+                                return Container(
+                                  padding: const EdgeInsets.only(
+                                      top: 16, bottom: 12, left: 4, right: 10),
+                                  child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "${selectedDeliveryInfo.firstName.capitalize()} ${selectedDeliveryInfo.lastName}, ${selectedDeliveryInfo.contactNumber}",
+                                          style: const TextStyle(
                                             fontSize: 14,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                    ]),
-                              );
+                                          ),
+                                        ),
+                                        Text(
+                                          "${selectedDeliveryInfo.addressLineOne}, ${selectedDeliveryInfo.addressLineTwo}, ${selectedDeliveryInfo.city}, ${selectedDeliveryInfo.zipCode}",
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      ]),
+                                );
+                              }else{
+                               return Container(
+                                 height: 50,
+                                 padding: const EdgeInsets.only(
+                                     top: 20, bottom: 8, left: 4),
+                                 child: const Text(
+                                   "Please select delivery information",
+                                 ),
+                               );
+                             }
                             } else {
                               return Container(
                                 height: 50,
@@ -164,7 +181,16 @@ class OrderCheckoutView extends StatelessWidget {
                                             height: 4,
                                           ),
                                           Text(
-                                              '\$${product.priceTag.price.toStringAsFixed(2)}')
+                                          "Quantity: ${product.quantity}",
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .labelLarge,
+                                          ),
+                                          const SizedBox(
+                                            height: 4,
+                                          ),
+                                          Text(
+                                             'Unit Rate: ' '₹${product.priceTag.price.toStringAsFixed(2)}')
                                         ],
                                       ),
                                     )
@@ -181,8 +207,8 @@ class OrderCheckoutView extends StatelessWidget {
                 OutlineLabelCard(
                   title: 'Order Summery',
                   child: Container(
-                    height: 120,
-                    padding: const EdgeInsets.symmetric(vertical: 8),
+
+                    padding: const EdgeInsets.symmetric(vertical: 15),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -198,21 +224,23 @@ class OrderCheckoutView extends StatelessWidget {
                           children: [
                             const Text("Total Price"),
                             Text(
-                                "\$${items.fold(0.0, (previousValue, element) => (element.priceTag.price + previousValue))}")
+                                "₹${CartCalculator.getTotal(items)}")
                           ],
                         ),
                         const Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [Text("Delivery Charge"), Text("\$4.99")],
+                          children: [Text("Delivery Charge"), Text("₹0.00")],
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const Text("Total"),
                             Text(
-                                "\$${(items.fold(0.0, (previousValue, element) => (element.priceTag.price + previousValue)) + 4.99)}")
+                                "₹${CartCalculator.getTotal(items)}"),
                           ],
-                        )
+                        ),
+                        Text(
+                            " Including Tax ₹${CartCalculator.getTotalWithoutTax(CartCalculator.getTotal(items)).toStringAsFixed(2)}"),
                       ],
                     ),
                   ),
@@ -227,29 +255,32 @@ class OrderCheckoutView extends StatelessWidget {
                 return InputFormButton(
                   color: Colors.black87,
                   onClick: () {
-                    if (context
-                            .read<DeliveryInfoFetchCubit>()
-                            .state
-                            .selectedDeliveryInformation ==
-                        null) {
-                      EasyLoading.showError("Error \nPlease select delivery add your delivery information");
+                    var currentState = context
+                        .read<UserBloc>()
+                        .state;
+                    if (currentState is UserLogged) {
+
+                      if(currentState.user.deliveryInfos.isNotEmpty && currentState.user.deliveryInfos.where((element) => element.isSelected).isNotEmpty){
+                        context.read<OrderAddCubit>().addOrder(OrderDetails(
+                            id: '',
+                            orderItems: items
+                                .map((item) => OrderItem(
+                              id: '',
+                              product: item.product,
+                              priceTag: item.priceTag,
+                              price: item.priceTag.price,
+                              quantity: item.quantity,
+                            ))
+                                .toList(),
+                            deliveryInfo: currentState.user.deliveryInfos.firstWhere((element) => element.isSelected),
+                            discount: 0, uid:currentState.user.id, total:CartCalculator.getTotal(items) , status: statuesPending,info: ""));
+                      }else{
+                        EasyLoading.showError("Error \nPlease select delivery add your delivery information");
+                      }
+
+
                     } else {
-                      context.read<OrderAddCubit>().addOrder(OrderDetails(
-                          id: '',
-                          orderItems: items
-                              .map((item) => OrderItem(
-                                    id: '',
-                                    product: item.product,
-                                    priceTag: item.priceTag,
-                                    price: item.priceTag.price,
-                                    quantity: 1,
-                                  ))
-                              .toList(),
-                          deliveryInfo: context
-                              .read<DeliveryInfoFetchCubit>()
-                              .state
-                              .selectedDeliveryInformation!,
-                          discount: 0));
+                      EasyLoading.showError("Error \nPlease select delivery add your delivery information");
                     }
                   },
                   titleText: 'Confirm',

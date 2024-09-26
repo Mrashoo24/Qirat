@@ -7,6 +7,7 @@ abstract class CartLocalDataSource {
   Future<List<CartItemModel>> getCart();
   Future<void> saveCart(List<CartItemModel> cart);
   Future<void> saveCartItem(CartItemModel cartItem);
+  Future<void> deleteCartItem(CartItemModel cartItem);
   Future<bool> clearCart();
 }
 
@@ -32,10 +33,29 @@ class CartLocalDataSourceImpl implements CartLocalDataSource {
       cart.addAll(cartItemModelListFromLocalJson(jsonString));
     }
     if (!cart.any((element) =>
-        element.product.id == cartItem.product.id &&
-        element.priceTag.id == cartItem.priceTag.id)) {
+        element.id == cartItem.id)) {
       cart.add(cartItem);
+    }else{
+      var index =   cart.indexOf(cartItem);
+      cart[index] = cartItem;
     }
+    return sharedPreferences.setString(
+      cachedCart,
+      cartItemModelToJson(cart),
+    );
+  }
+
+  @override
+  Future<void> deleteCartItem(CartItemModel cartItem) {
+    final jsonString = sharedPreferences.getString(cachedCart);
+    final List<CartItemModel> cart = [];
+    if (jsonString != null) {
+      cart.addAll(cartItemModelListFromLocalJson(jsonString));
+    }
+
+      var index =   cart.indexOf(cartItem);
+      cart.removeAt(index);
+
     return sharedPreferences.setString(
       cachedCart,
       cartItemModelToJson(cart),

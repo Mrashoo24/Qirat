@@ -9,6 +9,7 @@ class DeliveryInfo extends Equatable {
   final String city;
   final String zipCode;
   final String contactNumber;
+  final bool isSelected;
 
   const DeliveryInfo({
     required this.id,
@@ -19,6 +20,8 @@ class DeliveryInfo extends Equatable {
     required this.city,
     required this.zipCode,
     required this.contactNumber,
+    required this.isSelected,
+
   });
 
   @override

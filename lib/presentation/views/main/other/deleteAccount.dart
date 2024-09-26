@@ -1,59 +1,19 @@
 import 'package:flutter/material.dart';
 
-class PrivacyPolicyView extends StatelessWidget {
-  const PrivacyPolicyView({Key? key}) : super(key: key);
+class DeleteAccountView extends StatelessWidget {
+  const DeleteAccountView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Privacy Policy"),
+        title: const Text("Delete Policy"),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Privacy Policy',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 24,
-              ),
-            ),
-            const SizedBox(height: 10),
-            const Text('Last updated: September 25, 2024'),
-            const SizedBox(height: 20),
-            const Text(
-              'This Privacy Policy describes Our policies and procedures on the collection, use, and disclosure of Your information when You use the Service and tells You about Your privacy rights and how the law protects You. We use Your Personal data to provide and improve the Service. By using the Service, You agree to the collection and use of information in accordance with this Privacy Policy.',
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Interpretation and Definitions',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
-            const SizedBox(height: 10),
-            _buildRichText('Account', 'A unique account created for You to access our Service or parts of our Service.'),
-            _buildRichText('Personal Data', 'Any information that relates to an identified or identifiable individual.'),
-            _buildRichText(
-              'Service Provider',
-              'A natural or legal person who processes data on behalf of the Company, providing services related to the application.',
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Collecting and Using Your Personal Data',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
-            const SizedBox(height: 10),
-            _buildRichText('Personal Data', 'We may collect your name, email, phone number, and other identifiable information.'),
-            _buildRichText('Usage Data', 'Includes IP address, browser type, version, and pages you visit in the application.'),
-            const SizedBox(height: 20),
             const Text(
               'Delete Your Personal Data',
               style: TextStyle(

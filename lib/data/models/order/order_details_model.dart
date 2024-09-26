@@ -29,12 +29,12 @@ class OrderDetailsModel extends OrderDetails {
     required String id,
     required List<OrderItemModel> orderItems,
     required DeliveryInfoModel deliveryInfo,
-    required num discount,
+    required num discount,  required String uid, required double total,required String status,required String info
   }) : super(
           id: id,
           orderItems: orderItems,
           deliveryInfo: deliveryInfo,
-          discount: discount,
+          discount: discount,uid: uid,total: total,status: status,info: info
         );
 
   factory OrderDetailsModel.fromJson(Map<String, dynamic> json) =>
@@ -44,6 +44,10 @@ class OrderDetailsModel extends OrderDetails {
             json["orderItems"].map((x) => OrderItemModel.fromJson(x))),
         deliveryInfo: DeliveryInfoModel.fromJson(json["deliveryInfo"]),
         discount: json["discount"],
+        uid: json["uid"],
+        total: json["total"],
+        status: json["status"],
+        info: json["info"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -52,6 +56,10 @@ class OrderDetailsModel extends OrderDetails {
             (orderItems as List<OrderItemModel>).map((x) => x.toJson())),
         "deliveryInfo": (deliveryInfo as DeliveryInfoModel).toJson(),
         "discount": discount,
+    "uid": uid,
+    "total": total,
+    "status": status,
+    "info": info,
       };
 
   Map<String, dynamic> toJsonBody() => {
@@ -60,6 +68,10 @@ class OrderDetailsModel extends OrderDetails {
             (orderItems as List<OrderItemModel>).map((x) => x.toJsonBody())),
         "deliveryInfo": deliveryInfo.id,
         "discount": discount,
+    "uid": uid,
+    "total": total,
+    "status": status,
+    "info": info,
       };
 
   factory OrderDetailsModel.fromEntity(OrderDetails entity) =>
@@ -69,5 +81,11 @@ class OrderDetailsModel extends OrderDetails {
               .map((orderItem) => OrderItemModel.fromEntity(orderItem))
               .toList(),
           deliveryInfo: DeliveryInfoModel.fromEntity(entity.deliveryInfo),
-          discount: entity.discount);
+          discount: entity.discount,
+        status: entity.status,
+        uid: entity.uid,
+        total: entity.total,
+        info: entity.info,
+
+      );
 }

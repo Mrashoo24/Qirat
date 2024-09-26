@@ -26,7 +26,10 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     on<GetCart>(_onGetCart);
     on<AddProduct>(_onAddToCart);
     on<ClearCart>(_onClearCart);
+    on<RemoveProduct>(_onRemoveProduct);
+
   }
+
 
   void _onGetCart(GetCart event, Emitter<CartState> emit) async {
     try {
@@ -36,6 +39,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         (failure) => emit(CartError(cart: state.cart, failure: failure)),
         (cart) => emit(CartLoaded(cart: cart)),
       );
+
       final syncResult = await _syncCartUseCase(NoParams());
       emit(CartLoading(cart: state.cart));
       syncResult.fold(
@@ -52,8 +56,34 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       emit(CartLoading(cart: state.cart));
       List<CartItem> cart = [];
       cart.addAll(state.cart);
-      cart.add(event.cartItem);
+
+      if (!cart.any((element) =>
+      element.id == event.cartItem.id)) {
+        cart.add(event.cartItem);
+      }else{
+        var index =   cart.indexWhere((element) => element.id == event.cartItem.id);
+        cart[index] = event.cartItem;
+      }
       var result = await _addCartUseCase(event.cartItem);
+      result.fold(
+            (failure) => emit(CartError(cart: state.cart, failure: failure)),
+            (_) => emit(CartLoaded(cart: cart)),
+      );
+    } catch (e) {
+      emit(CartError(cart: state.cart, failure: ExceptionFailure()));
+    }
+  }
+
+  void _onRemoveProduct(RemoveProduct event, Emitter<CartState> emit) async {
+    try {
+      emit(CartLoading(cart: state.cart));
+      List<CartItem> cart = [];
+      cart.addAll(state.cart);
+
+        var index =   cart.indexWhere((element) => element.id == event.cartItem.id);
+        cart.removeAt(index);
+
+      var result = await _addCartUseCase.deleteCart(event.cartItem);
       result.fold(
             (failure) => emit(CartError(cart: state.cart, failure: failure)),
             (_) => emit(CartLoaded(cart: cart)),

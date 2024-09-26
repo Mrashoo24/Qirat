@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:eshop/core/usecases/usecase.dart';
+import 'package:eshop/data/models/user/user_model.dart';
 
 import '../../../../core/error/failures.dart';
 import '../../core/network/network_info.dart';
@@ -29,9 +30,9 @@ class DeliveryInfoRepositoryImpl implements DeliveryInfoRepository {
       if (await userLocalDataSource.isTokenAvailable()) {
         try {
           final String token = await userLocalDataSource.getToken();
-          final result = await remoteDataSource.getDeliveryInfo(
-            token,
-          );
+          final UserModel userModel = await userLocalDataSource.getUser();
+          final result = userModel.deliveryInfos;
+
           await localDataSource.saveDeliveryInfo(result);
           return Right(result);
         } on Failure catch (failure) {

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:eshop/data/models/user/delivery_info_model.dart';
+import 'package:eshop/data/models/user/user_model.dart';
 import 'package:eshop/domain/usecases/user/sign_out_usecase.dart';
 import 'package:eshop/domain/usecases/user/sign_up_usecase.dart';
 import 'package:flutter/cupertino.dart';
@@ -20,6 +22,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   final SignInUseCase _signInUseCase;
   final SignUpUseCase _signUpUseCase;
   final SignOutUseCase _signOutUseCase;
+
   UserBloc(
     this._signInUseCase,
     this._getCachedUserUseCase,
@@ -30,15 +33,26 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<SignUpUser>(_onSignUp);
     on<CheckUser>(_onCheckUser);
     on<SignOutUser>(_onSignOut);
+    on<UpdateUser>(_updateUser);
+
   }
 
   void _onSignIn(SignInUser event, Emitter<UserState> emit) async {
     try {
       emit(UserLoading());
+
+
       final result = await _signInUseCase(event.params);
+
+
+
+
       result.fold(
         (failure) => emit(UserLoggedFail(failure)),
-        (user) => emit(UserLogged(user)),
+        (user) {
+             return  emit(UserLogged(user));
+
+        }
       );
     } catch (e) {
       emit(UserLoggedFail(ExceptionFailure()));
@@ -80,4 +94,21 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       emit(UserLoggedFail(ExceptionFailure()));
     }
   }
+
+  void _updateUser(UpdateUser event, Emitter<UserState> emit) async {
+
+    try {
+      emit(UserLoading());
+      final result = await _signInUseCase.updateUser(event.params);
+
+      result.fold(
+            (failure) => emit(UserLoggedFail(failure)),
+            (user) => emit(UserLogged(user)),
+      );
+    } catch (e) {
+      emit(UserLoggedFail(ExceptionFailure()));
+    }
+
+  }
+
 }

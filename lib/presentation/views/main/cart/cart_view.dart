@@ -1,3 +1,4 @@
+import 'package:eshop/core/util/cartCalc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -22,6 +23,11 @@ class _CartViewState extends State<CartView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        foregroundColor: Colors.black,
+        backgroundColor: Colors.white,
+        title: const Text("Cart"),
+      ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20),
         child: Stack(
@@ -135,7 +141,7 @@ class _CartViewState extends State<CartView> {
                               style: const TextStyle(fontSize: 16),
                             ),
                             Text(
-                              '\$${state.cart.fold(0.0, (previousValue, element) => (element.priceTag.price + previousValue))}',
+                              '₹${CartCalculator.getTotal(state.cart)}',
                               style: const TextStyle(
                                   fontSize: 18, fontWeight: FontWeight.w500),
                             ),

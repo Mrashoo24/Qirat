@@ -1,4 +1,5 @@
 import 'package:eshop/core/extension/string_extension.dart';
+import 'package:eshop/presentation/blocs/user/user_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
@@ -11,8 +12,9 @@ import 'outline_label_card.dart';
 class DeliveryInfoCard extends StatelessWidget {
   final DeliveryInfo? deliveryInformation;
   final bool isSelected;
+  final void Function() onTap;
   const DeliveryInfoCard(
-      {Key? key, this.deliveryInformation, this.isSelected = false})
+      {Key? key, this.deliveryInformation, this.isSelected = false,required this.onTap})
       : super(key: key);
 
   @override
@@ -21,9 +23,7 @@ class DeliveryInfoCard extends StatelessWidget {
       return Padding(
         padding: const EdgeInsets.only(bottom: 10),
         child: InkWell(
-          onTap: () {
-            context.read<DeliveryInfoActionCubit>().selectDeliveryInfo(deliveryInformation!);
-          },
+          onTap: onTap,
           child: OutlineLabelCard(
             title: '',
             child: Container(
@@ -66,7 +66,7 @@ class DeliveryInfoCard extends StatelessWidget {
                                 ),
                                 builder: (BuildContext context) {
                                   return DeliveryInfoForm(
-                                    deliveryInfo: deliveryInformation,
+                                    deliveryInfo: deliveryInformation,state: context.read<UserBloc>().state as UserLogged,
                                   );
                                 },
                               );

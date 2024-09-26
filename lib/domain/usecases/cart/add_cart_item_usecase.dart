@@ -13,4 +13,8 @@ class AddCartUseCase implements UseCase<void, CartItem> {
   Future<Either<Failure, void>> call(CartItem params) async {
     return await repository.addToCart(params);
   }
+
+  Future<Either<Failure, void>> deleteCart(CartItem params) async {
+    return await repository.deleteFormCart(params);
+  }
 }

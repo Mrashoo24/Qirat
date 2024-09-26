@@ -1,12 +1,27 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../core/constant/images.dart';
 import '../../../../blocs/order/order_fetch/order_fetch_cubit.dart';
 import '../../../../widgets/order_info_card.dart';
+import '../../../../../core/services/services_locator.dart' as di;
 
-class OrderView extends StatelessWidget {
+class OrderView extends StatefulWidget {
   const OrderView({Key? key}) : super(key: key);
+
+  @override
+  State<OrderView> createState() => _OrderViewState();
+}
+
+class _OrderViewState extends State<OrderView> {
+
+
+  @override
+  void initState() {
+    context.read<OrderFetchCubit>().getOrders();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

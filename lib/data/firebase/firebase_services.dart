@@ -129,14 +129,25 @@ class FirebaseService {
   }
 
   /// Add or update a document in a collection
-  Future<void> setDocument({
+  Future<String?> setDocument({
     required String collectionPath,
-    required String documentId,
+     String? documentId,
     required Map<String, dynamic> data,
     bool merge = true, // To merge or replace existing document
   }) async {
     try {
-      await firestore.collection(collectionPath).doc(documentId).set(data, SetOptions(merge: merge));
+      if(documentId != null){
+        await firestore
+            .collection(collectionPath)
+            .doc(documentId)
+            .set(data, SetOptions(merge: merge));
+        return null;
+      }else{
+      var doc =   await firestore
+            .collection(collectionPath)
+            .add(data);
+        return doc.id;
+      }
     } catch (e) {
       throw Exception('Failed to set document: $e');
     }
