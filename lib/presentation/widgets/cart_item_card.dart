@@ -90,8 +90,9 @@ class CartItemCard extends StatelessWidget {
                             ),
                           )
                         : Padding(
-                            padding: const EdgeInsets.all(24.0),
+                            padding: const EdgeInsets.all(0.0),
                             child: CachedNetworkImage(
+
                               imageUrl: cartItem!.product.images.first,
                               placeholder: (context, url) => const Center(
                                   child: CircularProgressIndicator()),

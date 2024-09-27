@@ -12,6 +12,7 @@ import '../../../blocs/filter/filter_cubit.dart';
 import '../../../blocs/product/product_bloc.dart';
 import '../../../widgets/alert_card.dart';
 import '../../../widgets/product_card.dart';
+import 'home_view.dart';
 
 class SearchView extends StatefulWidget {
   const SearchView({Key? key}) : super(key: key);
@@ -151,7 +152,7 @@ class _SearchViewState extends State<SearchView> {
           ),
           Expanded(
             child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 8,vertical: 20),
                 child: BlocBuilder<FilterCubit, FilterProductParams>(
                     builder: (context, filterstate) {
                       return BlocBuilder<ProductBloc, ProductState>(
@@ -240,38 +241,8 @@ class _SearchViewState extends State<SearchView> {
                                     .read<ProductBloc>()
                                     .add(const GetProducts(FilterProductParams()));
                               },
-                              child: GridView.builder(
-                                itemCount: listoFProduct.length +
-                                    ((state is ProductLoading) ? 10 : 0),
-                                controller: scrollController,
-                                padding: EdgeInsets.only(
-                                    top: 18,
-                                    left: 20,
-                                    right: 20,
-                                    bottom: (80 + MediaQuery.of(context).padding.bottom)),
-                                gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  childAspectRatio: 0.55,
-                                  crossAxisSpacing: 12,
-                                  mainAxisSpacing: 20,
-                                ),
-                                physics: const BouncingScrollPhysics(),
-                                shrinkWrap: true,
-                                itemBuilder: (BuildContext context, int index) {
-                                  if (listoFProduct.length > index) {
-                                    return ProductCard(
-                                      product: state.products[index],
-                                    );
-                                  } else {
-                                    return Shimmer.fromColors(
-                                      baseColor: Colors.grey.shade100,
-                                      highlightColor: Colors.white,
-                                      child: const ProductCard(),
-                                    );
-                                  }
-                                },
-                              ),
+                              child:                                     ProductGrid(products: listoFProduct, scrollController: scrollController,state: state,),
+
                             );
                           });
                     }

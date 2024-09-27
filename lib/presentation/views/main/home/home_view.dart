@@ -4,6 +4,7 @@ import 'package:eshop/presentation/blocs/category/category_bloc.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../../core/constant/images.dart';
@@ -113,11 +114,11 @@ class _HomeViewState extends State<HomeView> {
                           style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 36),
                         ),
-                        Text(
-                          "E-Shop mobile store",
-                          style: TextStyle(
-                              fontWeight: FontWeight.normal, fontSize: 22),
-                        ),
+                        // Text(
+                        //   "Qirat Shop",
+                        //   style: TextStyle(
+                        //       fontWeight: FontWeight.normal, fontSize: 22),
+                        // ),
                       ],
                     ),
                     GestureDetector(
@@ -150,14 +151,16 @@ class _HomeViewState extends State<HomeView> {
                   child: BlocBuilder<FilterCubit, FilterProductParams>(
                     builder: (context, state) {
                       return InkWell(
-                        onTap: (){
-                          FirebaseAnalytics.instance.logEvent(name:"SearchClicked");
+                        onTap: () {
+                          FirebaseAnalytics.instance
+                              .logEvent(name: "SearchClicked");
                           Navigator.pushNamed(context, AppRouter.searchView);
                         },
                         child: TextField(
                           autofocus: false,
                           enabled: false,
-                          controller: context.read<FilterCubit>().searchController,
+                          controller:
+                              context.read<FilterCubit>().searchController,
                           onChanged: (val) => setState(() {}),
                           onSubmitted: (val) => context.read<ProductBloc>().add(
                               GetProducts(FilterProductParams(keyword: val))),
@@ -245,119 +248,128 @@ class _HomeViewState extends State<HomeView> {
             child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: BlocBuilder<CategoryBloc, CategoryState>(
-                  builder: (context, catstate) {
-                    return BlocBuilder<ProductBloc, ProductState>(
-                        builder: (context, state) {
-                      //Result Empty and No Error
-                      if (state is ProductLoaded && state.products.isEmpty) {
-                        return const AlertCard(
-                          image: kEmpty,
-                          message: "Products not found!",
-                        );
-                      }
-                      //Error and no preloaded data
-                      if (state is ProductError && state.products.isEmpty) {
-                        if (state.failure is NetworkFailure) {
-                          return AlertCard(
-                            image: kNoConnection,
-                            message: "Network failure\nTry again!",
-                            onClick: () {
-                              context.read<ProductBloc>().add(GetProducts(
-                                  FilterProductParams(
-                                      keyword: context
-                                          .read<FilterCubit>()
-                                          .searchController
-                                          .text)));
-                            },
-                          );
-                        }
-                        return Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (state.failure is ServerFailure)
-                              Image.asset(
-                                  'assets/status_image/internal-server-error.png'),
-                            if (state.failure is CacheFailure)
-                              Image.asset('assets/status_image/no-connection.png'),
-                            const Text("Products not found!"),
-                            IconButton(
-                                onPressed: () {
-                                  context.read<ProductBloc>().add(GetProducts(
-                                      FilterProductParams(
-                                          keyword: context
-                                              .read<FilterCubit>()
-                                              .searchController
-                                              .text)));
-                                },
-                                icon: const Icon(Icons.refresh)),
-                            SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.1,
-                            )
-                          ],
-                        );
-                      }
-
-                      // Group products by category
-                      final Map<String, List<Product>> categoryProductMap = {};
-                      for (var product in state.products) {
-                       var catname =  catstate.categories.firstWhere((element) => element.id == product.categories.first).name;
-                        categoryProductMap.putIfAbsent(
-                          catname, // Assuming `category` is a field in the `ProductModel`
-                              () => [],
-                        );
-                        categoryProductMap[catname]!.add(product);
-                      }
-
-
-                      return Padding(
-                        padding: EdgeInsets.only(
-                          top: 18,
-                          left: 20,
-                          right: 20,
-                          bottom: (80 + MediaQuery.of(context).padding.bottom),
-                        ),
-                        child: RefreshIndicator(
-                          onRefresh: () async {
-                            context
-                                .read<ProductBloc>()
-                                .add(const GetProducts(FilterProductParams()));
+                    builder: (context, catstate) {
+                  return BlocBuilder<ProductBloc, ProductState>(
+                      builder: (context, state) {
+                    //Result Empty and No Error
+                    if (state is ProductLoaded && state.products.isEmpty) {
+                      return const AlertCard(
+                        image: kEmpty,
+                        message: "Products not found!",
+                      );
+                    }
+                    //Error and no preloaded data
+                    if (state is ProductError && state.products.isEmpty) {
+                      if (state.failure is NetworkFailure) {
+                        return AlertCard(
+                          image: kNoConnection,
+                          message: "Network failure\nTry again!",
+                          onClick: () {
+                            context.read<ProductBloc>().add(GetProducts(
+                                FilterProductParams(
+                                    keyword: context
+                                        .read<FilterCubit>()
+                                        .searchController
+                                        .text)));
                           },
-                          child: SingleChildScrollView(
-                            child: Column(
+                        );
+                      }
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (state.failure is ServerFailure)
+                            Image.asset(
+                                'assets/status_image/internal-server-error.png'),
+                          if (state.failure is CacheFailure)
+                            Image.asset(
+                                'assets/status_image/no-connection.png'),
+                          const Text("Products not found!"),
+                          IconButton(
+                              onPressed: () {
+                                context.read<ProductBloc>().add(GetProducts(
+                                    FilterProductParams(
+                                        keyword: context
+                                            .read<FilterCubit>()
+                                            .searchController
+                                            .text)));
+                              },
+                              icon: const Icon(Icons.refresh)),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 0.1,
+                          )
+                        ],
+                      );
+                    }
+
+                    // Group products by category
+                    final Map<String, List<Product>> categoryProductMap = {};
+                    for (var product in state.products) {
+                      var catname = catstate.categories
+                          .firstWhere((element) =>
+                              element.id == product.categories.first)
+                          .name;
+                      categoryProductMap.putIfAbsent(
+                        catname, // Assuming `category` is a field in the `ProductModel`
+                        () => [],
+                      );
+                      categoryProductMap[catname]!.add(product);
+                    }
+
+                    return Padding(
+                      padding: EdgeInsets.only(
+                        top: 18,
+                        left: 20,
+                        right: 20,
+                        bottom: (80 + MediaQuery.of(context).padding.bottom),
+                      ),
+                      child: RefreshIndicator(
+                        onRefresh: () async {
+                          context
+                              .read<ProductBloc>()
+                              .add(const GetProducts(FilterProductParams()));
+                        },
+                        child: SingleChildScrollView(
+                          child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children:categoryProductMap.entries.map((entry) {
+                              children: categoryProductMap.entries.map((entry) {
                                 final categoryName = entry.key;
                                 final products = entry.value;
 
-                               return  Column(
-                                 crossAxisAlignment: CrossAxisAlignment.start,
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Padding(
-                                      padding: const EdgeInsets.only(top: 16.0, bottom: 8),
+                                      padding: const EdgeInsets.only(
+                                          top: 16.0, bottom: 8),
                                       child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            categoryName.toUpperCase(), // Display the category name
+                                            categoryName
+                                                .toUpperCase(), // Display the category name
                                             style: TextStyle(
                                               fontSize: 18,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
                                           InkWell(
-                                            onTap: (){
+                                            onTap: () {
+                                              var firebaseService =
+                                                  sl.get<FirebaseService>();
 
-                                            var firebaseService =  sl.get<FirebaseService>(
-
-                                             );
-
-                                            firebaseService.logEvent(context, "View_All", {"categoryName" : categoryName});
+                                              firebaseService.logEvent(
+                                                  context, "View_All", {
+                                                "categoryName": categoryName
+                                              });
 
                                               context.read<FilterCubit>().update(
-                                                  category: catstate.categories.firstWhere((element) => element.name == categoryName)
-                                              );
-                                              Navigator.of(context)
-                                                  .pushNamed(AppRouter.productPage);
+                                                  category: catstate.categories
+                                                      .firstWhere((element) =>
+                                                          element.name ==
+                                                          categoryName));
+                                              Navigator.of(context).pushNamed(
+                                                  AppRouter.productPage);
                                             },
                                             child: const Card(
                                               child: Padding(
@@ -368,11 +380,15 @@ class _HomeViewState extends State<HomeView> {
                                                       "View All", // Display the category name
                                                       style: TextStyle(
                                                         fontSize: 14,
-                                                        fontWeight: FontWeight.bold,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                       ),
                                                     ),
-                                                    SizedBox(width: 2,),
-                                                    Icon(Icons.arrow_circle_right_rounded)
+                                                    SizedBox(
+                                                      width: 2,
+                                                    ),
+                                                    Icon(Icons
+                                                        .arrow_circle_right_rounded)
                                                   ],
                                                 ),
                                               ),
@@ -381,46 +397,117 @@ class _HomeViewState extends State<HomeView> {
                                         ],
                                       ),
                                     ),
+                                    ProductGrid(products: products, scrollController: scrollController,state: state,),
+
                                     // Product Grid for this category
-                                    GridView.builder(
-                                      itemCount: products.length + ((state is ProductLoading) ? 10 : 0),
-                                      controller: scrollController,
-                                      padding: EdgeInsets.only(bottom: 16),
-                                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                                        crossAxisCount: 2,
-                                        childAspectRatio: 0.55,
-                                        crossAxisSpacing: 12,
-                                        mainAxisSpacing: 20,
-                                      ),
-                                      physics: const BouncingScrollPhysics(),
-                                      shrinkWrap: true,
-                                      itemBuilder: (BuildContext context, int index) {
-                                        if (products.length > index) {
-                                          return ProductCard(
-                                            product: products[index],
-                                          );
-                                        } else {
-                                          return Shimmer.fromColors(
-                                            baseColor: Colors.grey.shade100,
-                                            highlightColor: Colors.white,
-                                            child: const ProductCard(),
-                                          );
-                                        }
-                                      },
-                                    ),
+                                    // GridView.builder(
+                                    //   itemCount: products.length +
+                                    //       ((state is ProductLoading) ? 10 : 0),
+                                    //   controller: scrollController,
+                                    //   padding: EdgeInsets.only(bottom: 16),
+                                    //   gridDelegate:
+                                    //       const SliverGridDelegateWithFixedCrossAxisCount(
+                                    //     crossAxisCount: 2,
+                                    //     childAspectRatio: 0.55,
+                                    //     crossAxisSpacing: 12,
+                                    //     mainAxisSpacing: 20,
+                                    //   ),
+                                    //   physics: const BouncingScrollPhysics(),
+                                    //   shrinkWrap: true,
+                                    //   itemBuilder:
+                                    //       (BuildContext context, int index) {
+                                    //     if (products.length > index) {
+                                    //       return ProductCard(
+                                    //         product: products[index],
+                                    //       );
+                                    //     } else {
+                                    //       return Shimmer.fromColors(
+                                    //         baseColor: Colors.grey.shade100,
+                                    //         highlightColor: Colors.white,
+                                    //         child: const ProductCard(),
+                                    //       );
+                                    //     }
+                                    //   },
+                                    // ),
                                   ],
                                 );
-                              }).toList()
-                            ),
-                          ),
+                              }).toList()),
                         ),
-                      );
-                    });
-                  }
-                )),
+                      ),
+                    );
+                  });
+                })),
           )
         ],
       ),
+    );
+  }
+}
+
+class ProductGrid extends StatelessWidget {
+  const ProductGrid({
+    super.key,
+    required this.products,
+    required this.scrollController, required this.state,
+
+  });
+
+  final List<Product> products;
+  final ScrollController scrollController;
+  final ProductState state;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Adjust crossAxisCount based on screen width for web compatibility
+        int crossAxisCount =
+            (constraints.maxWidth > 600)
+                ? 4
+                : 2;
+
+        return MasonryGridView.builder(
+
+          itemCount: products.length +
+              ((state is ProductLoading)
+                  ? 10
+                  : 0),
+          controller: scrollController,
+          mainAxisSpacing: 10,
+          crossAxisSpacing: 30,
+          gridDelegate:
+              SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount:
+                      crossAxisCount),
+          padding:
+              EdgeInsets.zero, // Remove padding
+          physics:
+              const BouncingScrollPhysics(),
+          shrinkWrap: true,
+          itemBuilder: (BuildContext context,
+              int index) {
+            if (products.length > index) {
+              if (products.length > index) {
+                return ProductCard(
+                  product: products[index],
+                );
+              } else {
+                return Shimmer.fromColors(
+                  baseColor: Colors.grey.shade100,
+                  highlightColor: Colors.white,
+                  child: const ProductCard(),
+                );
+              }
+            } else {
+              return Shimmer.fromColors(
+                baseColor: Colors.grey.shade100,
+                highlightColor: Colors.white,
+                child: const ProductCard(),
+              );
+            }
+          },
+        );
+      },
     );
   }
 }
