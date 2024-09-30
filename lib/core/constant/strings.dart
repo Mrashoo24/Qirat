@@ -1,5 +1,5 @@
 // App
-const String appTitle = 'EShop';
+const String appTitle = 'Qirat';
 
 // Networking and APIs
 const String baseUrl = 'https://rich-jade-mackerel-kit.cyclic.app';
