@@ -70,7 +70,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '530001069485',
     projectId: 'qiratperfumes',
     storageBucket: 'qiratperfumes.appspot.com',
-    androidClientId: '530001069485-gd07hvdrbev67ckfmd1q0sa5ukfis1u5.apps.googleusercontent.com',
+    androidClientId: '530001069485-4hnlmpk585qhsm8fbq8egtjtf7d73r03.apps.googleusercontent.com',
     iosClientId: '530001069485-6g20bpgr9ji7pk7vsgm1adm9m4086gb0.apps.googleusercontent.com',
     iosBundleId: 'com.ak.qiratshop',
   );

@@ -29,22 +29,31 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
   Future<UserCredential> signInWithGoogle(UserModel params) async {
     // Trigger the authentication flow
     try {
-      final GoogleSignInAccount? googleUser =
-          await GoogleSignIn(scopes: ["profile", "email"]).signIn();
 
-      // Obtain the auth details from the request
-      final GoogleSignInAuthentication? googleAuth =
-          await googleUser?.authentication;
 
-      var googleAuthToken = googleAuth?.idToken;
+GoogleAuthProvider googleAuthProvider = GoogleAuthProvider();
 
-      // Create a new credential
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth?.accessToken,
-        idToken: googleAuth?.idToken,
-      );
+
+
+      // final GoogleSignInAccount? googleUser =
+      //     await GoogleSignIn(scopes: ["profile", "email"]).signIn();
+      //
+      // // Obtain the auth details from the request
+      // final GoogleSignInAuthentication? googleAuth =
+      //     await googleUser?.authentication;
+      //
+      // var googleAuthToken = googleAuth?.idToken;
+      //
+      // // Create a new credential
+      // final credential = GoogleAuthProvider.credential(
+      //   accessToken: googleAuth?.accessToken,
+      //   idToken: googleAuth?.idToken,
+      // );
+
+
+
       UserCredential userCredential =
-          await FirebaseAuth.instance.signInWithCredential(credential);
+          await FirebaseAuth.instance.signInWithPopup(googleAuthProvider);
       // var userName = (userCredential.user?.displayName ?? "").split(" ");
       // UserModel userModel = UserModel(
       //     id: userCredential.user?.uid ?? "",
@@ -62,13 +71,13 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
   Future<UserModel> updateUser(UserModel params) async {
     // Trigger the authentication flow
     try {
-    var toklen =  await FirebaseMessaging.instance.getToken(vapidKey: "BDhxFp_Vov1qHsjtF65y5Q7s54DHrdclkT9vh_vTtzlE7LbMwZlegW4DDz4roGNnUndtpzOZT15Zs9fmmjtTjm8");
+    // var toklen =  await FirebaseMessaging.instance.getToken(vapidKey: "BDhxFp_Vov1qHsjtF65y5Q7s54DHrdclkT9vh_vTtzlE7LbMwZlegW4DDz4roGNnUndtpzOZT15Zs9fmmjtTjm8");
 
       UserModel userModel = UserModel(
           id: params.id ?? "",
           firstName: params.firstName,
           lastName: params.lastName,
-          email: params.email,deliveryInfos: params.deliveryInfos, token:toklen.toString());
+          email: params.email,deliveryInfos: params.deliveryInfos, token:"".toString());
 
       await client.setDocument(collectionPath: "users", data: userModel.toJson(),merge: true,documentId:userModel.id );
 

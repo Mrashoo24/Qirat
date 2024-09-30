@@ -39,12 +39,13 @@ class _SignInViewState extends State<SignInView> {
           EasyLoading.show(status: 'Loading...');
         } else if (state is UserLogged) {
 
-          FirebaseAnalytics.instance.logSignUp(signUpMethod: Platform.isAndroid ? "Android" : "Ios");
+          FirebaseAnalytics.instance.logSignUp(signUpMethod: "Web");
 
            context.read<CartBloc>().add(const GetCart());
           // context.read<DeliveryInfoFetchCubit>().fetchDeliveryInfo();
           // context.read<OrderFetchCubit>().getOrders();
           context.read<NavbarCubit>().update(0);
+
           Navigator.of(context).pushNamedAndRemoveUntil(
             AppRouter.home,
             ModalRoute.withName(''),
