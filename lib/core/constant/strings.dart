@@ -1,5 +1,5 @@
 // App
-const String appTitle = 'Qirat';
+const String appTitle = 'Qirat Attars & Perfume - 20 Years of Fragrance Excellence';
 
 // Networking and APIs
 const String baseUrl = 'https://rich-jade-mackerel-kit.cyclic.app';
