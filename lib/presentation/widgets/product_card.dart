@@ -37,14 +37,14 @@ class ProductCard extends StatelessWidget {
       },
       child: Container(
         // width: 100,
-        height: 250 ,
+        height: MediaQuery.of(context).size.height * 0.3 ,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
                 child: Ink(
               decoration: BoxDecoration(
-                color: Colors.white,
+                // color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
@@ -83,7 +83,7 @@ class ProductCard extends StatelessWidget {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(16),
                         child: CachedNetworkImage(
-                          fit: BoxFit.cover,
+                          fit: BoxFit.fill,
                           imageUrl: product!.images.first,
                           placeholder: (context, url) => Shimmer.fromColors(
                             baseColor: Colors.grey.shade100,
