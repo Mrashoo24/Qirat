@@ -1,1 +1,41 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"qiratperfumes","appId":"1:530001069485:android:5e1891cec1ba894fb34d24","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"qiratperfumes","configurations":{"android":"1:530001069485:android:5e1891cec1ba894fb34d24","ios":"1:530001069485:ios:c9c74f7708e1cb54b34d24","web":"1:530001069485:web:aea676ef6e1534c7b34d24"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "qiratperfumes",
+          "appId": "1:530001069485:android:5e1891cec1ba894fb34d24",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "qiratperfumes",
+          "configurations": {
+            "android": "1:530001069485:android:5e1891cec1ba894fb34d24",
+            "ios": "1:530001069485:ios:c9c74f7708e1cb54b34d24",
+            "web": "1:530001069485:web:aea676ef6e1534c7b34d24"
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "rules": "y",
+    "indexes": "firestore.indexes.json"
+  },
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

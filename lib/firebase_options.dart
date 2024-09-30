@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
     appId: '1:530001069485:web:aea676ef6e1534c7b34d24',
     messagingSenderId: '530001069485',
     projectId: 'qiratperfumes',
-    authDomain: 'qiratperfumes.firebaseapp.com',
+    authDomain: 'www.qiratshop.in',
     storageBucket: 'qiratperfumes.appspot.com',
     measurementId: 'G-VDRTZQEW7C',
   );

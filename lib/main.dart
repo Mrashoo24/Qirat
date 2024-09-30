@@ -2,11 +2,8 @@ import 'dart:async';
 
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -27,107 +24,35 @@ import 'presentation/blocs/order/order_fetch/order_fetch_cubit.dart';
 import 'presentation/blocs/product/product_bloc.dart';
 import 'presentation/blocs/user/user_bloc.dart';
 
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-FlutterLocalNotificationsPlugin();
-
-Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // Handle background messages
-  print("Handling a background message: ${message.messageId}");
-}
-
-// Android notification channel
-const AndroidNotificationChannel channel = AndroidNotificationChannel(
-  'high_importance_channel', // id
-  'High Importance Notifications', // title
-  description: 'This channel is used for important notifications.', // description
-  importance: Importance.high,
-);
-
 Future<void> main() async {
-
   // Error handling for the app
-  // Run your app in the same zone
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    FirebaseMessaging messaging = FirebaseMessaging.instance;
-
-    NotificationSettings settings = await messaging.requestPermission(
-      alert: true,
-      announcement: false,
-      badge: true,
-      carPlay: false,
-      criticalAlert: false,
-      provisional: false,
-      sound: true,
-    );
-
-
-    // Initialize local notifications for Android
-    await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>()
-        ?.createNotificationChannel(channel);
-
-    // Initialize Firebase Messaging
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
-    // Initialize local notifications settings
-    const AndroidInitializationSettings initializationSettingsAndroid =
-    AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    const InitializationSettings initializationSettings = InitializationSettings(
-      android: initializationSettingsAndroid,
-    );
-
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
     await di.init();
     runApp(const MyApp());
     configLoading();
-    FirebaseAnalytics.instance.logEvent(name:"AppOpenedCustom",parameters: {"signUpMethod":"Web"});
+    FirebaseAnalytics.instance.logEvent(
+      name: "AppOpenedCustom",
+      parameters: {"signUpMethod": "Web"},
+    );
   }, (error, stackTrace) async {
-    // Log errors to Crashlytics
+    // Log errors (Crashlytics can be re-added later)
     // await FirebaseCrashlytics.instance.recordError(error, stackTrace);
-    // await FirebaseCrashlytics.instance.recordFlutterFatalError(FlutterErrorDetails(exception: error,stack: stackTrace));
-    // await FirebaseCrashlytics.instance.recordFlutterError(FlutterErrorDetails(exception: error,stack: stackTrace));
-
+    // await FirebaseCrashlytics.instance.recordFlutterError(
+    //   FlutterErrorDetails(exception: error, stack: stackTrace),
+    // );
   });
-
 }
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-
-
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      RemoteNotification? notification = message.notification;
-      AndroidNotification? android = message.notification?.android;
-
-      if (notification != null && android != null) {
-        // Display local notification
-        flutterLocalNotificationsPlugin.show(
-          notification.hashCode,
-          notification.title,
-          notification.body,
-          NotificationDetails(
-            android: AndroidNotificationDetails(
-              channel.id,
-              channel.name,
-              channelDescription: channel.description,
-              icon: '@mipmap/ic_launcher',
-            ),
-          ),
-        );
-      }
-    });
-
     return MultiBlocProvider(
       providers: [
         BlocProvider(
@@ -141,8 +66,7 @@ class MyApp extends StatelessWidget {
             ..add(const GetProducts(FilterProductParams())),
         ),
         BlocProvider(
-          create: (context) =>
-              di.sl<CategoryBloc>()..add(const GetCategories()),
+          create: (context) => di.sl<CategoryBloc>()..add(const GetCategories()),
         ),
         BlocProvider(
           create: (context) => di.sl<CartBloc>()..add(const GetCart()),
