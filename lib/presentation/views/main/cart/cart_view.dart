@@ -45,32 +45,44 @@ class _CartViewState extends State<CartView> {
                     child: BlocBuilder<CartBloc, CartState>(
                       builder: (context, state) {
                         if (state is CartError && state.cart.isEmpty) {
-                          return Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              if (state.failure is NetworkFailure)
-                                Image.asset(kNoConnection),
-                              if (state.failure is ServerFailure)
-                                Image.asset(kInternalServerError),
-                              const Text("Cart is Empty!"),
-                              SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.1,
-                              )
-                            ],
+                          return Container(
+                            height: 100,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                if (state.failure is NetworkFailure)
+                                  Container(
+                                      height: MediaQuery.of(context).size.height * 0.4,
+                                      width: MediaQuery.of(context).size.width,
+                                      child: ClipRRect(child: Image.asset(kEmptyCart))),
+                                if (state.failure is ServerFailure)
+                                  Image.asset(kInternalServerError),
+                                const Text("Cart is Empty!"),
+                                SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.1,
+                                )
+                              ],
+                            ),
                           );
                         }
                         if (state.cart.isEmpty) {
-                          return Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Image.asset(kEmptyCart),
-                              const Text("Cart is Empty!"),
-                              SizedBox(
-                                height:
-                                    MediaQuery.of(context).size.height * 0.1,
-                              )
-                            ],
+                          return Container(
+                            height: 100,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Container(
+                                    height: MediaQuery.of(context).size.height * 0.4,
+                                    width: MediaQuery.of(context).size.width,
+                                    child: ClipRRect(child: Image.asset(kEmptyCart))),
+                                const Text("Cart is Empty!"),
+                                SizedBox(
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.1,
+                                )
+                              ],
+                            ),
                           );
                         }
                         return ListView.builder(

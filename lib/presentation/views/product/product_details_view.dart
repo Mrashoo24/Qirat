@@ -53,7 +53,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
         return ListView(
           children: [
             SizedBox(
-              height: MediaQuery.sizeOf(context).width,
+              height: MediaQuery.sizeOf(context).height *0.2,
               child: CarouselSlider(
                 options: CarouselOptions(
                   height: double.infinity,
