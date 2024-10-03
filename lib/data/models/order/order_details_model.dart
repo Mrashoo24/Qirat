@@ -29,12 +29,13 @@ class OrderDetailsModel extends OrderDetails {
     required String id,
     required List<OrderItemModel> orderItems,
     required DeliveryInfoModel deliveryInfo,
-    required num discount,  required String uid, required double total,required String status,required String info
+    required num discount,  required String uid, required double total,required String status,required String info,
+    required String date,
   }) : super(
           id: id,
           orderItems: orderItems,
           deliveryInfo: deliveryInfo,
-          discount: discount,uid: uid,total: total,status: status,info: info
+          discount: discount,uid: uid,total: total,status: status,info: info,date:date
         );
 
   factory OrderDetailsModel.fromJson(Map<String, dynamic> json) =>
@@ -47,7 +48,7 @@ class OrderDetailsModel extends OrderDetails {
         uid: json["uid"],
         total: json["total"],
         status: json["status"],
-        info: json["info"],
+        info: json["info"],        date: json["date"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -60,6 +61,7 @@ class OrderDetailsModel extends OrderDetails {
     "total": total,
     "status": status,
     "info": info,
+    "date": date,
       };
 
   Map<String, dynamic> toJsonBody() => {
@@ -72,6 +74,7 @@ class OrderDetailsModel extends OrderDetails {
     "total": total,
     "status": status,
     "info": info,
+    "date": date,
       };
 
   factory OrderDetailsModel.fromEntity(OrderDetails entity) =>
@@ -86,6 +89,7 @@ class OrderDetailsModel extends OrderDetails {
         uid: entity.uid,
         total: entity.total,
         info: entity.info,
+          date:entity.date
 
       );
 }

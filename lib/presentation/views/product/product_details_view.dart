@@ -53,7 +53,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
         return ListView(
           children: [
             SizedBox(
-              height: MediaQuery.sizeOf(context).height *0.2,
+              height: MediaQuery.sizeOf(context).height *0.3,
               child: CarouselSlider(
                 options: CarouselOptions(
                   height: double.infinity,
@@ -148,7 +148,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                                 width: _selectedPriceTag.id == priceTag.id
                                     ? 2.0
                                     : 1.0,
-                                color: Colors.grey,
+                                color: _selectedPriceTag.id == priceTag.id ?Colors.orange :  Colors.grey,
                               ),
                               borderRadius:
                                   const BorderRadius.all(Radius.circular(5.0)),
