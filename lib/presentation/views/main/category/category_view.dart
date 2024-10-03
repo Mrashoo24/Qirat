@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import '../../../blocs/category/category_bloc.dart';
 import '../../../widgets/category_card.dart';
@@ -79,19 +80,39 @@ class _CategoryViewState extends State<CategoryView> {
             Expanded(
               child: BlocBuilder<CategoryBloc, CategoryState>(
                 builder: (context, state) {
-                  return ListView.builder(
-                    itemCount: (state is CategoryLoading)
-                        ? 10
-                        : state.categories.length,
-                    physics: const BouncingScrollPhysics(),
-                    padding: EdgeInsets.only(
-                        top: 14,
-                        bottom: (80 + MediaQuery.of(context).padding.bottom)),
-                    itemBuilder: (context, index) => (state is CategoryLoading)
-                        ? const CategoryCard()
-                        : CategoryCard(
-                            category: state.categories[index],
-                          ),
+                  return LayoutBuilder(
+
+                    builder: (context,constraints) {
+                      bool isWeb = constraints.maxWidth > 800;
+
+                      return isWeb ?
+                          MasonryGridView.builder(          mainAxisSpacing: 10,
+                              crossAxisSpacing: 30,
+                              itemCount: state.categories.length,
+                              gridDelegate:
+                              SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 4), itemBuilder: (context,index){
+                               return (state is CategoryLoading)
+                                   ? const CategoryCard()
+                                   :CategoryCard(
+                                  category: state.categories[index],
+                                );
+                              })
+                          : ListView.builder(
+                        itemCount: (state is CategoryLoading)
+                            ? 10
+                            : state.categories.length,
+                        physics: const BouncingScrollPhysics(),
+                        padding: EdgeInsets.only(
+                            top: 14,
+                            bottom: (80 + MediaQuery.of(context).padding.bottom)),
+                        itemBuilder: (context, index) => (state is CategoryLoading)
+                            ? const CategoryCard()
+                            : CategoryCard(
+                                category: state.categories[index],
+                              ),
+                      );
+                    }
                   );
                 },
               ),
