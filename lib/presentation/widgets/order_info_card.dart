@@ -26,7 +26,7 @@ class OrderInfoCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Order ID : ${orderDetails!.id}",
+                  "Order Date : ${orderDetails!.date}",
                   style: const TextStyle(
                     fontSize: 14,
                   ),

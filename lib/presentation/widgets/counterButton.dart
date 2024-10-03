@@ -4,12 +4,13 @@ class CartCounter extends StatefulWidget {
   final int initialQuantity;
   final Function(int) onQuantityIncrease;
   final Function(int) onQuantityDecrease;
+  final Color textColor;
 
   const CartCounter({
     Key? key,
     this.initialQuantity = 1,
     required this.onQuantityIncrease,
-    required this.onQuantityDecrease,
+    required this.onQuantityDecrease,this.textColor = Colors.white
   }) : super(key: key);
 
   @override
@@ -61,10 +62,10 @@ class _CartCounterState extends State<CartCounter> {
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
             quantity.toString(),
-            style: const TextStyle(
+            style:  TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.white
+                color: widget.textColor
             ),
           ),
         ),

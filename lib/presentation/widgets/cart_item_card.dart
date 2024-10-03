@@ -1,9 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eshop/domain/entities/cart/cart_item.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../core/router/app_router.dart';
+import '../blocs/cart/cart_bloc.dart';
+import '../blocs/user/user_bloc.dart';
+import 'counterButton.dart';
 
 class CartItemCard extends StatelessWidget {
   final CartItem? cartItem;
@@ -164,12 +168,54 @@ class CartItemCard extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(8),
                               ),
                             )
-                                : Text(
-                              "Quantity: " + cartItem!.quantity.toString(),
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
+                                : CartCounter(
+                              textColor: Colors.black,
+                              initialQuantity:
+                              (cartItem?.quantity ?? 1).toInt(),
+                              onQuantityIncrease: (quantity) {
+
+                                var state = context.read<UserBloc>().state;
+                                var uid = "1";
+                                if (state is UserLogged) {
+                                  uid = state.user.id;
+                                }
+                                context.read<CartBloc>().add(AddProduct(
+                                    cartItem: CartItem(
+                                        id: cartItem!.id,
+                                        product: cartItem!.product,
+                                        priceTag: cartItem!.priceTag,
+                                        quantity:
+                                        (cartItem?.quantity ?? 1) + 1,
+                                        uid: uid)));
+
+                                // Handle quantity change logic here
+                              },
+                              onQuantityDecrease: (quantity) {
+                                var state = context.read<UserBloc>().state;
+                                var uid = "1";
+                                if (state is UserLogged) {
+                                  uid = state.user.id;
+                                }
+                                if (quantity < 1) {
+                                  context.read<CartBloc>().add(RemoveProduct(
+                                      cartItem: CartItem(
+                                          id: cartItem!.id,
+                                          product: cartItem!.product,
+                                          priceTag: cartItem!.priceTag,
+                                          quantity: cartItem?.quantity ?? 1,
+                                          uid: uid)));
+                                } else {
+                                  context.read<CartBloc>().add(AddProduct(
+                                      cartItem: CartItem(
+                                          id: cartItem!.id,
+                                          product: cartItem!.product,
+                                          priceTag: cartItem!.priceTag,
+                                          quantity:
+                                          (cartItem?.quantity ?? 1) - 1,
+                                          uid: uid)));
+                                }
+                                // Handle quantity change logic here
+                              },
                             ),
                           )
                         ],

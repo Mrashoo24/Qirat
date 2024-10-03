@@ -37,27 +37,32 @@ class CategoryCard extends StatelessWidget {
       child: category != null
           ? Stack(
               children: [
-                Card(
-                  color: Colors.grey.shade100,
-                  margin: const EdgeInsets.only(bottom: 16),
-                  elevation: 4,
-                  clipBehavior: Clip.antiAlias,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.18,
-                    width: double.maxFinite,
-                    child: Hero(
-                      tag: category!.id,
-                      child: CachedNetworkImage(
-                        imageUrl: category!.image,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Container(
-                          color: Colors.grey.shade100,
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.25,
+                  child: Card(
+                    color: Colors.grey.shade100,
+                    margin: const EdgeInsets.only(bottom: 16),
+                    elevation: 4,
+                    clipBehavior: Clip.antiAlias,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.18,
+                      width: double.maxFinite,
+                      child: Hero(
+                        tag: category!.id,
+                        child: ClipRRect(
+                          child: CachedNetworkImage(
+                            imageUrl: category!.image,
+                            fit: BoxFit.fill,
+                            placeholder: (context, url) => Container(
+                              color: Colors.grey.shade100,
+                            ),
+                            errorWidget: (context, url, error) =>
+                                const Center(child: Icon(Icons.error)),
+                          ),
                         ),
-                        errorWidget: (context, url, error) =>
-                            const Center(child: Icon(Icons.error)),
                       ),
                     ),
                   ),

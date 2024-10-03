@@ -12,13 +12,14 @@ class OrderDetails extends Equatable {
   final double total;
   final String status;
   final String info;
+  final String date;
 
   const OrderDetails({
     required this.id,
     required this.orderItems,
     required this.deliveryInfo,
     required this.discount,
-    required this.uid, required this.total,required this.status,required this.info,
+    required this.uid, required this.total,required this.status,required this.info,required this.date
   });
 
   @override

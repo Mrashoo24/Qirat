@@ -86,11 +86,11 @@ class _CartViewState extends State<CartView> {
                           );
                         }
                         return ListView.builder(
-                          itemCount:
-                              (state is CartLoading && state.cart.isEmpty)
-                                  ? 10
-                                  : (state.cart.length +
-                                      ((state is CartLoading) ? 10 : 0)),
+                          itemCount:state.cart.length,
+                              // (state is CartLoading && state.cart.isEmpty)
+                              //     ? 10
+                              //     : (state.cart.length +
+                              //         ((state is CartLoading) ? 10 : 0)),
                           padding: EdgeInsets.only(
                               top: (MediaQuery.of(context).padding.top + 20),
                               bottom:

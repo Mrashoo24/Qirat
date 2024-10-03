@@ -21,11 +21,14 @@ class OrderFetchCubit extends Cubit<OrderFetchState> {
     try {
       emit(OrderFetchLoading(state.orders));
       final cachedResult = await _getCachedOrdersUseCase(NoParams());
+
       cachedResult.fold(
         (failure) => (),
         (orders) => emit(OrderFetchSuccess(orders)),
       );
       final remoteResult = await _getOrdersUseCase(NoParams());
+
+
       remoteResult.fold(
         (failure) => emit(OrderFetchFail(state.orders)),
         (orders) => emit(OrderFetchSuccess(orders)),

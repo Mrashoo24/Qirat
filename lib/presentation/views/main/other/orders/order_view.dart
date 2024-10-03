@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../../core/constant/images.dart';
+import '../../../../../domain/entities/order/order_details.dart';
 import '../../../../blocs/order/order_fetch/order_fetch_cubit.dart';
 import '../../../../widgets/order_info_card.dart';
 import '../../../../../core/services/services_locator.dart' as di;
@@ -45,9 +46,13 @@ class _OrderViewState extends State<OrderView> {
             );
           }
           if (state is OrderFetchSuccess) {
+
+            var orderList = state.orders;
+            orderList.sort((OrderDetails a,OrderDetails b) => b.date.compareTo(a.date));
+
             return ListView.builder(
               physics: const BouncingScrollPhysics(),
-              itemCount: state.orders.length,
+              itemCount: orderList.length,
               padding: EdgeInsets.only(
                 left: 20,
                 right: 20,
@@ -55,7 +60,7 @@ class _OrderViewState extends State<OrderView> {
                 top: 10,
               ),
               itemBuilder: (context, index) => OrderInfoCard(
-                orderDetails: state.orders[index],
+                orderDetails: orderList[index],
               ),
             );
           } else {

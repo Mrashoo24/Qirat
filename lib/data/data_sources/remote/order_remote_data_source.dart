@@ -34,7 +34,7 @@ class OrderRemoteDataSourceSourceImpl implements OrderRemoteDataSource {
           uid: params.uid,
           total: params.total,
           status: params.status,
-          info: params.info);
+          info: params.info,date: params.date);
 
       await client.setDocument(
           collectionPath: "orders", data: newParam.toJson(), documentId: id);

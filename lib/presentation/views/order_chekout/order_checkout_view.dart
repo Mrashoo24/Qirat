@@ -62,14 +62,14 @@ class OrderCheckoutView extends StatelessWidget {
                       padding: const EdgeInsets.only(top: 8),
                       child: OutlineLabelCard(
                         title: 'Delivery Details',
-                        child: BlocBuilder<UserBloc,
-                            UserState>(
+                        child: BlocBuilder<UserBloc, UserState>(
                           builder: (context, state) {
                             if (state is UserLogged) {
+                              var selectedDeliveryInfo =
+                                  state.user.deliveryInfos.firstWhereOrNull(
+                                      (element) => element.isSelected);
 
-                              var selectedDeliveryInfo = state.user.deliveryInfos.firstWhereOrNull((element) => element.isSelected);
-
-                             if(selectedDeliveryInfo != null) {
+                              if (selectedDeliveryInfo != null) {
                                 return Container(
                                   padding: const EdgeInsets.only(
                                       top: 16, bottom: 12, left: 4, right: 10),
@@ -93,16 +93,16 @@ class OrderCheckoutView extends StatelessWidget {
                                         ),
                                       ]),
                                 );
-                              }else{
-                               return Container(
-                                 height: 50,
-                                 padding: const EdgeInsets.only(
-                                     top: 20, bottom: 8, left: 4),
-                                 child: const Text(
-                                   "Please select delivery information",
-                                 ),
-                               );
-                             }
+                              } else {
+                                return Container(
+                                  height: 50,
+                                  padding: const EdgeInsets.only(
+                                      top: 20, bottom: 8, left: 4),
+                                  child: const Text(
+                                    "Please select delivery information",
+                                  ),
+                                );
+                              }
                             } else {
                               return Container(
                                 height: 50,
@@ -181,7 +181,7 @@ class OrderCheckoutView extends StatelessWidget {
                                             height: 4,
                                           ),
                                           Text(
-                                          "Quantity: ${product.quantity}",
+                                            "Quantity: ${product.quantity}",
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .labelLarge,
@@ -189,8 +189,8 @@ class OrderCheckoutView extends StatelessWidget {
                                           const SizedBox(
                                             height: 4,
                                           ),
-                                          Text(
-                                             'Unit Rate: ' '₹${product.priceTag.price.toStringAsFixed(2)}')
+                                          Text('Unit Rate: '
+                                              '₹${product.priceTag.price.toStringAsFixed(2)}')
                                         ],
                                       ),
                                     )
@@ -207,7 +207,6 @@ class OrderCheckoutView extends StatelessWidget {
                 OutlineLabelCard(
                   title: 'Order Summery',
                   child: Container(
-
                     padding: const EdgeInsets.symmetric(vertical: 15),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -223,8 +222,7 @@ class OrderCheckoutView extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const Text("Total Price"),
-                            Text(
-                                "₹${CartCalculator.getTotal(items)}")
+                            Text("₹${CartCalculator.getTotal(items)}")
                           ],
                         ),
                         const Row(
@@ -235,8 +233,7 @@ class OrderCheckoutView extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             const Text("Total"),
-                            Text(
-                                "₹${CartCalculator.getTotal(items)}"),
+                            Text("₹${CartCalculator.getTotal(items)}"),
                           ],
                         ),
                         Text(
@@ -255,32 +252,38 @@ class OrderCheckoutView extends StatelessWidget {
                 return InputFormButton(
                   color: Colors.black87,
                   onClick: () {
-                    var currentState = context
-                        .read<UserBloc>()
-                        .state;
+                    var currentState = context.read<UserBloc>().state;
                     if (currentState is UserLogged) {
-
-                      if(currentState.user.deliveryInfos.isNotEmpty && currentState.user.deliveryInfos.where((element) => element.isSelected).isNotEmpty){
+                      if (currentState.user.deliveryInfos.isNotEmpty &&
+                          currentState.user.deliveryInfos
+                              .where((element) => element.isSelected)
+                              .isNotEmpty) {
                         context.read<OrderAddCubit>().addOrder(OrderDetails(
                             id: '',
                             orderItems: items
                                 .map((item) => OrderItem(
-                              id: '',
-                              product: item.product,
-                              priceTag: item.priceTag,
-                              price: item.priceTag.price,
-                              quantity: item.quantity,
-                            ))
+                                      id: '',
+                                      product: item.product,
+                                      priceTag: item.priceTag,
+                                      price: item.priceTag.price,
+                                      quantity: item.quantity,
+                                    ))
                                 .toList(),
-                            deliveryInfo: currentState.user.deliveryInfos.firstWhere((element) => element.isSelected),
-                            discount: 0, uid:currentState.user.id, total:CartCalculator.getTotal(items) , status: statuesPending,info: ""));
-                      }else{
-                        EasyLoading.showError("Error \nPlease select delivery add your delivery information");
+                            deliveryInfo: currentState.user.deliveryInfos
+                                .firstWhere((element) => element.isSelected),
+                            discount: 0,
+                            uid: currentState.user.id,
+                            total: CartCalculator.getTotal(items),
+                            status: statuesPending,
+                            info: "",
+                            date: DateTime.now().toString().split(".")[0]));
+                      } else {
+                        EasyLoading.showError(
+                            "Error \nPlease select delivery add your delivery information");
                       }
-
-
                     } else {
-                      EasyLoading.showError("Error \nPlease select delivery add your delivery information");
+                      EasyLoading.showError(
+                          "Error \nPlease select delivery add your delivery information");
                     }
                   },
                   titleText: 'Confirm',
