@@ -148,7 +148,8 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                                 width: _selectedPriceTag.id == priceTag.id
                                     ? 2.0
                                     : 1.0,
-                                color: Colors.grey,
+                                color: _selectedPriceTag.id == priceTag.id
+                                    ? Colors.orange :Colors.grey,
                               ),
                               borderRadius:
                                   const BorderRadius.all(Radius.circular(5.0)),
