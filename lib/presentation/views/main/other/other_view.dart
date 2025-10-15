@@ -155,6 +155,13 @@ class OtherView extends StatelessWidget {
           const SizedBox(height: 6),
           OtherItemCard(
             onClick: () {
+              Navigator.of(context).pushNamed(AppRouter.terms);
+            },
+            title: "Terms & Conditions",
+          ),
+          const SizedBox(height: 6),
+          OtherItemCard(
+            onClick: () {
               Navigator.of(context).pushNamed(AppRouter.deletePage);
             },
             title: "Delete Account",

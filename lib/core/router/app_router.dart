@@ -16,6 +16,7 @@ import '../../presentation/views/main/other/notification/notification_view.dart'
 import '../../presentation/views/main/other/orders/order_view.dart';
 import '../../presentation/views/main/other/profile/profile_screen.dart';
 import '../../presentation/views/main/other/settings/settings_view.dart';
+import '../../presentation/views/main/other/terms/terms.dart';
 import '../../presentation/views/order_chekout/order_checkout_view.dart';
 import '../../presentation/views/product/product_details_view.dart';
 import '../error/exceptions.dart';
@@ -34,6 +35,7 @@ class AppRouter {
   static const String deliveryDetails = '/delivery-details';
   static const String orders = '/orders';
   static const String settings = '/settings';
+  static const String terms = '/terms';
   static const String notifications = '/notifications';
   static const String about = '/about';
   static const String filter = '/filter';
@@ -70,7 +72,9 @@ static const String searchView = "/searchView";
         return MaterialPageRoute(builder: (_) => const OrderView());
       case settings:
         return MaterialPageRoute(builder: (_) => const PrivacyPolicyView());
-      case notifications:
+
+      case terms:
+        return MaterialPageRoute(builder: (_) => const TermsView());    case notifications:
         return MaterialPageRoute(builder: (_) => const ContactUsView());
       case about:
         return MaterialPageRoute(builder: (_) => const AboutView());

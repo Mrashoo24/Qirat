@@ -53,6 +53,31 @@ class PrivacyPolicyView extends StatelessWidget {
             const SizedBox(height: 10),
             _buildRichText('Personal Data', 'We may collect your name, email, phone number, and other identifiable information.'),
             _buildRichText('Usage Data', 'Includes IP address, browser type, version, and pages you visit in the application.'),
+
+            const SizedBox(height: 20),
+            const Text(
+              'Shipping Policy',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+            _buildRichText('Processing & Shipping Time', '''
+  \n\n Orders are processed within 5 business days.
+
+  Delivery times vary based on location and shipping method.
+
+  All the orders will be delivered within 5-7 business days .
+'''),
+
+            _buildRichText('Shipping Costs', '''
+  \n\n Shipping fees are calculated at checkout based on weight and destination..
+
+   Free shipping is available.
+
+  We are not liable for delays due to customs, weather, or carrier issues. .
+'''),
+
             const SizedBox(height: 20),
             const Text(
               'Delete Your Personal Data',
