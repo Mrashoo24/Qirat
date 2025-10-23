@@ -3,6 +3,7 @@ import 'package:eshop/presentation/blocs/user/user_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../../core/constant/images.dart';
 import '../../../../../core/router/app_router.dart';
@@ -78,7 +79,8 @@ class _DeliveryInfoViewState extends State<DeliveryInfoView> {
               child: FloatingActionButton(
                 onPressed: () {
                   if (state is! UserLogged) {
-                    Navigator.of(context).pushNamed(AppRouter.signIn);
+                    context.pushNamed(AppRouter.signIn);
+                    // context.pushNamed(AppRouter.signIn);
                   } else {
                     showModalBottomSheet<void>(
                       context: context,
@@ -349,7 +351,7 @@ class _DeliveryInfoFormState extends State<DeliveryInfoForm> {
                             } else {
                               updateDeliveryInfo(userModel, context,widget.deliveryInfo);
                             }
-                            Navigator.of(context).pop();
+                            context.pop();
                           }
                         },
                         titleText: widget.deliveryInfo == null ? 'Save' : 'Update',
@@ -360,7 +362,7 @@ class _DeliveryInfoFormState extends State<DeliveryInfoForm> {
                       InputFormButton(
                         color: Colors.black87,
                         onClick: () {
-                          Navigator.of(context).pop();
+                          context.pop();
                         },
                         titleText: 'Cancel',
                       ),

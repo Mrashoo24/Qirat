@@ -5,6 +5,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../../core/constant/images.dart';
@@ -79,7 +80,7 @@ class _HomeViewState extends State<HomeView> {
                     ),
                     // GestureDetector(
                     //   onTap: () {
-                    //     Navigator.of(context).pushNamed(AppRouter.userProfile);
+                    //     context.pushNamed(AppRouter.userProfile);
                     //   },
                     //   child: state.user.image != null
                     //       ? CachedNetworkImage(
@@ -123,7 +124,9 @@ class _HomeViewState extends State<HomeView> {
                     ),
                     GestureDetector(
                       onTap: () {
-                        Navigator.of(context).pushNamed(AppRouter.signIn);
+
+                        context.pushNamed(AppRouter.signIn);
+                        // context.pushNamed(AppRouter.signIn);
                       },
                       child: const Padding(
                         padding: EdgeInsets.all(8.0),
@@ -234,7 +237,7 @@ class _HomeViewState extends State<HomeView> {
                 //         child: InputFormButton(
                 //           color: Colors.black87,
                 //           onClick: () {
-                //             Navigator.of(context).pushNamed(AppRouter.filter);
+                //             context.pushNamed(AppRouter.filter);
                 //           },
                 //         ),
                 //       );
@@ -368,8 +371,10 @@ class _HomeViewState extends State<HomeView> {
                                                       .firstWhere((element) =>
                                                           element.name ==
                                                           categoryName));
-                                              Navigator.of(context).pushNamed(
+                                              context.pushNamed(
                                                   AppRouter.productPage);
+                                              // context.pushNamed(
+                                              //     AppRouter.productPage);
                                             },
                                             child: const Card(
                                               child: Padding(

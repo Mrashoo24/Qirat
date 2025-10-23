@@ -3,6 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:eshop/presentation/blocs/user/user_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../../../../../domain/entities/cart/cart_item.dart';
@@ -361,8 +362,7 @@ class _ProductDetailsViewState extends State<ProductDetailsView> {
                       uid = state.user.id;
                     }
 
-                    Navigator.of(context)
-                        .pushNamed(AppRouter.orderCheckout, arguments: [
+                    context.pushNamed(AppRouter.orderCheckout, extra: [
                       CartItem(
                           product: widget.product,
                           priceTag: _selectedPriceTag,

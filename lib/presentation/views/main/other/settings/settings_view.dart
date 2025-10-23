@@ -1,12 +1,24 @@
 import 'package:flutter/material.dart';
+import 'dart:html' as html;
+
+import 'package:go_router/go_router.dart';
+
+import '../../../../../core/router/app_router.dart';
 
 class PrivacyPolicyView extends StatelessWidget {
-  const PrivacyPolicyView({Key? key}) : super(key: key);
+  final bool? showAppBar;
+
+  const PrivacyPolicyView({Key? key, this.showAppBar}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: showAppBar ?? false ? IconButton(onPressed: (){
+          context.goNamed(AppRouter.home);
+          html.window.history.pushState(null, 'title', '/home}');
+        }, icon: Icon(Icons.arrow_back_ios)) : null,
+        automaticallyImplyLeading: true,
         title: const Text("Privacy Policy"),
       ),
       body: SingleChildScrollView(
@@ -55,44 +67,7 @@ class PrivacyPolicyView extends StatelessWidget {
             _buildRichText('Usage Data', 'Includes IP address, browser type, version, and pages you visit in the application.'),
 
             const SizedBox(height: 20),
-            const Text(
-              'Shipping Policy',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
-            _buildRichText('Processing & Shipping Time', '''
-  \n\n Orders are processed within 5 business days.
 
-  Delivery times vary based on location and shipping method.
-
-  All the orders will be delivered within 5-7 business days .
-'''),
-
-            _buildRichText('Shipping Costs', '''
-  \n\n Shipping fees are calculated at checkout based on weight and destination..
-
-   Free shipping is available.
-
-  We are not liable for delays due to customs, weather, or carrier issues. .
-'''),
-
-            const SizedBox(height: 20),
-            const Text(
-              'Delete Your Personal Data',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-                color: Colors.red,
-              ),
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              'You have the right to delete or request that We assist in deleting the Personal Data that We have collected about You. Our Service may give You the ability to delete certain information from within the Service. '
-                  'You may also contact Us directly to request access, correction, or deletion of any personal information that You have provided.',
-              style: TextStyle(fontSize: 16),
-            ),
             const SizedBox(height: 10),
             _buildContactDetails(),
             const SizedBox(height: 20),

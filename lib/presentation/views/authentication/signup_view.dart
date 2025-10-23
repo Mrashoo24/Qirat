@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/constant/images.dart';
 import '../../../core/error/failures.dart';
@@ -36,9 +37,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
           EasyLoading.show(status: 'Loading...');
         } else if (state is UserLogged) {
           context.read<CartBloc>().add(const GetCart());
-          Navigator.of(context).pushNamedAndRemoveUntil(
+          context.goNamed(
             AppRouter.home,
-            ModalRoute.withName(''),
           );
         } else if (state is UserLoggedFail) {
           if (state.failure is CredentialFailure) {
@@ -189,7 +189,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   InputFormButton(
                     color: Colors.black87,
                     onClick: () {
-                      Navigator.of(context).pop();
+                     context.pop();
                     },
                     titleText: 'Back',
                   ),

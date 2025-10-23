@@ -1,6 +1,7 @@
 import 'package:eshop/core/util/cartCalc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/constant/images.dart';
 import '../../../../core/error/failures.dart';
@@ -175,9 +176,12 @@ class _CartViewState extends State<CartView> {
                             );
 
                             firebaseService.logEvent(context, "Checkout_Clicked",{});
-                            Navigator.of(context).pushNamed(
+                            context.pushNamed(
                                 AppRouter.orderCheckout,
-                                arguments: state.cart);
+                                extra: state.cart);
+                            // context.pushNamed(
+                            //     AppRouter.orderCheckout,
+                            //     arguments: state.cart);
                           },
                           titleText: 'Checkout',
                         ),

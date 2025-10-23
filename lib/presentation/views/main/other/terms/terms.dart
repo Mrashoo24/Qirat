@@ -1,13 +1,23 @@
+import 'package:eshop/core/router/app_router.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'dart:html' as html;
 
 class TermsView extends StatelessWidget {
-  const TermsView({Key? key}) : super(key: key);
+  final bool? showAppBar;
+
+  const TermsView( {Key? key,  this.showAppBar}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: showAppBar ?? false ? IconButton(onPressed: (){
+          context.goNamed(AppRouter.home);
+          html.window.history.pushState(null, 'title', '/home}');
+        }, icon: Icon(Icons.arrow_back_ios)) : null,
         title: const Text("Terms and Conditions"),
+        automaticallyImplyLeading: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -116,9 +126,31 @@ class TermsView extends StatelessWidget {
               'These Terms shall be governed by and construed in accordance with the laws of India, excluding its conflict of law rules.\n\n'
                   'Owner: Arsalan Ikramullah Khan',
             ),
-
             const SizedBox(height: 30),
-            const Divider(thickness: 1),
+
+            const Text(
+              'Shipping Policy',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+            _buildRichText('Processing & Shipping Time', '''
+  \n\n Orders are processed within 5 business days.
+
+  Delivery times vary based on location and shipping method.
+
+  All the orders will be delivered within 5-7 business days .
+'''),
+
+            _buildRichText('Shipping Costs', '''
+  \n\n Shipping fees are calculated at checkout based on weight and destination..
+
+   Free shipping is available.
+
+  We are not liable for delays due to customs, weather, or carrier issues. .
+'''),
+
             const SizedBox(height: 20),
 
             const Text(
@@ -133,18 +165,39 @@ class TermsView extends StatelessWidget {
             _buildRichText('Returns & Refunds',
                 'Returns are accepted only if the delivered item is damaged or defective. '
                     'You must notify us within 48 hours of delivery by emailing us at care@qiratshop.in with clear photos of the damaged/defective item. '
-                    'Once approved, we will arrange a return pickup or provide instructions for returning the item. Refunds are processed within 5–7 business days after inspection.'),
+                    'Once approved, we will arrange a return pickup or provide instructions for returning the item. Refunds will be processed and credited within 5–7 business days after inspection.'),
             const SizedBox(height: 10),
             _buildRichText('Exchanges',
                 'If you would like to exchange a product (for reasons other than damage/defect), you may courier the item to us at:\n\n'
                     'Room no 102/B-wing, Khushnuma Apartment, Kadar Palace, Kausa, Mumbra 400612.\n\n'
-                    'Once received in original condition, we will ship the replacement item of your choice. Customers are responsible for shipping charges for exchanges. Replacement delivery within 4–5 days.'),
+                    'Once received in original condition, we will ship the replacement item of your choice. Customers are responsible for shipping charges for exchanges. Your order will be replaced and exchange and will be delivered within 4–5 days.'),
             const SizedBox(height: 10),
             _buildRichText('Conditions for Return & Exchange',
-                'Items must be unused, unwashed, and returned in original condition.\n\n'
+                'Items must be unused, and returned in original condition.\n\n'
                     'We do not accept returns or exchanges on:\n• Customized products\n• Clearance or sale items\n\nIn case the desired replacement is unavailable, we will issue a refund.'),
 
             const SizedBox(height: 30),
+
+            const Text(
+              'Delete Your Personal Data',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                color: Colors.red,
+              ),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'You have the right to delete or request that We assist in deleting the Personal Data that We have collected about You. Our Service may give You the ability to delete certain information from within the Service. '
+                  'You may also contact Us directly to request access, correction, or deletion of any personal information that You have provided.',
+              style: TextStyle(fontSize: 16),
+            ),
+
+            const SizedBox(height: 30),
+            const Divider(thickness: 1),
+            const SizedBox(height: 20),
+
+
             _buildContactDetails(),
             const SizedBox(height: 40),
           ],
