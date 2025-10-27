@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:eshop/domain/entities/cart/cart_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../core/router/app_router.dart';
@@ -42,8 +43,8 @@ class CartItemCard extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         if (cartItem != null) {
-          Navigator.of(context).pushNamed(AppRouter.productDetails,
-              arguments: cartItem!.product);
+          context.pushNamed(AppRouter.productDetails,
+              extra: cartItem!.product);
         }
       },
       onLongPress: onLongClick,

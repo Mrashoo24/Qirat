@@ -3,6 +3,7 @@ import 'package:eshop/presentation/blocs/filter/filter_cubit.dart';
 import 'package:eshop/presentation/blocs/product/product_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../core/router/app_router.dart';
@@ -20,8 +21,7 @@ class CategoryCard extends StatelessWidget {
         context.read<FilterCubit>().update(
             category: category
         );
-        Navigator.of(context)
-            .pushNamed(AppRouter.productPage);
+        context.pushNamed(AppRouter.productPage);
         // if(category!=null){
         //   context.read<NavbarCubit>().controller.animateToPage(
         //       0,

@@ -3,6 +3,7 @@ import 'package:eshop/presentation/blocs/delivery_info/delivery_info_fetch/deliv
 import 'package:eshop/presentation/blocs/order/order_fetch/order_fetch_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/constant/images.dart';
 import '../../../../core/router/app_router.dart';
@@ -27,9 +28,9 @@ class OtherView extends StatelessWidget {
                 if (state is UserLogged) {
                   return GestureDetector(
                     onTap: () {
-                      Navigator.of(context).pushNamed(
+                      context.pushNamed(
                         AppRouter.userProfile,
-                        arguments: state.user,
+                        extra: state.user,
                       );
                     },
                     child: Row(
@@ -65,7 +66,9 @@ class OtherView extends StatelessWidget {
                 } else {
                   return GestureDetector(
                     onTap: () {
-                      Navigator.of(context).pushNamed(AppRouter.signIn);
+
+                      context.pushNamed(AppRouter.signIn);
+                      // context.pushNamed(AppRouter.signIn);
                     },
                     child: Row(
                       children: [
@@ -98,12 +101,12 @@ class OtherView extends StatelessWidget {
           //     return OtherItemCard(
           //       onClick: () {
           //         if (state is UserLogged) {
-          //           Navigator.of(context).pushNamed(
+          //           context.pushNamed(
           //             AppRouter.userProfile,
           //             arguments: state.user,
           //           );
           //         } else {
-          //           Navigator.of(context).pushNamed(AppRouter.signIn);
+          //           context.pushNamed(AppRouter.signIn);
           //         }
           //       },
           //       title: "Profile",
@@ -117,7 +120,8 @@ class OtherView extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 6),
                   child: OtherItemCard(
                     onClick: () {
-                      Navigator.of(context).pushNamed(AppRouter.orders);
+                      context.pushNamed(AppRouter.orders);
+                      // context.pushNamed(AppRouter.orders);
                     },
                     title: "Orders",
                   ),
@@ -134,8 +138,9 @@ class OtherView extends StatelessWidget {
                   padding: const EdgeInsets.only(top: 6),
                   child: OtherItemCard(
                     onClick: () {
-                      Navigator.of(context)
-                          .pushNamed(AppRouter.deliveryDetails);
+                      context.pushNamed(AppRouter.deliveryDetails);
+                      // Navigator.of(context)
+                      //     .pushNamed(AppRouter.deliveryDetails);
                     },
                     title: "Delivery Info",
                   ),
@@ -148,35 +153,35 @@ class OtherView extends StatelessWidget {
           const SizedBox(height: 6),
           OtherItemCard(
             onClick: () {
-              Navigator.of(context).pushNamed(AppRouter.settings);
+              context.pushNamed(AppRouter.settings);
             },
             title: "Privacy Policy",
           ),
           const SizedBox(height: 6),
           OtherItemCard(
             onClick: () {
-              Navigator.of(context).pushNamed(AppRouter.terms);
+              context.pushNamed(AppRouter.terms);
             },
             title: "Terms & Conditions",
           ),
           const SizedBox(height: 6),
           OtherItemCard(
             onClick: () {
-              Navigator.of(context).pushNamed(AppRouter.deletePage);
+              context.pushNamed(AppRouter.deletePage);
             },
             title: "Delete Account",
           ),
           const SizedBox(height: 6),
           OtherItemCard(
             onClick: () {
-              Navigator.of(context).pushNamed(AppRouter.notifications);
+              context.pushNamed(AppRouter.notifications);
             },
             title: "Contact Us",
           ),
           const SizedBox(height: 6),
           OtherItemCard(
             onClick: () {
-              Navigator.of(context).pushNamed(AppRouter.about);
+              context.pushNamed(AppRouter.about);
             },
             title: "About",
           ),

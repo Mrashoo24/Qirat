@@ -7,6 +7,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/constant/images.dart';
 import '../../../core/error/failures.dart';
@@ -46,10 +47,11 @@ class _SignInViewState extends State<SignInView> {
           // context.read<OrderFetchCubit>().getOrders();
           context.read<NavbarCubit>().update(0);
 
-          Navigator.of(context).pushNamedAndRemoveUntil(
-            AppRouter.home,
-            ModalRoute.withName(''),
-          );
+          context.goNamed(AppRouter.home);
+          // context.pushNamedAndRemoveUntil(
+          //   AppRouter.home,
+          //   ModalRoute.withName(''),
+          // );
         } else if (state is UserLoggedFail) {
           if (state.failure is CredentialFailure) {
             EasyLoading.showError("Username/Password Wrong!");
@@ -177,7 +179,7 @@ class _SignInViewState extends State<SignInView> {
                   InputFormButton(
                     color: Colors.black87,
                     onClick: () {
-                      Navigator.of(context).pop();
+                      context.pop();
                     },
                     titleText: 'Back',
                   ),

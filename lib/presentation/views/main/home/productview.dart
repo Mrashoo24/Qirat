@@ -140,7 +140,7 @@ class _ProductPageViewState extends State<ProductPageView> {
                 //         child: InputFormButton(
                 //           color: Colors.black87,
                 //           onClick: () {
-                //             Navigator.of(context).pushNamed(AppRouter.filter);
+                //             context.pushNamed(AppRouter.filter);
                 //           },
                 //         ),
                 //       );

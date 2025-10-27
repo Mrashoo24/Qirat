@@ -1,6 +1,7 @@
 import 'package:eshop/presentation/blocs/product/product_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../../domain/usecases/product/get_product_usecase.dart';
 import '../../../../blocs/category/category_bloc.dart';
@@ -109,7 +110,7 @@ class FilterView extends StatelessWidget {
                     .add(GetProducts(context
                     .read<FilterCubit>()
                     .state));
-                Navigator.of(context).pop();
+                context.pop();
               },
               titleText: 'Continue',
             );

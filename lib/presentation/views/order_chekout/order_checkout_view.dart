@@ -8,6 +8,7 @@ import 'package:eshop/presentation/blocs/user/user_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/services/services_locator.dart' as di;
 import '../../../core/router/app_router.dart';
@@ -37,7 +38,7 @@ class OrderCheckoutView extends StatelessWidget {
             context.read<NavbarCubit>().update(0);
             context.read<NavbarCubit>().controller.jumpToPage(0);
             context.read<CartBloc>().add(const ClearCart());
-            Navigator.of(context).pop();
+            context.pop();
             EasyLoading.showSuccess("Order Placed Successfully");
           } else if (state is OrderAddFail) {
             EasyLoading.showError("Error");
@@ -122,8 +123,7 @@ class OrderCheckoutView extends StatelessWidget {
                       top: 0,
                       child: IconButton(
                         onPressed: () {
-                          Navigator.of(context)
-                              .pushNamed(AppRouter.deliveryDetails);
+                          context.pushNamed(AppRouter.deliveryDetails);
                         },
                         icon: const Icon(
                           Icons.edit,

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_snake_navigationbar/flutter_snake_navigationbar.dart';
+import 'package:go_router/go_router.dart';
+import 'dart:html' as html; // Only for Flutter Web
 
 import '../../blocs/home/navbar_cubit.dart';
 import 'cart/cart_view.dart';
@@ -16,6 +18,38 @@ class MainView extends StatefulWidget {
 }
 
 class _MainViewState extends State<MainView> {
+
+  // Only works on Flutter Web
+  final currentPath = html.window.location.pathname;
+
+  // List of all your routes
+  static const validRoutes = [
+    '/terms',
+    '/about',
+    '/filter',
+    '/searchView',
+    '/settings',
+    '/orders',
+    '/notifications',
+    '/product-page',
+    '/deleteAccountView',
+    '/delivery-details',
+  ];
+
+  @override
+  void initState() {
+    // If the current URL path matches one of your routes, navigate there
+    if (validRoutes.contains(currentPath)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.go(currentPath!,extra: true);
+        html.window.history.pushState(null, 'title', '/${currentPath?.split('/').last}');
+
+      });
+    }
+    super.initState();
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
