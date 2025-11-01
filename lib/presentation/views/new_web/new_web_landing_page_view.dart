@@ -8,6 +8,7 @@ import '../../widgets/new_web/sections/qirat_collection_section_widget.dart';
 import '../../widgets/new_web/sections/qirat_heritage_section_widget.dart';
 import '../../widgets/new_web/sections/qirat_footer_section_widget.dart';
 import '../../widgets/new_web/modals/qirat_scent_advisor_modal.dart';
+import '../../widgets/new_web/sections/qirat_products_collection_view.dart';
 
 /// New Web Landing Page - Complete Qirat website experience
 class NewWebLandingPageView extends StatefulWidget {
@@ -80,7 +81,10 @@ class _NewWebLandingPageViewState extends State<NewWebLandingPageView> {
 
                     // Differences Section
                     const QiratDifferencesSectionWidget(),
-
+                    QiratCollectionHorizontalSectionWidget(
+                      onViewAllTap: _handleViewAllProductsTap,
+                      onProductTap: _handleProductTap,
+                    ),
                     // Collection Section
                     QiratCollectionSectionWidget(
                       onViewAllTap: _handleViewAllProductsTap,

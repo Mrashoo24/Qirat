@@ -129,35 +129,49 @@ class _AnimatedProductCircleWidgetState
     return ResponsiveBuilder(
       builder: (context, isMobile, isTablet, isDesktop) {
         return Container(
-          height: isMobile ? 500 : 600,
+          height: isMobile ? null : 600,
           padding: ResponsiveHelper.getResponsivePadding(context),
           child: Stack(
             children: [
               // Main content
-              Row(
-                children: [
-                  // Left side - Circular product highlights
-                  Expanded(
-                    flex: isMobile ? 1 : 2,
-                    child: _buildCircularProductHighlights(context, isMobile),
-                  ),
+              isMobile
+                  ? Column(
+                      children: [
+                        // Top - Circular product highlights
+                        _buildCircularProductHighlights(context, isMobile),
 
-                  if (!isMobile) const SizedBox(width: 40),
+                        const SizedBox(height: 24),
 
-                  // Right side - Product image and details
-                  Expanded(
-                    flex: isMobile ? 1 : 3,
-                    child: _buildProductDisplay(context, isMobile),
-                  ),
-                ],
-              ),
+                        // Bottom - Product image and details
+                        _buildProductDisplay(context, isMobile),
+                      ],
+                    )
+                  : Row(
+                      children: [
+                        // Left side - Circular product highlights
+                        Expanded(
+                          flex: 2,
+                          child: _buildCircularProductHighlights(
+                              context, isMobile),
+                        ),
+
+                        const SizedBox(width: 40),
+
+                        // Right side - Product image and details
+                        Expanded(
+                          flex: 3,
+                          child: _buildProductDisplay(context, isMobile),
+                        ),
+                      ],
+                    ),
 
               // Add to cart button (top right)
-              Positioned(
-                top: 20,
-                right: 20,
-                child: _buildAddToCartButton(context),
-              ),
+              if (!isMobile)
+                Positioned(
+                  top: 20,
+                  right: 20,
+                  child: _buildAddToCartButton(context),
+                ),
             ],
           ),
         );
@@ -224,8 +238,6 @@ class _AnimatedProductCircleWidgetState
             final index = entry.key;
             final product = entry.value;
             final angle = (2 * math.pi / widget.products.length) * index;
-            final x = centerX + radius * math.cos(angle - math.pi / 2);
-            final y = centerY + radius * math.sin(angle - math.pi / 2);
 
             return AnimatedBuilder(
               animation: _rotationController,
