@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qirat Attars | The Purity. The Projection.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+
+    <style>
+        /* Define the custom gold color for the brand */
+        :root {
+            --qirat-gold: #F4C042;
+            --qirat-black: #0A0A0A;
+        }
+
+        /* Set base styles and font */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--qirat-black);
+            color: white;
+            /* Mobile-first scrolling */
+            scroll-behavior: smooth;
+        }
+
+        /* Custom utility for the gold accent color */
+        .text-qirat-gold {
+            color: var(--qirat-gold);
+        }
+
+        .bg-qirat-gold {
+            background-color: var(--qirat-gold);
+        }
+
+        .border-qirat-gold {
+            border-color: var(--qirat-gold);
+        }
+
+        /* The scroll bar/timeline element on the right */
+        .scroll-indicator {
+            position: fixed;
+            /* Changed to fixed for constant visibility */
+            top: 20%;
+            right: 0.5rem;
+            height: 60%;
+            width: 2px;
+            background-color: rgba(255, 255, 255, 0.2);
+            z-index: 10;
+        }
+
+        .scroll-indicator::after {
+            content: " ";
+            position: absolute;
+            top: 0;
+            left: -1px;
+            width: 4px;
+            height: 20%;
+            background-color: var(--qirat-gold);
+            border-radius: 9999px;
+            transition: transform 0.5s ease-out;
+            /* Smooth scrolling indication */
+            transform: translateY(0%);
+        }
+
+        /* Apply subtle shadow to product container to enhance luxury look */
+        .product-circle {
+            box-shadow: 0 0 50px 0px rgba(244, 192, 66, 0.2);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen">
+
+    <header class="fixed top-0 left-0 right-0 z-50 bg-[var(--qirat-black)] border-b border-gray-900 shadow-xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
+            <div class="text-xl font-bold tracking-wider">
+                <span class="text-qirat-gold">Qirat</span> Attars
+            </div>
+
+            <nav class="hidden md:flex space-x-8 items-center text-sm font-medium">
+                <a href="#" class="text-qirat-gold px-3 py-1 bg-gray-900 rounded-md">Home</a>
+                <a href="#" class="hover:text-qirat-gold transition duration-200">Products</a>
+                <a href="#" class="hover:text-qirat-gold transition duration-200">Our Story</a>
+                <a href="#" class="hover:text-qirat-gold transition duration-200">Contact</a>
+            </nav>
+
+            <div class="flex items-center space-x-4">
+                <button class="p-2 hover:text-qirat-gold transition duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                </button>
+                <button class="md:hidden p-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 text-qirat-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="hero-content max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12 md:pt-32 min-h-[70vh]">
+        <div class="grid md:grid-cols-2 gap-12 lg:gap-20 items-center">
+
+            <div class="md:order-1 order-2">
+                <h1 class="text-5xl lg:text-7xl font-extrabold leading-tight tracking-tighter mb-4">
+                    <span class="text-white block">The Purity.</span>
+                    <span class="text-qirat-gold block">The Projection.</span>
+                    <span class="text-white block">The Attar.</span>
+                </h1>
+
+                <p class="text-lg text-gray-400 mb-8 max-w-md">
+                    **Mawj: The Essence of Waves.** Pure, alcohol-free attar designed for the Indian climate. Gets richer as the day gets hotter.
+                </p>
+
+                <div class="flex flex-col sm:flex-row sm:items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-10 md:mb-16">
+                    <button id="openModalBtn" class="bg-qirat-gold text-gray-900 font-bold py-3 px-6 rounded-full text-sm shadow-lg hover:bg-yellow-400 transition duration-300 transform hover:scale-105">
+                        ✨ Find Your Signature Scent
+                    </button>
+
+                    <a href="#" class="text-white hover:text-qirat-gold transition duration-300 flex items-center space-x-2 font-medium">
+                        <span>Explore All Attars</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                    </a>
+                </div>
+
+                <div class="flex space-x-4 overflow-x-auto pb-4">
+                    <div class="flex-shrink-0 w-48 bg-gray-900 border border-qirat-gold/30 p-4 rounded-xl shadow-lg">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-sm font-semibold">Mawj (12ml)</span>
+                            <span class="text-qirat-gold text-lg font-bold">₹699</span>
+                        </div>
+                        <div class="h-28 bg-qirat-gold/10 flex items-center justify-center rounded-lg">
+                            <p class="text-qirat-gold/70 text-sm">Product Image Placeholder</p>
+                        </div>
+                    </div>
+
+                    <div class="flex-shrink-0 w-48 bg-gray-900 border border-qirat-gold/10 p-4 rounded-xl shadow-lg">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-sm font-semibold">Sahar (6ml)</span>
+                            <span class="text-qirat-gold text-lg font-bold">₹399</span>
+                        </div>
+                        <div class="h-28 bg-gray-800 flex items-center justify-center rounded-lg">
+                            <p class="text-gray-600 text-sm">Product Image Placeholder</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="md:order-2 order-1 relative flex justify-center items-center h-[400px] md:h-auto">
+
+                <div class="relative product-circle w-64 h-64 md:w-80 md:h-80 flex items-center justify-center rounded-full border-2 border-qirat-gold/50">
+
+                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center w-40 text-gray-300">
+                        <h3 class="text-2xl font-bold text-qirat-gold mb-1">Qirat Attar</h3>
+                        <p class="text-xs italic">Pure Essence. 12ml Roll-On.</p>
+                        <p class="mt-2 text-xs">Alcohol-free, long-lasting formulation for the modern connoisseur.</p>
+                    </div>
+
+                    <div class="absolute bottom-4 right-1/4 w-32 h-48 bg-qirat-gold/70 transform rotate-[-10deg] rounded-t-lg">
+                        <div class="p-2 bg-qirat-gold text-center text-xs font-bold text-gray-800 rounded-t-lg">MAWJ</div>
+                    </div>
+
+                    <div class="absolute -top-6 right-6 p-2 rounded-full bg-qirat-gold/70 text-gray-900">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                        </svg>
+                    </div>
+                    <div class="absolute -bottom-6 left-6 p-2 rounded-full border border-qirat-gold text-qirat-gold">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11.049 2.152a1.503 1.503 0 011.002 0l4.383 2.192a1.503 1.503 0 01.75 1.306v6.953a1.503 1.503 0 01-.75 1.306l-4.383 2.192a1.503 1.503 0 01-1.002 0l-4.383-2.192a1.503 1.503 0 01-.75-1.306V5.65a1.503 1.503 0 01.75-1.306l4.383-2.192z" />
+                        </svg>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <h2 class="text-4xl font-bold mb-4 text-center text-qirat-gold">Traditional Purity. Modern Elegance.</h2>
+        <p class="text-center text-gray-500 max-w-2xl mx-auto">Qirat bridges authentic heritage with high-projection scents for the discerning Indian Connoisseur.</p>
+    </div>
+
+    <div class="hidden md:block scroll-indicator">
+        <span class="absolute top-0 right-3 text-xs text-qirat-gold">01</span>
+        <span class="absolute bottom-0 right-3 text-xs text-gray-500">05</span>
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute bottom-[-20px] -right-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+    </div>
+
+    <div id="scentModal" class="fixed inset-0 bg-black bg-opacity-90 z-[100] hidden flex items-center justify-center p-4" onclick="if(event.target.id === 'scentModal') closeModal()">
+        <div class="bg-[var(--qirat-black)] border border-qirat-gold/50 rounded-xl shadow-2xl w-full max-w-lg p-6 md:p-8">
+            <div class="flex justify-between items-start mb-6">
+                <h2 class="text-3xl font-extrabold text-qirat-gold">Signature Scent Advisor ✨</h2>
+                <button onclick="closeModal()" class="text-gray-400 hover:text-white transition duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <p class="text-gray-400 mb-4">Describe the **mood, occasion, or feeling** you want your attar to capture:</p>
+
+            <textarea id="scentQuery" rows="3" class="w-full bg-gray-900 border border-gray-700 text-white rounded-lg p-3 focus:ring-qirat-gold focus:border-qirat-gold transition duration-200" placeholder="E.g., 'A confident scent for a first date,' or 'Calm and earthy for a quiet evening at home.'"></textarea>
+
+            <button onclick="generateRecommendation()" id="recommendBtn" class="mt-4 w-full bg-qirat-gold text-gray-900 font-bold py-3 rounded-lg shadow-md hover:bg-yellow-400 transition duration-300">
+                Get My Recommendation
+            </button>
+
+            <div id="recommendationOutput" class="mt-6 pt-4 border-t border-gray-800 hidden">
+                <h3 class="text-2xl font-bold mb-3">Your Perfect Attar:</h3>
+                <div class="p-4 bg-gray-900 rounded-lg border border-qirat-gold/50">
+                    <p class="text-xl font-bold text-qirat-gold mb-2" id="attarName"></p>
+                    <p class="text-gray-300 text-sm" id="attarJustification"></p>
+                </div>
+                <button id="purchaseBtn" class="mt-4 w-full bg-qirat-gold text-gray-900 font-bold py-3 rounded-lg shadow-md hover:bg-yellow-400 transition duration-300">
+                    Secure Your Attar Now <span id="purchaseAttarName" class="ml-1"></span>
+                </button>
+            </div>
+
+            <div id="loadingIndicator" class="mt-4 hidden text-center">
+                <div class="animate-spin inline-block w-6 h-6 border-4 border-qirat-gold border-t-transparent rounded-full"></div>
+                <p class="text-qirat-gold mt-2">Searching our archives for your signature scent...</p>
+            </div>
+
+            <div id="errorBox" class="mt-4 p-3 bg-red-900/30 border border-red-700 rounded-lg text-red-300 hidden">
+                An error occurred. Please try again.
+            </div>
+
+        </div>
+    </div>
+
+
+    <script>
+        // NOTE: Replace this placeholder with your actual Gemini API Key
+        const apiKey = "YOUR_GEMINI_API_KEY_HERE";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+        // Product list and details for the LLM
+        const PRODUCT_DATA = `
+            Product List:
+            - Mawj: Aquatic, Fresh, Mint, Sea Salt, Amber. (Theme: Energetic, Confidence, All-Day Freshness, Thrives in Heat)
+            - Sahar: Soft, Floral, Powdery, White Musk, Rose Petals. (Theme: Purity, Gentle, Uplifting, Daily Grace, Calmness)
+            - Rubaie Rose: Classic, Deep Indian Rose, Saffron, Sandalwood. (Theme: Elegance, Tradition, Sophistication, Enduring Romance)
+            - Moss Aura: Earthy, Green Moss Accord, Vetiver, Oakmoss, Cedarwood. (Theme: Calmness, Focus, Stability, Connection to Nature)
+            - Honey Lush: Warm, Sweet, Honey Nectar, Incense Resin, Vanilla Pod, Benzoin. (Theme: Intimacy, Comfort, Inviting, Cozy Luxury)
+            - Oud Majestic: Medium Oud, Musky, Aromatic, Cardamom. (Theme: Commanding, Versatile, Power, Statement, Depth)
+        `;
+
+        const SYSTEM_PROMPT = `You are the Chief Scent Advisor for Qirat Attars, a premium, luxury, alcohol-free fragrance house. Your core directive is to recommend ONE specific attar from the provided product list that is the absolute best match for the user's need. Your justification must be sophisticated, authoritative, and tie the attar's notes directly to the requested mood. Always adhere strictly to the list. ${PRODUCT_DATA}`;
+
+        const jsonSchema = {
+            type: "OBJECT",
+            properties: {
+                "attarName": {
+                    "type": "STRING",
+                    "description": "The name of the suggested Qirat Attar from the list."
+                },
+                "justification": {
+                    "type": "STRING",
+                    "description": "A concise, 3-4 sentence explanation of why this attar is perfect for the mood/occasion, using Qirat's luxurious, authoritative brand tone."
+                }
+            },
+            propertyOrdering: ["attarName", "justification"]
+        };
+
+        // Utility function for exponential backoff (for robust API calls)
+        const MAX_RETRIES = 5;
+        const INITIAL_DELAY_MS = 1000;
+
+        async function fetchWithBackoff(url, options, attempt = 0) {
+            try {
+                const response = await fetch(url, options);
+                if (response.status === 429 && attempt < MAX_RETRIES) {
+                    const delay = INITIAL_DELAY_MS * Math.pow(2, attempt) + Math.random() * 1000;
+                    console.warn(`Rate limit hit. Retrying in ${delay / 1000}s... (Attempt ${attempt + 1})`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    return fetchWithBackoff(url, options, attempt + 1);
+                }
+                if (!response.ok) {
+                    throw new Error(`API returned status code ${response.status}`);
+                }
+                return response;
+            } catch (error) {
+                if (attempt < MAX_RETRIES) {
+                    const delay = INITIAL_DELAY_MS * Math.pow(2, attempt) + Math.random() * 1000;
+                    console.error(`Fetch error: ${error.message}. Retrying in ${delay / 1000}s...`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    return fetchWithBackoff(url, options, attempt + 1);
+                }
+                throw new Error("Failed to fetch from API after multiple retries.");
+            }
+        }
+
+        async function generateRecommendation() {
+            const query = document.getElementById('scentQuery').value.trim();
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const recommendationOutput = document.getElementById('recommendationOutput');
+            const errorBox = document.getElementById('errorBox');
+            const recommendBtn = document.getElementById('recommendBtn');
+            const purchaseAttarName = document.getElementById('purchaseAttarName');
+
+            if (!query) {
+                errorBox.textContent = "Please describe a mood or occasion.";
+                errorBox.classList.remove('hidden');
+                return;
+            }
+
+            loadingIndicator.classList.remove('hidden');
+            recommendationOutput.classList.add('hidden');
+            errorBox.classList.add('hidden');
+            recommendBtn.disabled = true;
+            recommendBtn.textContent = 'Generating...';
+
+            try {
+                const payload = {
+                    contents: [{
+                        parts: [{
+                            text: query
+                        }]
+                    }],
+                    config: {
+                        systemInstruction: SYSTEM_PROMPT,
+                        responseMimeType: "application/json",
+                        responseSchema: jsonSchema
+                    }
+                };
+
+                const options = {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                };
+
+                const response = await fetchWithBackoff(apiUrl, options);
+                const result = await response.json();
+
+                // Using the correct path for structured JSON output from Gemini
+                const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (!jsonText) {
+                    throw new Error('Could not parse structured JSON response from Gemini.');
+                }
+
+                const parsedJson = JSON.parse(jsonText);
+
+                const attarName = parsedJson.attarName || "Attar Not Found";
+
+                document.getElementById('attarName').textContent = attarName;
+                document.getElementById('attarJustification').textContent = parsedJson.justification || "Could not generate justification.";
+
+                // Update the CTA button text dynamically
+                purchaseAttarName.textContent = `(${attarName})`;
+                document.getElementById('purchaseBtn').onclick = () => {
+                    // TODO: Replace this alert with actual navigation logic (e.g., /products/mawj)
+                    alert(`Navigating to the Product Page for ${attarName}...`);
+                    closeModal();
+                };
+
+                recommendationOutput.classList.remove('hidden');
+
+            } catch (error) {
+                console.error("Gemini API Error:", error);
+                errorBox.textContent = `Error: ${error.message}. Please refine your input.`;
+                errorBox.classList.remove('hidden');
+            } finally {
+                loadingIndicator.classList.add('hidden');
+                recommendBtn.disabled = false;
+                recommendBtn.textContent = 'Get My Recommendation';
+            }
+        }
+
+        // --- MODAL CONTROL FUNCTIONS ---
+
+        function openModal() {
+            document.getElementById('scentModal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            document.getElementById('recommendationOutput').classList.add('hidden');
+            document.getElementById('errorBox').classList.add('hidden');
+            document.getElementById('scentQuery').value = '';
+        }
+
+        function closeModal() {
+            document.getElementById('scentModal').classList.add('hidden');
+            document.body.style.overflow = ''; // Restore scrolling
+        }
+
+        document.getElementById('openModalBtn').addEventListener('click', openModal);
+
+        // --- GEMINI API INTEGRATION END ---
+    </script>
+</body>
+
+</html>
+
+<section id="section-02" class="min-h-screen flex items-center justify-center p-4 bg-[var(--qirat-black)]">
+    <div class="max-w-4xl text-center">
+        <p class="text-xl text-qirat-gold font-semibold mb-8 tracking-widest uppercase">The Qirat Difference</p>
+        <h2 class="text-5xl md:text-6xl font-extrabold mb-12 leading-snug">
+            Purity is the new projection.
+        </h2>
+
+        <div class="grid md:grid-cols-3 gap-8 text-left">
+            <div class="p-6 border border-qirat-gold/30 rounded-xl bg-gray-900/50">
+                <span class="text-4xl text-qirat-gold mb-3 block">💧</span>
+                <h3 class="text-2xl font-bold mb-2">Traditional Purity</h3>
+                <p class="text-gray-400 text-sm">Every attar is **100% alcohol-free**, adhering to authentic, sacred preparation methods for a cleaner, richer oil base.</p>
+            </div>
+
+            <div class="p-6 border border-qirat-gold/30 rounded-xl bg-gray-900/50">
+                <span class="text-4xl text-qirat-gold mb-3 block">⏳</span>
+                <h3 class="text-2xl font-bold mb-2">Exceptional Longevity</h3>
+                <p class="text-gray-400 text-sm">Concentrated oils mean your signature scent lasts all day, evolving gracefully from morning to night.</p>
+            </div>
+
+            <div class="p-6 border border-qirat-gold/30 rounded-xl bg-gray-900/50">
+                <span class="text-4xl text-qirat-gold mb-3 block">🔊</span>
+                <h3 class="text-2xl font-bold mb-2">Intimate Projection</h3>
+                <p class="text-gray-400 text-sm">High-grade ingredients ensure a compelling projection that draws others in without overwhelming the space.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="section-03" class="min-h-screen flex items-center justify-center p-4 bg-gray-900">
+    <div class="max-w-7xl w-full text-center">
+        <h2 class="text-4xl font-extrabold text-qirat-gold mb-12">The Qirat Collection</h2>
+
+        <div class="flex overflow-x-auto space-x-8 p-4 snap-x snap-mandatory">
+
+            <div class="flex-shrink-0 w-80 snap-center p-6 bg-[var(--qirat-black)] border border-qirat-gold/50 rounded-lg shadow-xl">
+                <div class="h-64 bg-qirat-gold/10 mb-4 rounded-lg flex items-center justify-center">
+                    <p class="text-qirat-gold/70">Moss Aura Image</p>
+                </div>
+                <h3 class="text-3xl font-bold text-qirat-gold mb-1">Moss Aura</h3>
+                <p class="text-sm text-gray-400 italic mb-3">Earthy, Green, Grounding</p>
+                <p class="text-gray-300 text-sm">Key Notes: Vetiver, Oakmoss, Cedarwood.</p>
+                <a href="#" class="mt-4 inline-block text-qirat-gold hover:text-white transition duration-200 text-sm font-medium border-b border-qirat-gold/50">View Details &rarr;</a>
+            </div>
+
+        </div>
+        <a href="#" class="mt-12 inline-block bg-qirat-gold text-gray-900 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-yellow-400 transition duration-300">
+            Explore The Full Attar Portfolio
+        </a>
+    </div>
+</section>
+
+<section id="section-04" class="min-h-screen flex items-center justify-center p-4 bg-[var(--qirat-black)]">
+    <div class="max-w-3xl text-center">
+        <p class="text-lg text-gray-500 font-medium mb-4 tracking-widest uppercase">The Heritage of Qirat</p>
+        <h2 class="text-5xl md:text-6xl font-extrabold mb-8 leading-tight">
+            Distilled for the <span class="text-qirat-gold">Modern Indian Connoisseur.</span>
+        </h2>
+        <p class="text-xl text-gray-300 mb-10">
+            We are not just a fragrance; we are a statement. Qirat revives the timeless art of **attar-making**, merging traditional oil purity with scent engineering that meets the demands of contemporary life. This is luxury defined by **discretion, longevity, and purity.**
+        </p>
+        <div class="text-qirat-gold border border-qirat-gold/50 inline-block p-4 rounded-full text-2xl">
+            👑
+        </div>
+    </div>
+</section>
+
+<section id="section-05" class="pt-20 pb-10 bg-gray-900 border-t border-qirat-gold/50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-4xl font-extrabold text-white mb-6">Ready to Define Your Aura?</h2>
+
+        <a href="#" class="bg-qirat-gold text-gray-900 font-bold py-4 px-10 rounded-full text-lg shadow-xl hover:bg-yellow-400 transition duration-300 transform hover:scale-105 inline-block mb-12">
+            Shop The Full Qirat Collection
+        </a>
+
+        <div class="grid md:grid-cols-4 gap-8 border-t border-gray-700 pt-10 text-left">
+            <div>
+                <h4 class="text-lg font-bold text-qirat-gold mb-4">Qirat Attars</h4>
+                <p class="text-sm text-gray-400">Luxury. Purity. Projection.</p>
+            </div>
+            <div>
+                <h4 class="text-lg font-bold text-white mb-4">Quick Links</h4>
+                <ul class="space-y-2 text-sm text-gray-400">
+                    <li><a href="#" class="hover:text-qirat-gold">Signature Scent Advisor</a></li>
+                    <li><a href="#" class="hover:text-qirat-gold">Returns & Exchange</a></li>
+                    <li><a href="#" class="hover:text-qirat-gold">FAQ</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-lg font-bold text-white mb-4">Connect</h4>
+                <ul class="space-y-2 text-sm text-gray-400">
+                    <li><a href="#" class="hover:text-qirat-gold">Instagram</a></li>
+                    <li><a href="#" class="hover:text-qirat-gold">WhatsApp</a></li>
+                    <li><a href="#" class="hover:text-qirat-gold">info@qirat.in</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-lg font-bold text-white mb-4">Legal</h4>
+                <ul class="space-y-2 text-sm text-gray-400">
+                    <li><a href="#" class="hover:text-qirat-gold">Privacy Policy</a></li>
+                    <li><a href="#" class="hover:text-qirat-gold">Terms of Service</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <p class="text-xs text-gray-600 mt-16">&copy; 2025 Qirat Attars. All rights reserved.</p>
+    </div>
+</section>
