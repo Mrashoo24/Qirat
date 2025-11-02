@@ -6,6 +6,7 @@ import '../../domain/entities/cart/cart_item.dart';
 import '../../presentation/views/new_web/new_web_landing_page_view.dart';
 // Add new imports
 import '../../presentation/views/new_web/products/new_web_products_view.dart';
+import '../../domain/entities/category/category.dart';
 import '../../presentation/views/new_web/product/new_web_product_details_view.dart';
 import '../../presentation/views/new_web/cart/new_web_cart_view.dart';
 import '../../presentation/views/new_web/checkout/new_web_checkout_view.dart';
@@ -15,6 +16,9 @@ import '../../presentation/views/new_web/wishlist/new_web_wishlist_view.dart';
 import '../../presentation/views/new_web/profile/new_web_profile_view.dart';
 import '../../presentation/views/new_web/search/new_web_search_view.dart';
 import '../../presentation/views/new_web/auth/new_web_signin_view.dart';
+import '../../presentation/views/new_web/static/new_web_privacy_view.dart';
+import '../../presentation/views/new_web/static/new_web_terms_view.dart';
+import '../../presentation/views/new_web/static/new_web_delete_account_view.dart';
 
 // TODO: Uncomment these imports when implementing the actual views
 // import '../../../domain/entities/product/product.dart';
@@ -35,6 +39,9 @@ class NewWebRouter {
   static const String newCategories = '/new-categories';
   static const String newOrders = '/new-orders';
   static const String newWishlist = '/new-wishlist';
+  static const String newPrivacyPolicy = '/new-privacy';
+  static const String newTerms = '/new-terms';
+  static const String newDeleteAccount = '/new-delete-account';
 
   // Authentication routes (new design)
   static const String newSignIn = '/new-sign-in';
@@ -60,7 +67,14 @@ final GoRouter newWebRouter = GoRouter(
     GoRoute(
       name: NewWebRouter.newProducts,
       path: NewWebRouter.newProducts,
-      builder: (context, state) => const NewWebProductsView(),
+      builder: (context, state) {
+        final extra = state.extra;
+        Category? category;
+        if (extra is Map && extra['category'] is Category) {
+          category = extra['category'] as Category;
+        }
+        return NewWebProductsView(category: category);
+      },
     ),
     GoRoute(
       name: NewWebRouter.newProductDetails,
@@ -109,6 +123,21 @@ final GoRouter newWebRouter = GoRouter(
       name: NewWebRouter.newWishlist,
       path: NewWebRouter.newWishlist,
       builder: (context, state) => const NewWebWishlistView(),
+    ),
+    GoRoute(
+      name: NewWebRouter.newPrivacyPolicy,
+      path: NewWebRouter.newPrivacyPolicy,
+      builder: (context, state) => const NewWebPrivacyView(),
+    ),
+    GoRoute(
+      name: NewWebRouter.newTerms,
+      path: NewWebRouter.newTerms,
+      builder: (context, state) => const NewWebTermsView(),
+    ),
+    GoRoute(
+      name: NewWebRouter.newDeleteAccount,
+      path: NewWebRouter.newDeleteAccount,
+      builder: (context, state) => const NewWebDeleteAccountView(),
     ),
     // Auth placeholders (can reuse old views if needed)
     GoRoute(

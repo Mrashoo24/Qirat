@@ -4,15 +4,37 @@ import '../../../../core/theme/qirat_theme.dart';
 import '../../../../core/responsive/responsive_helper.dart';
 import '../../../../domain/entities/cart/cart_item.dart';
 import '../../../../domain/entities/product/product.dart';
+import '../../../../domain/entities/category/category.dart';
 import '../../../blocs/product/product_bloc.dart';
 import '../../../blocs/filter/filter_cubit.dart';
 import '../../../blocs/cart/cart_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/router/new_web_router.dart';
 import '../../../widgets/new_web/common/qirat_header_widget.dart';
+import '../../../../domain/usecases/product/get_product_usecase.dart';
 
-class NewWebProductsView extends StatelessWidget {
-  const NewWebProductsView({Key? key}) : super(key: key);
+class NewWebProductsView extends StatefulWidget {
+  final Category? category;
+  const NewWebProductsView({Key? key, this.category}) : super(key: key);
+
+  @override
+  State<NewWebProductsView> createState() => _NewWebProductsViewState();
+}
+
+class _NewWebProductsViewState extends State<NewWebProductsView> {
+  @override
+  void initState() {
+    super.initState();
+    // Seed FilterCubit with incoming category if provided
+    if (widget.category != null) {
+      context.read<FilterCubit>().update(category: widget.category);
+    }
+    // Ensure products are loaded
+    final productState = context.read<ProductBloc>().state;
+    if (productState.products.isEmpty) {
+      context.read<ProductBloc>().add(const GetProducts(FilterProductParams()));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,34 +49,135 @@ class NewWebProductsView extends StatelessWidget {
             constraints: BoxConstraints(
               maxWidth: ResponsiveHelper.getContentMaxWidth(context),
             ),
-            child: BlocBuilder<ProductBloc, ProductState>(
-              builder: (context, state) {
-                final products = state.products;
-                if (products.isEmpty) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                final crossCount = ResponsiveHelper.responsive(
-                  context: context,
-                  mobile: 2,
-                  tablet: 3,
-                  desktop: 4,
-                );
-                return GridView.builder(
-                  shrinkWrap: true,
-                  itemCount: products.length,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: crossCount,
-                    crossAxisSpacing: 20,
-                    mainAxisSpacing: 20,
-                    childAspectRatio: 0.75,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSearchBar(context),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: BlocBuilder<FilterCubit, FilterProductParams>(
+                    builder: (context, filterState) {
+                      return BlocBuilder<ProductBloc, ProductState>(
+                        builder: (context, state) {
+                          final all = state.products;
+                          if (all.isEmpty && state is! ProductLoading) {
+                            return const Center(
+                                child: Text('No products')); // fallback
+                          }
+
+                          // Filter by selected categories (ids) if any
+                          List<Product> filtered = all;
+                          if (filterState.categories.isNotEmpty) {
+                            final selectedIds =
+                                filterState.categories.map((c) => c.id).toSet();
+                            filtered = filtered
+                                .where((p) => p.categories
+                                    .any((id) => selectedIds.contains(id)))
+                                .toList();
+                          }
+                          // Keyword filter (case-insensitive)
+                          final kw = filterState.keyword?.trim() ?? '';
+                          if (kw.isNotEmpty) {
+                            filtered = filtered
+                                .where((p) => p.name
+                                    .toLowerCase()
+                                    .contains(kw.toLowerCase()))
+                                .toList();
+                          }
+
+                          if (state is ProductLoading && filtered.isEmpty) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
+                            );
+                          }
+
+                          final crossCount = ResponsiveHelper.responsive(
+                            context: context,
+                            mobile: 2,
+                            tablet: 3,
+                            desktop: 4,
+                          );
+                          return RefreshIndicator(
+                            onRefresh: () async {
+                              context.read<ProductBloc>().add(
+                                  const GetProducts(FilterProductParams()));
+                            },
+                            child: GridView.builder(
+                              shrinkWrap: true,
+                              itemCount: filtered.length,
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: crossCount,
+                                crossAxisSpacing: 20,
+                                mainAxisSpacing: 20,
+                                childAspectRatio: 0.75,
+                              ),
+                              itemBuilder: (ctx, i) => _ProductCard(
+                                product: filtered[i],
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
                   ),
-                  itemBuilder: (ctx, i) => _ProductCard(product: products[i]),
-                );
-              },
+                ),
+              ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildSearchBar(BuildContext context) {
+    final isMobile = ResponsiveHelper.isMobile(context);
+    return Row(
+      children: [
+        Expanded(
+          child: BlocBuilder<FilterCubit, FilterProductParams>(
+            builder: (context, state) {
+              final controller = context.read<FilterCubit>().searchController;
+              return TextField(
+                controller: controller,
+                onChanged: (val) {
+                  context.read<FilterCubit>().update(keyword: val);
+                  setState(() {});
+                },
+                style: const TextStyle(color: QiratTheme.darkOnBackground),
+                decoration: InputDecoration(
+                  hintText: 'Search in this category',
+                  hintStyle: const TextStyle(color: QiratTheme.textSecondary),
+                  prefixIcon:
+                      const Icon(Icons.search, color: QiratTheme.textSecondary),
+                  filled: true,
+                  fillColor: QiratTheme.darkSurfaceVariant,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: QiratTheme.goldBorder),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: QiratTheme.goldBorder),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: QiratTheme.qiratGold),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        if (!isMobile) const SizedBox(width: 12),
+        if (!isMobile)
+          IconButton(
+            tooltip: 'Global search',
+            onPressed: () => context.go(NewWebRouter.newSearch),
+            icon: const Icon(Icons.travel_explore,
+                color: QiratTheme.darkOnSurface),
+          ),
+      ],
     );
   }
 }

@@ -147,7 +147,7 @@ class _DeliveryInfoViewNewState extends State<DeliveryInfoViewNew> {
       deliveryInfos: updateDeliveryInfoList,
       token: userModel.token,
     )));
-    Navigator.pop(context);
+    context.pop();
   }
 }
 
