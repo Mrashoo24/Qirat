@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/qirat_theme.dart';
 import '../../../../core/responsive/responsive_helper.dart';
+import '../../../../domain/entities/product/product.dart';
 import '../common/animated_product_circle_widget.dart';
 
 /// Collection Section Widget - Showcasing Qirat's product collection with animated circle
 class QiratCollectionSectionWidget extends StatelessWidget {
   final VoidCallback? onViewAllTap;
-  final Function(String)? onProductTap;
+  final Function(Product)? onProductTap;
   final Function(String)? onAddToCart;
 
   const QiratCollectionSectionWidget({
@@ -63,7 +64,7 @@ class QiratCollectionSectionWidget extends StatelessWidget {
               AnimatedProductCircleWidget(
                 products: _getSampleProducts(),
                 onProductTap: (product) {
-                  onProductTap?.call(product.id);
+                  // onProductTap?.call(product);
                 },
                 onAddToCart: (product) {
                   onAddToCart?.call(product.id);

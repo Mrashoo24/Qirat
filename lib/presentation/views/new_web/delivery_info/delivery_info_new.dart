@@ -1,3 +1,4 @@
+import 'package:eshop/core/router/new_web_router.dart';
 import 'package:eshop/data/models/user/user_model.dart';
 import 'package:eshop/presentation/blocs/user/user_bloc.dart';
 import 'package:flutter/material.dart';
@@ -9,19 +10,19 @@ import '../../../../../core/router/app_router.dart';
 import '../../../../../data/models/user/delivery_info_model.dart';
 import '../../../../../domain/entities/user/delivery_info.dart';
 import '../../../../../core/theme/qirat_theme.dart';
-// Removed unused DeliveryInfo action/fetch imports to keep functionality intact and fix lints.
-import '../../../../widgets/delivery_info_card.dart';
-import '../../../../widgets/input_form_button.dart';
-import '../../../../widgets/input_text_form_field.dart';
+import '../../../widgets/delivery_info_card.dart';
+import '../../../widgets/input_form_button.dart';
+import '../../../widgets/input_text_form_field.dart';
+import '../../main/other/delivery_info/delivery_info.dart';
 
-class DeliveryInfoView extends StatefulWidget {
-  const DeliveryInfoView({Key? key}) : super(key: key);
+class DeliveryInfoViewNew extends StatefulWidget {
+  const DeliveryInfoViewNew({Key? key}) : super(key: key);
 
   @override
-  State<DeliveryInfoView> createState() => _DeliveryInfoViewState();
+  State<DeliveryInfoViewNew> createState() => _DeliveryInfoViewNewState();
 }
 
-class _DeliveryInfoViewState extends State<DeliveryInfoView> {
+class _DeliveryInfoViewNewState extends State<DeliveryInfoViewNew> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<UserBloc, UserState>(
@@ -75,7 +76,7 @@ class _DeliveryInfoViewState extends State<DeliveryInfoView> {
               return ListView.builder(
                 itemCount: state.user.deliveryInfos.length,
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 itemBuilder: (context, index) => DeliveryInfoCard(
                   deliveryInformation: state.user.deliveryInfos[index],
                   isSelected: state.user.deliveryInfos[index].isSelected,
@@ -88,7 +89,7 @@ class _DeliveryInfoViewState extends State<DeliveryInfoView> {
             },
           ),
           floatingActionButton:
-              BlocBuilder<UserBloc, UserState>(builder: (context, state) {
+          BlocBuilder<UserBloc, UserState>(builder: (context, state) {
             return SafeArea(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -96,7 +97,7 @@ class _DeliveryInfoViewState extends State<DeliveryInfoView> {
                   backgroundColor: QiratTheme.qiratGold,
                   onPressed: () {
                     if (state is! UserLogged) {
-                      context.pushNamed(AppRouter.signIn);
+                      context.goNamed(NewWebRouter.newSignIn);
                     } else {
                       showModalBottomSheet<void>(
                         context: context,
@@ -139,13 +140,13 @@ class _DeliveryInfoViewState extends State<DeliveryInfoView> {
     }).toList();
 
     context.read<UserBloc>().add(UpdateUser(UserModel(
-          id: userModel.id,
-          firstName: userModel.firstName,
-          lastName: userModel.lastName,
-          email: userModel.email,
-          deliveryInfos: updateDeliveryInfoList,
-          token: userModel.token,
-        )));
+      id: userModel.id,
+      firstName: userModel.firstName,
+      lastName: userModel.lastName,
+      email: userModel.email,
+      deliveryInfos: updateDeliveryInfoList,
+      token: userModel.token,
+    )));
     Navigator.pop(context);
   }
 }
@@ -256,7 +257,7 @@ class _DeliveryInfoFormState extends State<DeliveryInfoForm> {
                           controller: firstName,
                           hint: 'First name',
                           contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 12),
+                          const EdgeInsets.symmetric(horizontal: 12),
                           validation: (String? val) {
                             if (val == null || val.isEmpty) {
                               return 'This field can\'t be empty';
@@ -271,7 +272,7 @@ class _DeliveryInfoFormState extends State<DeliveryInfoForm> {
                           controller: lastName,
                           hint: 'Last name',
                           contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 12),
+                          const EdgeInsets.symmetric(horizontal: 12),
                           validation: (String? val) {
                             if (val == null || val.isEmpty) {
                               return 'This field can\'t be empty';
@@ -286,7 +287,7 @@ class _DeliveryInfoFormState extends State<DeliveryInfoForm> {
                           controller: addressLineOne,
                           hint: 'Address line one',
                           contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 12),
+                          const EdgeInsets.symmetric(horizontal: 12),
                           validation: (String? val) {
                             if (val == null || val.isEmpty) {
                               return 'This field can\'t be empty';
@@ -301,7 +302,7 @@ class _DeliveryInfoFormState extends State<DeliveryInfoForm> {
                           controller: addressLineTwo,
                           hint: 'Address line two',
                           contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 12),
+                          const EdgeInsets.symmetric(horizontal: 12),
                           validation: (String? val) {
                             if (val == null || val.isEmpty) {
                               return 'This field can\'t be empty';
@@ -316,7 +317,7 @@ class _DeliveryInfoFormState extends State<DeliveryInfoForm> {
                           controller: city,
                           hint: 'City',
                           contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 12),
+                          const EdgeInsets.symmetric(horizontal: 12),
                           validation: (String? val) {
                             if (val == null || val.isEmpty) {
                               return 'This field can\'t be empty';
@@ -331,7 +332,7 @@ class _DeliveryInfoFormState extends State<DeliveryInfoForm> {
                           controller: zipCode,
                           hint: 'Zip code',
                           contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 12),
+                          const EdgeInsets.symmetric(horizontal: 12),
                           validation: (String? val) {
                             if (val == null || val.isEmpty) {
                               return 'This field can\'t be empty';
@@ -346,7 +347,7 @@ class _DeliveryInfoFormState extends State<DeliveryInfoForm> {
                           controller: contactNumber,
                           hint: 'Contact number',
                           contentPadding:
-                              const EdgeInsets.symmetric(horizontal: 12),
+                          const EdgeInsets.symmetric(horizontal: 12),
                           validation: (String? val) {
                             if (val == null || val.isEmpty) {
                               return 'This field can\'t be empty';
@@ -359,7 +360,7 @@ class _DeliveryInfoFormState extends State<DeliveryInfoForm> {
                           color: QiratTheme.qiratGold,
                           onClick: () {
                             UserModel userModel =
-                                UserModel.fromEntity(widget.state.user);
+                            UserModel.fromEntity(widget.state.user);
 
                             if (_formKey.currentState!.validate()) {
                               if (widget.deliveryInfo == null) {
@@ -382,7 +383,7 @@ class _DeliveryInfoFormState extends State<DeliveryInfoForm> {
                                   zipCode: zipCode.text,
                                   contactNumber: contactNumber.text,
                                   isSelected:
-                                      true, // The new delivery info is selected
+                                  true, // The new delivery info is selected
                                 );
 
                                 updateDeliveryInfo(
@@ -398,11 +399,11 @@ class _DeliveryInfoFormState extends State<DeliveryInfoForm> {
                                 updateDeliveryInfo(
                                     userModel, context, widget.deliveryInfo);
                               }
-                              context.pop();
+                              // context.pop();
                             }
                           },
                           titleText:
-                              widget.deliveryInfo == null ? 'Save' : 'Update',
+                          widget.deliveryInfo == null ? 'Save' : 'Update',
                         ),
                         const SizedBox(height: 8),
                         InputFormButton(

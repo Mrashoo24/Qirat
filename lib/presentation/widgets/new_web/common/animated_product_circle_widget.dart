@@ -35,6 +35,7 @@ class _AnimatedProductCircleWidgetState
     extends State<AnimatedProductCircleWidget> with TickerProviderStateMixin {
   late AnimationController _rotationController;
   late AnimationController _fadeController;
+  late AnimationController _pulseController;
   late Timer _switchTimer;
 
   int _currentIndex = 0;
@@ -55,6 +56,12 @@ class _AnimatedProductCircleWidgetState
       duration: const Duration(milliseconds: 500),
       vsync: this,
     )..forward();
+
+    // Pulse animation for add to cart button
+    _pulseController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    )..repeat(reverse: true);
 
     _startAutoSwitch();
   }
@@ -115,6 +122,7 @@ class _AnimatedProductCircleWidgetState
     _switchTimer.cancel();
     _rotationController.dispose();
     _fadeController.dispose();
+    _pulseController.dispose();
     super.dispose();
   }
 
@@ -315,100 +323,299 @@ class _AnimatedProductCircleWidgetState
       builder: (context, child) {
         return Opacity(
           opacity: _fadeController.value,
+          child: isMobile
+              ? _buildMobileProductDisplay(currentProduct, isMobile)
+              : _buildDesktopProductDisplay(currentProduct, isMobile),
+        );
+      },
+    );
+  }
+
+  Widget _buildMobileProductDisplay(
+      ProductHighlight currentProduct, bool isMobile) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        // Product Image
+        Container(
+          height: 200,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: QiratTheme.darkSurface,
+            border: Border.all(color: QiratTheme.qiratGold.withOpacity(0.3)),
+            image: currentProduct.imageUrl != null
+                ? DecorationImage(
+                    image: NetworkImage(currentProduct.imageUrl!),
+                    fit: BoxFit.cover,
+                  )
+                : null,
+          ),
+          child: currentProduct.imageUrl == null
+              ? Center(
+                  child: Icon(
+                    Icons.batch_prediction_outlined,
+                    size: 60,
+                    color: QiratTheme.qiratGold,
+                  ),
+                )
+              : null,
+        ),
+
+        const SizedBox(height: 24),
+
+        // Product Details
+        Text(
+          currentProduct.name,
+          style: QiratTheme.headlineMedium.copyWith(
+            color: QiratTheme.darkOnSurface,
+            fontSize: 24,
+          ),
+        ),
+
+        const SizedBox(height: 12),
+
+        Text(
+          currentProduct.description,
+          style: QiratTheme.bodyMedium.copyWith(
+            color: QiratTheme.textSecondary,
+            fontSize: 14,
+          ),
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
+        ),
+
+        const SizedBox(height: 16),
+
+        // Price and Rating
+        Row(
+          children: [
+            Text(
+              '₹${currentProduct.price}',
+              style: QiratTheme.titleLarge.copyWith(
+                color: QiratTheme.qiratGold,
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+            ),
+            if (currentProduct.originalPrice != null) ...[
+              const SizedBox(width: 12),
+              Text(
+                '₹${currentProduct.originalPrice}',
+                style: QiratTheme.bodyMedium.copyWith(
+                  color: QiratTheme.textMuted,
+                  decoration: TextDecoration.lineThrough,
+                ),
+              ),
+            ],
+            const Spacer(),
+            if (currentProduct.rating != null) ...[
+              Icon(
+                Icons.star,
+                color: QiratTheme.qiratGold,
+                size: 16,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '${currentProduct.rating}',
+                style: QiratTheme.bodyMedium.copyWith(
+                  color: QiratTheme.darkOnSurface,
+                ),
+              ),
+            ],
+          ],
+        ),
+
+        const SizedBox(height: 24),
+
+        // Action Buttons
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () => widget.onProductTap?.call(currentProduct),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: QiratTheme.qiratGold,
+                  side: const BorderSide(color: QiratTheme.qiratGold),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                child: const Text('View'),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: ElevatedButton(
+                onPressed: () => widget.onAddToCart?.call(currentProduct),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: QiratTheme.qiratGold,
+                  foregroundColor: QiratTheme.darkBackground,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                child: const Text('Add'),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDesktopProductDisplay(
+      ProductHighlight currentProduct, bool isMobile) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // Left: Product Details
+        Expanded(
+          flex: 3,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // Product Image
-              Container(
-                height: isMobile ? 200 : 300,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: QiratTheme.darkSurface,
-                  image: currentProduct.imageUrl != null
-                      ? DecorationImage(
-                          image: NetworkImage(currentProduct.imageUrl!),
-                          fit: BoxFit.cover,
-                        )
-                      : null,
+              // Badge for featured/new products
+              if (currentProduct.isFeatured || currentProduct.isNew)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: QiratTheme.qiratGold.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: QiratTheme.qiratGold),
+                  ),
+                  child: Text(
+                    currentProduct.isFeatured ? 'FEATURED' : 'NEW',
+                    style: QiratTheme.bodyMedium.copyWith(
+                      color: QiratTheme.qiratGold,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
                 ),
-                child: currentProduct.imageUrl == null
-                    ? Center(
-                        child: Icon(
-                          Icons.batch_prediction_outlined,
-                          size: isMobile ? 60 : 80,
-                          color: QiratTheme.qiratGold,
-                        ),
-                      )
-                    : null,
-              ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
 
-              // Product Details
+              // Product Name
               Text(
                 currentProduct.name,
                 style: QiratTheme.headlineMedium.copyWith(
                   color: QiratTheme.darkOnSurface,
-                  fontSize: isMobile ? 24 : 28,
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
 
+              // Category
+              if (currentProduct.category != null)
+                Text(
+                  currentProduct.category!.toUpperCase(),
+                  style: QiratTheme.bodyMedium.copyWith(
+                    color: QiratTheme.qiratGold.withOpacity(0.7),
+                    fontSize: 14,
+                    letterSpacing: 2,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+
+              const SizedBox(height: 16),
+
+              // Description
               Text(
                 currentProduct.description,
                 style: QiratTheme.bodyMedium.copyWith(
                   color: QiratTheme.textSecondary,
-                  fontSize: isMobile ? 14 : 16,
+                  fontSize: 16,
+                  height: 1.6,
                 ),
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
 
-              // Price and Rating
+              // Price and Rating Row
               Row(
                 children: [
-                  Text(
-                    '₹${currentProduct.price}',
-                    style: QiratTheme.titleLarge.copyWith(
-                      color: QiratTheme.qiratGold,
-                      fontWeight: FontWeight.bold,
-                      fontSize: isMobile ? 20 : 24,
-                    ),
+                  // Price
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'PRICE',
+                        style: QiratTheme.bodyMedium.copyWith(
+                          color: QiratTheme.textSecondary,
+                          fontSize: 12,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Text(
+                            '₹${currentProduct.price}',
+                            style: QiratTheme.titleLarge.copyWith(
+                              color: QiratTheme.qiratGold,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 28,
+                            ),
+                          ),
+                          if (currentProduct.originalPrice != null) ...[
+                            const SizedBox(width: 12),
+                            Text(
+                              '₹${currentProduct.originalPrice}',
+                              style: QiratTheme.bodyMedium.copyWith(
+                                color: QiratTheme.textMuted,
+                                decoration: TextDecoration.lineThrough,
+                                fontSize: 18,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ],
                   ),
-                  if (currentProduct.originalPrice != null) ...[
-                    const SizedBox(width: 12),
-                    Text(
-                      '₹${currentProduct.originalPrice}',
-                      style: QiratTheme.bodyMedium.copyWith(
-                        color: QiratTheme.textMuted,
-                        decoration: TextDecoration.lineThrough,
-                      ),
+                  const SizedBox(width: 40),
+                  // Rating
+                  if (currentProduct.rating != null)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'RATING',
+                          style: QiratTheme.bodyMedium.copyWith(
+                            color: QiratTheme.textSecondary,
+                            fontSize: 12,
+                            letterSpacing: 1.5,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.star,
+                              color: QiratTheme.qiratGold,
+                              size: 24,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              '${currentProduct.rating}/5.0',
+                              style: QiratTheme.titleLarge.copyWith(
+                                color: QiratTheme.darkOnSurface,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                  ],
-                  const Spacer(),
-                  if (currentProduct.rating != null) ...[
-                    Icon(
-                      Icons.star,
-                      color: QiratTheme.qiratGold,
-                      size: isMobile ? 16 : 20,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${currentProduct.rating}',
-                      style: QiratTheme.bodyMedium.copyWith(
-                        color: QiratTheme.darkOnSurface,
-                      ),
-                    ),
-                  ],
                 ],
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
 
               // Action Buttons
               Row(
@@ -419,62 +626,119 @@ class _AnimatedProductCircleWidgetState
                           widget.onProductTap?.call(currentProduct),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: QiratTheme.qiratGold,
-                        side: const BorderSide(color: QiratTheme.qiratGold),
-                        padding: EdgeInsets.symmetric(
-                          vertical: isMobile ? 12 : 16,
+                        side: const BorderSide(
+                            color: QiratTheme.qiratGold, width: 2),
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                      ),
+                      child: const Text(
+                        'VIEW DETAILS',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
                         ),
                       ),
-                      child: Text(isMobile ? 'View' : 'View Details'),
                     ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: ElevatedButton(
+                    child: ElevatedButton.icon(
                       onPressed: () => widget.onAddToCart?.call(currentProduct),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: QiratTheme.qiratGold,
                         foregroundColor: QiratTheme.darkBackground,
-                        padding: EdgeInsets.symmetric(
-                          vertical: isMobile ? 12 : 16,
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                      ),
+                      icon: const Icon(Icons.add_shopping_cart),
+                      label: const Text(
+                        'ADD TO CART',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.2,
                         ),
                       ),
-                      child: Text(isMobile ? 'Add' : 'Add to Cart'),
                     ),
                   ),
                 ],
               ),
             ],
           ),
-        );
-      },
+        ),
+
+        const SizedBox(width: 40),
+
+        // Right: Product Image
+        Expanded(
+          flex: 2,
+          child: Container(
+            height: 400,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              color: QiratTheme.darkSurface,
+              border: Border.all(
+                color: QiratTheme.qiratGold.withOpacity(0.3),
+                width: 2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: QiratTheme.qiratGold.withOpacity(0.2),
+                  blurRadius: 20,
+                  spreadRadius: 2,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+              image: currentProduct.imageUrl != null
+                  ? DecorationImage(
+                      image: NetworkImage(currentProduct.imageUrl!),
+                      fit: BoxFit.cover,
+                    )
+                  : null,
+            ),
+            child: currentProduct.imageUrl == null
+                ? Center(
+                    child: Icon(
+                      Icons.batch_prediction_outlined,
+                      size: 100,
+                      color: QiratTheme.qiratGold,
+                    ),
+                  )
+                : null,
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildAddToCartButton(BuildContext context) {
     return AnimatedBuilder(
-      animation: _fadeController,
+      animation: Listenable.merge([_fadeController, _pulseController]),
       builder: (context, child) {
-        return Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: QiratTheme.qiratGold,
-            boxShadow: [
-              BoxShadow(
-                color: QiratTheme.qiratGold.withOpacity(0.3),
-                blurRadius: 10,
-                spreadRadius: 2,
-              ),
-            ],
-          ),
-          child: IconButton(
-            onPressed: () =>
-                widget.onAddToCart?.call(widget.products[_currentIndex]),
-            icon: const Icon(
-              Icons.add,
-              color: QiratTheme.qiratBlack,
-              size: 24,
+        final scale = 1.0 + (_pulseController.value * 0.15);
+        final pulseOpacity = 0.3 + (_pulseController.value * 0.3);
+
+        return Transform.scale(
+          scale: scale,
+          child: Container(
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: QiratTheme.qiratGold,
+              boxShadow: [
+                BoxShadow(
+                  color: QiratTheme.qiratGold.withOpacity(pulseOpacity),
+                  blurRadius: 15 + (_pulseController.value * 10),
+                  spreadRadius: 3 + (_pulseController.value * 2),
+                ),
+              ],
             ),
-            tooltip: 'Add to Cart',
+            child: IconButton(
+              onPressed: () =>
+                  widget.onAddToCart?.call(widget.products[_currentIndex]),
+              icon: const Icon(
+                Icons.add_shopping_cart,
+                color: QiratTheme.qiratBlack,
+                size: 24,
+              ),
+              tooltip: 'Add to Cart',
+            ),
           ),
         );
       },

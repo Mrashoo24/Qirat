@@ -1,6 +1,20 @@
+import 'package:eshop/domain/entities/product/product.dart';
+import 'package:eshop/presentation/views/new_web/delivery_info/delivery_info_new.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../domain/entities/cart/cart_item.dart';
 import '../../presentation/views/new_web/new_web_landing_page_view.dart';
+// Add new imports
+import '../../presentation/views/new_web/products/new_web_products_view.dart';
+import '../../presentation/views/new_web/product/new_web_product_details_view.dart';
+import '../../presentation/views/new_web/cart/new_web_cart_view.dart';
+import '../../presentation/views/new_web/checkout/new_web_checkout_view.dart';
+import '../../presentation/views/new_web/categories/new_web_categories_view.dart';
+import '../../presentation/views/new_web/orders/new_web_orders_view.dart';
+import '../../presentation/views/new_web/wishlist/new_web_wishlist_view.dart';
+import '../../presentation/views/new_web/profile/new_web_profile_view.dart';
+import '../../presentation/views/new_web/search/new_web_search_view.dart';
+import '../../presentation/views/new_web/auth/new_web_signin_view.dart';
 
 // TODO: Uncomment these imports when implementing the actual views
 // import '../../../domain/entities/product/product.dart';
@@ -29,6 +43,8 @@ class NewWebRouter {
   // Admin routes (if needed)
   static const String newAdmin = '/new-admin';
   static const String newDashboard = '/new-dashboard';
+
+  static const newDeliveryInfo = '/new-delivery-info';
 }
 
 /// New GoRouter configuration for the redesigned web app
@@ -36,201 +52,83 @@ class NewWebRouter {
 final GoRouter newWebRouter = GoRouter(
   initialLocation: NewWebRouter.newHome,
   routes: [
-    /// 🏠 New Home
     GoRoute(
       name: NewWebRouter.newHome,
       path: NewWebRouter.newHome,
       builder: (context, state) => const NewWebLandingPageView(),
     ),
-
-    /// 🛍️ New Products
     GoRoute(
       name: NewWebRouter.newProducts,
       path: NewWebRouter.newProducts,
-      builder: (context, state) {
-        // TODO: Replace with NewWebProductsView when created
-        return const Scaffold(
-          body: Center(
-            child: Text('New Web Products - Coming Soon'),
-          ),
-        );
-      },
+      builder: (context, state) => const NewWebProductsView(),
     ),
-
-    /// 📱 New Product Details
     GoRoute(
       name: NewWebRouter.newProductDetails,
-      path: '${NewWebRouter.newProductDetails}/:productId',
+      path: NewWebRouter.newProductDetails,
       builder: (context, state) {
-        final productId = state.pathParameters['productId']!;
-        // final product = state.extra as Product?; // TODO: Use when implementing view
-        // TODO: Replace with NewWebProductDetailsView when created
-        return Scaffold(
-          body: Center(
-            child: Text('New Web Product Details - Product ID: $productId'),
-          ),
-        );
+        // Pass Product via state.extra
+        return NewWebProductDetailsView(product: state.extra as Product);
       },
     ),
-
-    /// 🛒 New Cart
     GoRoute(
       name: NewWebRouter.newCart,
       path: NewWebRouter.newCart,
-      builder: (context, state) {
-        // TODO: Replace with NewWebCartView when created
-        return const Scaffold(
-          body: Center(
-            child: Text('New Web Cart - Coming Soon'),
-          ),
-        );
-      },
+      builder: (context, state) => const NewWebCartView(),
     ),
-
-    /// 🧾 New Checkout
     GoRoute(
       name: NewWebRouter.newCheckout,
       path: NewWebRouter.newCheckout,
       builder: (context, state) {
-        // final items = state.extra as List<CartItem>?; // TODO: Use when implementing view
-        // TODO: Replace with NewWebCheckoutView when created
-        return const Scaffold(
-          body: Center(
-            child: Text('New Web Checkout - Coming Soon'),
-          ),
-        );
+        final items = state.extra as List<CartItem>;
+        return NewWebCheckoutView(items: items);
       },
     ),
-
-    /// 👤 New Profile
     GoRoute(
       name: NewWebRouter.newProfile,
       path: NewWebRouter.newProfile,
-      builder: (context, state) {
-        // final user = state.extra as User?; // TODO: Use when implementing view
-        // TODO: Replace with NewWebProfileView when created
-        return const Scaffold(
-          body: Center(
-            child: Text('New Web Profile - Coming Soon'),
-          ),
-        );
-      },
+      builder: (context, state) => const NewWebProfileView(),
     ),
-
-    /// 🔍 New Search
     GoRoute(
       name: NewWebRouter.newSearch,
       path: NewWebRouter.newSearch,
-      builder: (context, state) {
-        final query = state.uri.queryParameters['q'];
-        // TODO: Replace with NewWebSearchView when created
-        return Scaffold(
-          body: Center(
-            child: Text('New Web Search - Query: ${query ?? ""}'),
-          ),
-        );
-      },
+      builder: (context, state) => NewWebSearchView(
+        query: state.uri.queryParameters['q'] ?? '',
+      ),
     ),
-
-    /// 📂 New Categories
     GoRoute(
       name: NewWebRouter.newCategories,
       path: NewWebRouter.newCategories,
-      builder: (context, state) {
-        // TODO: Replace with NewWebCategoriesView when created
-        return const Scaffold(
-          body: Center(
-            child: Text('New Web Categories - Coming Soon'),
-          ),
-        );
-      },
+      builder: (context, state) => const NewWebCategoriesView(),
     ),
-
-    /// 📦 New Orders
     GoRoute(
       name: NewWebRouter.newOrders,
       path: NewWebRouter.newOrders,
-      builder: (context, state) {
-        // TODO: Replace with NewWebOrdersView when created
-        return const Scaffold(
-          body: Center(
-            child: Text('New Web Orders - Coming Soon'),
-          ),
-        );
-      },
+      builder: (context, state) => const NewWebOrdersView(),
     ),
-
-    /// ❤️ New Wishlist
     GoRoute(
       name: NewWebRouter.newWishlist,
       path: NewWebRouter.newWishlist,
-      builder: (context, state) {
-        // TODO: Replace with NewWebWishlistView when created
-        return const Scaffold(
-          body: Center(
-            child: Text('New Web Wishlist - Coming Soon'),
-          ),
-        );
-      },
+      builder: (context, state) => const NewWebWishlistView(),
     ),
-
-    /// 🔐 New Sign In
+    // Auth placeholders (can reuse old views if needed)
     GoRoute(
       name: NewWebRouter.newSignIn,
       path: NewWebRouter.newSignIn,
-      builder: (context, state) {
-        // TODO: Replace with NewWebSignInView when created
-        return const Scaffold(
-          body: Center(
-            child: Text('New Web Sign In - Coming Soon'),
-          ),
-        );
-      },
+      builder: (context, state) => const NewWebSignInView(),
     ),
-
-    /// 📝 New Sign Up
     GoRoute(
       name: NewWebRouter.newSignUp,
       path: NewWebRouter.newSignUp,
-      builder: (context, state) {
-        // TODO: Replace with NewWebSignUpView when created
-        return const Scaffold(
-          body: Center(
-            child: Text('New Web Sign Up - Coming Soon'),
-          ),
-        );
-      },
+      builder: (context, state) =>
+          const Scaffold(body: Center(child: Text('Sign Up'))),
     ),
 
-    /// 👨‍💼 New Admin
     GoRoute(
-      name: NewWebRouter.newAdmin,
-      path: NewWebRouter.newAdmin,
-      builder: (context, state) {
-        // TODO: Replace with NewWebAdminView when created
-        return const Scaffold(
-          body: Center(
-            child: Text('New Web Admin - Coming Soon'),
-          ),
-        );
-      },
-    ),
-
-    /// 📊 New Dashboard
-    GoRoute(
-      name: NewWebRouter.newDashboard,
-      path: NewWebRouter.newDashboard,
-      builder: (context, state) {
-        // TODO: Replace with NewWebDashboardView when created
-        return const Scaffold(
-          body: Center(
-            child: Text('New Web Dashboard - Coming Soon'),
-          ),
-        );
-      },
-    ),
+      path: NewWebRouter.newDeliveryInfo,
+      name: NewWebRouter.newDeliveryInfo,
+      builder: (context, state) => DeliveryInfoViewNew(),
+    )
   ],
-
   // Error handling
   errorBuilder: (context, state) {
     return Scaffold(

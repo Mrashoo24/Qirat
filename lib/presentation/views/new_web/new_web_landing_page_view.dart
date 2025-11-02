@@ -1,14 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import '../../../core/router/new_web_router.dart';
 import '../../../core/theme/qirat_theme.dart';
 import '../../../core/responsive/responsive_helper.dart';
+import '../../../domain/entities/product/price_tag.dart';
+import '../../../domain/entities/product/product.dart';
+import '../../../domain/entities/category/category.dart';
+import '../../blocs/category/category_bloc.dart';
+import '../../blocs/product/product_bloc.dart';
+import '../../blocs/filter/filter_cubit.dart';
+import '../../../domain/usecases/product/get_product_usecase.dart';
 import '../../widgets/new_web/common/qirat_header_widget.dart';
+import '../../widgets/new_web/common/qirat_horizontal_collection_widget.dart';
+import '../../widgets/new_web/sections/qirat_category_section_widget.dart';
 import '../../widgets/new_web/sections/qirat_hero_section_widget.dart';
 import '../../widgets/new_web/sections/qirat_differences_section_widget.dart';
 import '../../widgets/new_web/sections/qirat_collection_section_widget.dart';
 import '../../widgets/new_web/sections/qirat_heritage_section_widget.dart';
 import '../../widgets/new_web/sections/qirat_footer_section_widget.dart';
 import '../../widgets/new_web/modals/qirat_scent_advisor_modal.dart';
-import '../../widgets/new_web/sections/qirat_products_collection_view.dart';
 
 /// New Web Landing Page - Complete Qirat website experience
 class NewWebLandingPageView extends StatefulWidget {
@@ -21,11 +32,111 @@ class NewWebLandingPageView extends StatefulWidget {
 class _NewWebLandingPageViewState extends State<NewWebLandingPageView> {
   final ScrollController _scrollController = ScrollController();
   bool _showScrollIndicator = true;
+  Category? _selectedCategory;
+
+  // Dummy top-selling products
+  late final List<Product> _topSellingProducts;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_handleScroll);
+    _topSellingProducts = _createDummyProducts();
+  }
+
+  List<Product> _createDummyProducts() {
+    return [
+      Product(
+        id: '1',
+        name: 'Royal Oud Supreme',
+        description:
+            'Premium aged oud with rich, complex notes that evolve beautifully throughout the day. Perfect for special occasions.',
+        images: [],
+        priceTags: [
+          PriceTag(
+            id: 'pt1',
+            name: '12ml',
+            price: 2499,
+          ),
+        ],
+        categories: ['Oud', 'Premium'],
+        tags: ['bestseller', 'featured'],
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+      Product(
+        id: '2',
+        name: 'Musk Heritage',
+        description:
+            'Traditional white musk blend, soft and lingering with timeless appeal. A signature scent for daily wear.',
+        images: [],
+        priceTags: [
+          PriceTag(
+            id: 'pt2',
+            name: '12ml',
+            price: 999,
+          ),
+        ],
+        categories: ['Musk', 'Classic'],
+        tags: ['popular', 'everyday'],
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+      Product(
+        id: '3',
+        name: 'Rose Majesty',
+        description:
+            'Pure Bulgarian rose attar, capturing the essence of a thousand petals. Elegant and unforgettable.',
+        images: [],
+        priceTags: [
+          PriceTag(
+            id: 'pt3',
+            name: '12ml',
+            price: 1899,
+          ),
+        ],
+        categories: ['Rose', 'Floral'],
+        tags: ['new', 'luxury'],
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+      Product(
+        id: '4',
+        name: 'Sandalwood Supreme',
+        description:
+            'Authentic Mysore sandalwood, aged to perfection with creamy richness. A meditative and calming fragrance.',
+        images: [],
+        priceTags: [
+          PriceTag(
+            id: 'pt4',
+            name: '12ml',
+            price: 1599,
+          ),
+        ],
+        categories: ['Sandalwood', 'Premium'],
+        tags: ['bestseller', 'calming'],
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+      Product(
+        id: '5',
+        name: 'Amber Nights',
+        description:
+            'Warm amber blend with vanilla and musk undertones for evening wear. Sophisticated and alluring.',
+        images: [],
+        priceTags: [
+          PriceTag(
+            id: 'pt5',
+            name: '12ml',
+            price: 1299,
+          ),
+        ],
+        categories: ['Amber', 'Oriental'],
+        tags: ['evening', 'warm'],
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      ),
+    ];
   }
 
   @override
@@ -52,7 +163,6 @@ class _NewWebLandingPageViewState extends State<NewWebLandingPageView> {
         backgroundColor: QiratTheme.darkBackground,
         body: Stack(
           children: [
-            // Main Content
             CustomScrollView(
               controller: _scrollController,
               slivers: [
@@ -70,29 +180,78 @@ class _NewWebLandingPageViewState extends State<NewWebLandingPageView> {
                 // Page Content
                 SliverList(
                   delegate: SliverChildListDelegate([
-                    // Hero Section
-                    QiratHeroSectionWidget(
-                      onFindScentTap: _showScentAdvisorModal,
-                      onExploreAllTap: _handleExploreAllTap,
+                    // Hero Section with Top Selling Products
+                    BlocBuilder<ProductBloc, ProductState>(
+                      builder: (context, productState) {
+                        final products = productState.products.isNotEmpty
+                            ? productState.products
+                            : _topSellingProducts;
+
+                        return QiratHeroSectionWidget(
+                          topSellingProducts: products.take(5).toList(),
+                          onAddToCart: _handleAddToCart,
+                          onFindScentTap: _showScentAdvisorModal,
+                          onExploreAllTap: _handleExploreAllTap,
+                        );
+                      },
                     ),
 
                     // Tagline Section
                     _buildTaglineSection(),
 
+                    // Category Section
+                    BlocBuilder<CategoryBloc, CategoryState>(
+                      builder: (context, categoryState) {
+                        if (categoryState is CategoryLoaded ||
+                            categoryState is CategoryCacheLoaded) {
+                          return QiratCategorySectionWidget(
+                            categories: categoryState.categories,
+                            onCategoryTap: _handleCategoryTap,
+                            onViewAllTap: _handleViewAllCategories,
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
+                    ),
+
                     // Differences Section
                     const QiratDifferencesSectionWidget(),
-                    QiratCollectionHorizontalSectionWidget(
-                      onViewAllTap: _handleViewAllProductsTap,
-                      onProductTap: _handleProductTap,
+
+                    // Top Selling Products Collection
+                    BlocBuilder<ProductBloc, ProductState>(
+                      builder: (context, productState) {
+                        final topSellingProducts
+                        =
+                        // productState
+                        //         .products.isNotEmpty
+                        //     ? productState.products
+                        //         .where((p) => p.tags.contains('top-selling'))
+                        //         .toList()
+                        //     :
+                        //
+                        _topSellingProducts;
+
+                        return QiratHorizontalCollectionWidget(
+                          title: 'Top Selling Attars',
+                          subtitle:
+                              'Discover our most popular fragrances loved by connoisseurs',
+                          products: topSellingProducts,
+                          onProductTap: _handleProductTap,
+                          onAddToCart: _handleAddToCart,
+                          onViewAllTap: _handleViewAllProductsTap,
+                          viewAllButtonText: 'View All Top Sellers',
+                        );
+                      },
                     ),
-                    // Collection Section
+                    // Heritage Section
+                    const QiratHeritageSectionWidget(),
+                    // Animated Collection Section
                     QiratCollectionSectionWidget(
                       onViewAllTap: _handleViewAllProductsTap,
                       onProductTap: _handleProductTap,
                     ),
 
-                    // Heritage Section
-                    const QiratHeritageSectionWidget(),
+
 
                     // Footer Section
                     QiratFooterSectionWidget(
@@ -104,7 +263,7 @@ class _NewWebLandingPageViewState extends State<NewWebLandingPageView> {
               ],
             ),
 
-            // Scroll Indicator (Desktop only)
+            // Scroll Indicator
             if (_showScrollIndicator && !ResponsiveHelper.isMobile(context))
               _buildScrollIndicator(),
           ],
@@ -262,7 +421,7 @@ class _NewWebLandingPageViewState extends State<NewWebLandingPageView> {
     debugPrint('View all products tapped');
   }
 
-  void _handleProductTap(String productName) {
+  void _handleProductTap(Product productName) {
     // TODO: Navigate to product details page
     debugPrint('Product tapped: $productName');
   }
@@ -290,4 +449,35 @@ class _NewWebLandingPageViewState extends State<NewWebLandingPageView> {
       ),
     );
   }
+
+  void _handleAddToCart(Product product, String priceTagId) {
+    // TODO: Add product to cart
+    debugPrint('Adding to cart: ${product.name} with price tag: $priceTagId');
+
+    // Show success message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${product.name} added to cart!'),
+        backgroundColor: QiratTheme.qiratGold,
+        behavior: SnackBarBehavior.floating,
+        action: SnackBarAction(
+          label: 'VIEW CART',
+          textColor: QiratTheme.qiratBlack,
+          onPressed: _handleCartTap,
+        ),
+      ),
+    );
+  }
+
+  void _handleCategoryTap(Category category) {
+    setState(() {
+      _selectedCategory = category;
+    });
+
+    // Update filter cubit
+    context.read<FilterCubit>().update(category: category);
+    context.go(NewWebRouter.newProducts);
+  }
+
+  void _handleViewAllCategories() {}
 }

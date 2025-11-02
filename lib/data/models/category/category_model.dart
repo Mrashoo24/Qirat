@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import '../../../domain/entities/category/category.dart';
 
 List<CategoryModel> categoryModelListFromRemoteJson(String str) =>
@@ -18,27 +17,32 @@ class CategoryModel extends Category {
     required String id,
     required String name,
     required String image,
+    String? mobileImage,
   }) : super(
           id: id,
           name: name,
           image: image,
+          mobileImage: mobileImage,
         );
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) => CategoryModel(
         id: json["_id"],
         name: json["name"],
         image: json["image"],
+        mobileImage: json["mobileImage"],
       );
 
   Map<String, dynamic> toJson() => {
         "_id": id,
         "name": name,
         "image": image,
+        "mobileImage": mobileImage,
       };
 
   factory CategoryModel.fromEntity(Category entity) => CategoryModel(
         id: entity.id,
         name: entity.name,
         image: entity.image,
+        mobileImage: entity.mobileImage,
       );
 }
