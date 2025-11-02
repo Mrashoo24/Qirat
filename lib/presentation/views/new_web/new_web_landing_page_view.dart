@@ -476,7 +476,7 @@ class _NewWebLandingPageViewState extends State<NewWebLandingPageView> {
 
     // Update filter cubit
     context.read<FilterCubit>().update(category: category);
-    context.go(NewWebRouter.newProducts);
+    context.push(NewWebRouter.newProducts);
   }
 
   void _handleViewAllCategories() {}

@@ -59,9 +59,29 @@ class QiratHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
   }
 
   Widget _buildMobileLayout(BuildContext context) {
+    final ishome =
+        GoRouter.of(context).routerDelegate.currentConfiguration.fullPath ==
+            NewWebRouter.newHome;
     return Row(
       children: [
-        _buildLogo(),
+        // Back button (always visible on mobile)
+        ishome ? SizedBox() :  IconButton(
+          tooltip: 'Back',
+          onPressed: ishome
+              ? null
+              : () {
+                  if (Navigator.canPop(context)) {
+                    context.pop();
+                  } else {
+                    context.go(NewWebRouter.newHome);
+                  }
+                },
+          icon: const Icon(Icons.arrow_back_ios_new,
+              color: QiratTheme.darkOnSurface, size: 22),
+        ),
+        const SizedBox(width: 4),
+        // Clickable logo -> Home
+        _buildLogoButton(context),
         const Spacer(),
         IconButton(
           onPressed: () => context.go(NewWebRouter.newSearch),
@@ -70,7 +90,7 @@ class QiratHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
         ),
         _buildCartButton(context),
         IconButton(
-          onPressed:  () => _openMobileMenu(context),
+          onPressed: () => _openMobileMenu(context),
           icon: const Icon(Icons.menu, color: QiratTheme.qiratGold, size: 28),
         ),
       ],
@@ -80,7 +100,8 @@ class QiratHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
   Widget _buildDesktopLayout(BuildContext context) {
     return Row(
       children: [
-        _buildLogo(),
+        // Clickable logo -> Home
+        _buildLogoButton(context),
         const Spacer(),
         _buildNavigation(context),
         const SizedBox(width: 32),
@@ -124,6 +145,17 @@ class QiratHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildLogoButton(BuildContext context) {
+    return InkWell(
+      onTap: () => context.go(NewWebRouter.newHome),
+      borderRadius: BorderRadius.circular(6),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        child: _buildLogo(),
       ),
     );
   }
