@@ -18,11 +18,16 @@ class CategoryModel extends Category {
     required String name,
     required String image,
     String? mobileImage,
+    String? body,
+    String? location,
   }) : super(
           id: id,
           name: name,
           image: image,
           mobileImage: mobileImage,
+          body: body,
+          location: location,
+
         );
 
   factory CategoryModel.fromJson(Map<String, dynamic> json) => CategoryModel(
@@ -30,6 +35,8 @@ class CategoryModel extends Category {
         name: json["name"],
         image: json["image"],
         mobileImage: json["mobileImage"],
+        body: json["body"],
+        location: json["location"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -37,6 +44,8 @@ class CategoryModel extends Category {
         "name": name,
         "image": image,
         "mobileImage": mobileImage,
+        "body": body,
+        "location": location,
       };
 
   factory CategoryModel.fromEntity(Category entity) => CategoryModel(
@@ -44,5 +53,7 @@ class CategoryModel extends Category {
         name: entity.name,
         image: entity.image,
         mobileImage: entity.mobileImage,
+        body: entity.body,
+        location: entity.location,
       );
 }

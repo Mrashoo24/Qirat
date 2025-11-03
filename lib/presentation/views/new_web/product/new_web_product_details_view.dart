@@ -13,6 +13,7 @@ import '../../../../domain/entities/cart/cart_item.dart';
 import '../../../../domain/entities/product/product.dart';
 import '../../../../domain/entities/product/price_tag.dart';
 import '../../../blocs/cart/cart_bloc.dart';
+import '../../../blocs/product/product_bloc.dart';
 import '../../../blocs/user/user_bloc.dart';
 import '../../../blocs/home/navbar_cubit.dart';
 import '../../../widgets/new_web/common/qirat_header_widget.dart';
@@ -21,6 +22,50 @@ import '../../../widgets/counterButton.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../data/firebase/firebase_services.dart';
 import '../../../../core/services/services_locator.dart';
+
+class NewWebProductDetailsLoader extends StatelessWidget {
+  final String productId;
+  const NewWebProductDetailsLoader({Key? key, required this.productId}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<ProductBloc, ProductState>(
+      builder: (context, state) {
+        // Wait for products to be available (ProductLoaded or any state with non-empty list)
+        final List<Product> products = state.products;
+        if (products.isEmpty) {
+          return const Scaffold(
+            backgroundColor: QiratTheme.darkBackground,
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        final product = products.firstWhere(
+          (p) => p.id == productId,
+          orElse: () =>  Product(
+            id: '',
+            name: '',
+            description: '',
+            images: [],
+            priceTags: [],
+            categories: [],
+            tags: [],
+            createdAt:DateTime.now(), // Safe placeholder if your entity allows null/adjust to your constructor
+            updatedAt: DateTime.now(), // Safe placeholder if your entity allows null/adjust to your constructor
+          ),
+        );
+
+        if (product.id.isEmpty) {
+          // Invalid ID -> redirect to home gracefully
+          Future.microtask(() => context.go(NewWebRouter.newHome));
+          return const SizedBox.shrink();
+        }
+
+        return NewWebProductDetailsView(product: product);
+      },
+    );
+  }
+}
 
 class NewWebProductDetailsView extends StatefulWidget {
   final Product product;
@@ -272,10 +317,17 @@ class _NewWebProductDetailsViewState extends State<NewWebProductDetailsView> {
             children: widget.product.tags
                 .map((t) => Row(
                       mainAxisSize: MainAxisSize.min,
-                      children: const [
+                      children:  [
                         Icon(Icons.circle,
                             size: 6, color: QiratTheme.qiratGold),
                         SizedBox(width: 6),
+                        Text(
+                            widget.product.tags.isNotEmpty ? t : 'No Tags',
+                          style: TextStyle(
+                            color: QiratTheme.textSecondary,
+                            fontFamily: 'Inter',
+                          ),
+                        ),
                       ],
                     ))
                 .toList(),

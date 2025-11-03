@@ -20,6 +20,10 @@ import '../../widgets/new_web/sections/qirat_collection_section_widget.dart';
 import '../../widgets/new_web/sections/qirat_heritage_section_widget.dart';
 import '../../widgets/new_web/sections/qirat_footer_section_widget.dart';
 import '../../widgets/new_web/modals/qirat_scent_advisor_modal.dart';
+import '../../blocs/cart/cart_bloc.dart';
+import '../../../domain/entities/cart/cart_item.dart';
+import '../../../core/services/services_locator.dart' as di;
+import '../../../core/services/config_service.dart';
 
 /// New Web Landing Page - Complete Qirat website experience
 class NewWebLandingPageView extends StatefulWidget {
@@ -32,7 +36,7 @@ class NewWebLandingPageView extends StatefulWidget {
 class _NewWebLandingPageViewState extends State<NewWebLandingPageView> {
   final ScrollController _scrollController = ScrollController();
   bool _showScrollIndicator = true;
-  Category? _selectedCategory;
+  // Removed unused state: selected category now handled via navigation/filter
 
   // Dummy top-selling products
   late final List<Product> _topSellingProducts;
@@ -42,6 +46,11 @@ class _NewWebLandingPageViewState extends State<NewWebLandingPageView> {
     super.initState();
     _scrollController.addListener(_handleScroll);
     _topSellingProducts = _createDummyProducts();
+    // Ensure products are loaded for dynamic promotional sections
+    final productState = context.read<ProductBloc>().state;
+    if (productState.products.isEmpty) {
+      context.read<ProductBloc>().add(const GetProducts(FilterProductParams()));
+    }
   }
 
   List<Product> _createDummyProducts() {
@@ -172,6 +181,7 @@ class _NewWebLandingPageViewState extends State<NewWebLandingPageView> {
                   toolbarHeight: 80,
                   backgroundColor: Colors.transparent,
                   flexibleSpace: QiratHeaderWidget(
+                    showBackButton: false,
                     onCartTap: _handleCartTap,
                     onMenuTap: _handleMenuTap,
                   ),
@@ -183,12 +193,14 @@ class _NewWebLandingPageViewState extends State<NewWebLandingPageView> {
                     // Hero Section with Top Selling Products
                     BlocBuilder<ProductBloc, ProductState>(
                       builder: (context, productState) {
+                        final heroId = di.sl<ConfigService>().heroCategoryId;
                         final products = productState.products.isNotEmpty
                             ? productState.products
+                                .where((e) => e.categories.contains(heroId))
                             : _topSellingProducts;
 
                         return QiratHeroSectionWidget(
-                          topSellingProducts: products.take(5).toList(),
+                          topSellingProducts: products.toList(),
                           onAddToCart: _handleAddToCart,
                           onFindScentTap: _showScentAdvisorModal,
                           onExploreAllTap: _handleExploreAllTap,
@@ -205,7 +217,9 @@ class _NewWebLandingPageViewState extends State<NewWebLandingPageView> {
                         if (categoryState is CategoryLoaded ||
                             categoryState is CategoryCacheLoaded) {
                           return QiratCategorySectionWidget(
-                            categories: categoryState.categories,
+                            categories: categoryState.categories
+                                .where((c) => c.location == 'main')
+                                .toList(),
                             onCategoryTap: _handleCategoryTap,
                             onViewAllTap: _handleViewAllCategories,
                           );
@@ -217,41 +231,74 @@ class _NewWebLandingPageViewState extends State<NewWebLandingPageView> {
                     // Differences Section
                     const QiratDifferencesSectionWidget(),
 
-                    // Top Selling Products Collection
-                    BlocBuilder<ProductBloc, ProductState>(
-                      builder: (context, productState) {
-                        final topSellingProducts
-                        =
-                        // productState
-                        //         .products.isNotEmpty
-                        //     ? productState.products
-                        //         .where((p) => p.tags.contains('top-selling'))
-                        //         .toList()
-                        //     :
-                        //
-                        _topSellingProducts;
+                    BlocBuilder<CategoryBloc, CategoryState>(
+                      builder: (context, categoryState) {
+                        if (categoryState is CategoryLoaded ||
+                            categoryState is CategoryCacheLoaded) {
+                          final heroId = di.sl<ConfigService>().featured_collection_id;
 
-                        return QiratHorizontalCollectionWidget(
-                          title: 'Top Selling Attars',
-                          subtitle:
-                              'Discover our most popular fragrances loved by connoisseurs',
-                          products: topSellingProducts,
-                          onProductTap: _handleProductTap,
-                          onAddToCart: _handleAddToCart,
-                          onViewAllTap: _handleViewAllProductsTap,
-                          viewAllButtonText: 'View All Top Sellers',
-                        );
+                          final promotionCategories = categoryState.categories
+                              .where((c) => c.id == heroId)
+                              .toList();
+
+                          // Return regular RenderBox children (Column) instead of a SliverList
+                          // to avoid placing a sliver inside a non-sliver parent.
+                          return Column(
+                            children:
+                                promotionCategories.map((currentCategory) {
+                              return BlocBuilder<ProductBloc, ProductState>(
+                                builder: (context, productState) {
+                                  final topSellingProducts = productState
+                                          .products.isNotEmpty
+                                      ? productState.products.where((p) {
+                                          final cats = p.categories;
+                                          // Support both cases where product.categories may be a list of Category objects
+                                          // or a list of category names (String).
+                                          return cats
+                                                  .contains(currentCategory) ||
+                                              cats.contains(currentCategory.id);
+                                        }).toList()
+                                      : _topSellingProducts;
+
+                                  return QiratHorizontalCollectionWidget(
+                                    title: currentCategory.name,
+                                    subtitle: currentCategory.body,
+                                    products: topSellingProducts,
+                                    onProductTap: _handleProductTap,
+                                    onAddToCart: _handleAddToCart,
+                                    onViewAllTap: _handleViewAllProductsTap,
+                                    viewAllButtonText:
+                                        'Explore All ${currentCategory.name}',
+                                  );
+                                },
+                              );
+                            }).toList(),
+                          );
+                        }
+                        return const SizedBox.shrink();
                       },
                     ),
                     // Heritage Section
                     const QiratHeritageSectionWidget(),
-                    // Animated Collection Section
-                    QiratCollectionSectionWidget(
-                      onViewAllTap: _handleViewAllProductsTap,
-                      onProductTap: _handleProductTap,
+
+                    BlocBuilder<ProductBloc, ProductState>(
+                      builder: (context, productState) {
+                        final heroId = di.sl<ConfigService>().premiumCategoryId;
+                        final products = productState.products.isNotEmpty
+                            ? productState.products
+                                .where((e) => e.categories.contains(heroId))
+                            : _topSellingProducts;
+
+                        return
+                            // Animated Collection Section
+                            QiratCollectionSectionWidget(
+                          products: products.toList(),
+                          onViewAllTap: _handleViewAllpremiumProductsTap,
+                          onProductTap: _handleProductTap,
+                          onAddToCart: _handleAddToCart,
+                        );
+                      },
                     ),
-
-
 
                     // Footer Section
                     QiratFooterSectionWidget(
@@ -412,23 +459,97 @@ class _NewWebLandingPageViewState extends State<NewWebLandingPageView> {
   }
 
   void _handleExploreAllTap() {
-    // TODO: Navigate to products page
-    debugPrint('Explore all attars tapped');
+    final targetCategoryId = 'v856hO8j5qQHsrCqLq75';
+    Category? category;
+    final catState = context.read<CategoryBloc>().state;
+    if (catState is CategoryLoaded) {
+      final matches =
+          catState.categories.where((c) => c.id == targetCategoryId).toList();
+      if (matches.isNotEmpty) category = matches.first;
+    } else if (catState is CategoryCacheLoaded) {
+      final matches =
+          catState.categories.where((c) => c.id == targetCategoryId).toList();
+      if (matches.isNotEmpty) category = matches.first;
+    }
+
+    if (category != null) {
+      context.read<FilterCubit>().update(category: category);
+      context.push(NewWebRouter.newProducts, extra: {'category': category});
+    } else {
+      // Fallback if categories not ready yet
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Loading category…')),
+      );
+      context.push(NewWebRouter.newProducts,
+          extra: {'categoryId': targetCategoryId});
+    }
   }
+
 
   void _handleViewAllProductsTap() {
-    // TODO: Navigate to collection page
-    debugPrint('View all products tapped');
+    final targetCategoryId = di.sl<ConfigService>().featured_collection_id;
+    Category? category;
+    final catState = context.read<CategoryBloc>().state;
+    if (catState is CategoryLoaded) {
+      final matches =
+      catState.categories.where((c) => c.id == targetCategoryId).toList();
+      if (matches.isNotEmpty) category = matches.first;
+    } else if (catState is CategoryCacheLoaded) {
+      final matches =
+      catState.categories.where((c) => c.id == targetCategoryId).toList();
+      if (matches.isNotEmpty) category = matches.first;
+    }
+
+    if (category != null) {
+      context.read<FilterCubit>().update(category: category);
+      context.push(NewWebRouter.newProducts, extra: {'category': category});
+    } else {
+      // Fallback if categories not ready yet
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Loading category…')),
+      );
+      context.push(NewWebRouter.newProducts,
+          extra: {'categoryId': targetCategoryId});
+    }
   }
 
-  void _handleProductTap(Product productName) {
-    // TODO: Navigate to product details page
-    debugPrint('Product tapped: $productName');
+  void _handleViewAllpremiumProductsTap() {
+    final targetCategoryId = di.sl<ConfigService>().premiumCategoryId;
+    Category? category;
+    final catState = context.read<CategoryBloc>().state;
+    if (catState is CategoryLoaded) {
+      final matches =
+      catState.categories.where((c) => c.id == targetCategoryId).toList();
+      if (matches.isNotEmpty) category = matches.first;
+    } else if (catState is CategoryCacheLoaded) {
+      final matches =
+      catState.categories.where((c) => c.id == targetCategoryId).toList();
+      if (matches.isNotEmpty) category = matches.first;
+    }
+
+    if (category != null) {
+      context.read<FilterCubit>().update(category: category);
+      context.push(NewWebRouter.newProducts, extra: {'category': category});
+    } else {
+      // Fallback if categories not ready yet
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Loading category…')),
+      );
+      context.push(NewWebRouter.newProducts,
+          extra: {'categoryId': targetCategoryId});
+    }
   }
+
+
+  void _handleProductTap(Product product) {
+    context.push(NewWebRouter.newProductDetails, extra: product);
+  }
+
 
   void _handleShopCollectionTap() {
-    // TODO: Navigate to shop page
-    debugPrint('Shop collection tapped');
+
+      context.push(NewWebRouter.newProducts);
+
   }
 
   void _handleFooterLinkTap(String linkName) {
@@ -451,10 +572,26 @@ class _NewWebLandingPageViewState extends State<NewWebLandingPageView> {
   }
 
   void _handleAddToCart(Product product, String priceTagId) {
-    // TODO: Add product to cart
-    debugPrint('Adding to cart: ${product.name} with price tag: $priceTagId');
+    // Resolve selected priceTag; fallback to first if not found
+    final priceTag = product.priceTags.firstWhere(
+      (pt) => pt.id == priceTagId,
+      // orElse: () => product.priceTags.first,
+    );
 
-    // Show success message
+    // Dispatch to CartBloc (use guest uid '1' if not logged)
+    context.read<CartBloc>().add(
+          AddProduct(
+            cartItem: CartItem(
+              id: 'tmp-${product.id}-${priceTag.id}',
+              product: product,
+              priceTag: priceTag,
+              quantity: 1,
+              uid: '1',
+            ),
+          ),
+        );
+
+    // Show confirmation with quick link to cart
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('${product.name} added to cart!'),
@@ -463,21 +600,19 @@ class _NewWebLandingPageViewState extends State<NewWebLandingPageView> {
         action: SnackBarAction(
           label: 'VIEW CART',
           textColor: QiratTheme.qiratBlack,
-          onPressed: _handleCartTap,
+          onPressed: () => context.push(NewWebRouter.newCart),
         ),
       ),
     );
   }
 
   void _handleCategoryTap(Category category) {
-    setState(() {
-      _selectedCategory = category;
-    });
-
     // Update filter cubit
     context.read<FilterCubit>().update(category: category);
     context.push(NewWebRouter.newProducts);
   }
 
-  void _handleViewAllCategories() {}
+  void _handleViewAllCategories() {
+    context.push(NewWebRouter.newCategories);
+  }
 }

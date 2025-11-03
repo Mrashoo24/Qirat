@@ -4,12 +4,14 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:go_router/go_router.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'core/constant/strings.dart';
 import 'core/router/app_router.dart';
 import 'core/router/new_web_router.dart';
+import 'core/services/config_service.dart';
 import 'core/services/notification_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/qirat_theme.dart';
@@ -42,6 +44,9 @@ Future<void> main() async {
     );
 
     await di.init();
+    // Initialize Remote Config (with safe defaults)
+    await di.sl<ConfigService>().init();
+    GoRouter.optionURLReflectsImperativeAPIs = true;
     // await NotificationService.initialize();
     runApp(const NewWebTestApp());
     configLoading();

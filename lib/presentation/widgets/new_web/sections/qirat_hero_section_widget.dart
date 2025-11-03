@@ -447,23 +447,6 @@ class _QiratHeroSectionWidgetState extends State<QiratHeroSectionWidget>
             child: _buildAddToCartFloatingButton(isMobile),
           ),
 
-          // Small star icon on circle (bottom left)
-          Positioned(
-            bottom: size * 0.2,
-            left: size * 0.15,
-            child: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: QiratTheme.qiratGold,
-              ),
-              child: Icon(
-                Icons.star,
-                color: QiratTheme.qiratBlack,
-                size: isMobile ? 12 : 16,
-              ),
-            ),
-          ),
         ],
       ),
     );
@@ -481,19 +464,21 @@ class _QiratHeroSectionWidgetState extends State<QiratHeroSectionWidget>
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Category
-                Text(
-                  product.categories.isNotEmpty
-                      ? product.categories.first
-                      : 'Cosmetic',
-                  style: TextStyle(
-                    fontSize: isMobile ? 12 : 14,
-                    color: QiratTheme.textSecondary,
-                    fontFamily: 'Inter',
-                  ),
-                ),
-                SizedBox(height: isMobile ? 8 : 12),
+                // // Category
+                // Text(
+                //   product.categories.isNotEmpty
+                //       ? product.categories.first
+                //       : 'Cosmetic',
+                //   style: TextStyle(
+                //     fontSize: isMobile ? 12 : 14,
+                //     color: QiratTheme.textSecondary,
+                //     fontFamily: 'Inter',
+                //   ),
+                // ),
+                // SizedBox(height: isMobile ? 8 : 12),
+
                 // Product Name
+
                 Text(
                   product.name,
                   style: TextStyle(
@@ -505,6 +490,37 @@ class _QiratHeroSectionWidgetState extends State<QiratHeroSectionWidget>
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
+                SizedBox(height: isMobile ? 8 : 12),
+
+                if (product.tags.isNotEmpty) ...[
+                  Wrap(
+                    spacing: 12.0,
+                    runSpacing: 8.0,
+                    children:product.tags
+                        .map((t) => Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children:  [
+                        Icon(Icons.circle,
+                            size: 6, color: QiratTheme.qiratGold),
+                        SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            product.tags.isNotEmpty ? t : 'No Tags',
+                            maxLines: 2,
+                            style: TextStyle(
+                              color: QiratTheme.textSecondary,
+                              fontFamily: 'Inter',
+                              fontSize: 10.0,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ))
+                        .toList(),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+
                 SizedBox(height: isMobile ? 8 : 12),
                 // Description
                 Text(

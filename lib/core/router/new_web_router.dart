@@ -70,18 +70,37 @@ final GoRouter newWebRouter = GoRouter(
       builder: (context, state) {
         final extra = state.extra;
         Category? category;
+        String? categoryId;
         if (extra is Map && extra['category'] is Category) {
           category = extra['category'] as Category;
         }
-        return NewWebProductsView(category: category);
+        if (extra is Map && extra['categoryId'] is String) {
+          categoryId = extra['categoryId'] as String;
+        }
+        final q = state.uri.queryParameters;
+        categoryId = categoryId ?? q['catid'] ?? q['categoryId'];
+        return NewWebProductsView(category: category, categoryId: categoryId);
       },
     ),
     GoRoute(
       name: NewWebRouter.newProductDetails,
       path: NewWebRouter.newProductDetails,
       builder: (context, state) {
-        // Pass Product via state.extra
-        return NewWebProductDetailsView(product: state.extra as Product);
+        // Supports:
+        // - state.extra as Product
+        // - /new-product-details?prodid=ID or ?id=ID
+        final extra = state.extra;
+        if (extra is Product) {
+          return NewWebProductDetailsView(product: extra);
+        }
+        final q = state.uri.queryParameters;
+        final prodId = q['prodid'] ?? q['id'];
+        if (prodId != null && prodId.trim().isNotEmpty) {
+          return NewWebProductDetailsLoader(productId: prodId.trim());
+        }
+        // No data -> go home
+        Future.microtask(() => context.go(NewWebRouter.newHome));
+        return const SizedBox.shrink();
       },
     ),
     GoRoute(

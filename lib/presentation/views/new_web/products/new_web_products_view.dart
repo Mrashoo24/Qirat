@@ -15,7 +15,9 @@ import '../../../../domain/usecases/product/get_product_usecase.dart';
 
 class NewWebProductsView extends StatefulWidget {
   final Category? category;
-  const NewWebProductsView({Key? key, this.category}) : super(key: key);
+  final String? categoryId;
+  const NewWebProductsView({Key? key, this.category, this.categoryId})
+      : super(key: key);
 
   @override
   State<NewWebProductsView> createState() => _NewWebProductsViewState();
@@ -28,6 +30,17 @@ class _NewWebProductsViewState extends State<NewWebProductsView> {
     // Seed FilterCubit with incoming category if provided
     if (widget.category != null) {
       context.read<FilterCubit>().update(category: widget.category);
+    } else if (widget.categoryId != null && widget.categoryId!.isNotEmpty) {
+      // Seed with a lightweight placeholder Category so filtering works immediately
+      context.read<FilterCubit>().update(
+            category: Category(
+              id: widget.categoryId!,
+              name: '',
+              image: '',
+              body: null,
+              location: null,
+            ),
+          );
     }
     // Ensure products are loaded
     final productState = context.read<ProductBloc>().state;
@@ -173,7 +186,7 @@ class _NewWebProductsViewState extends State<NewWebProductsView> {
         if (!isMobile)
           IconButton(
             tooltip: 'Global search',
-            onPressed: () => context.go(NewWebRouter.newSearch),
+            onPressed: () => context.push(NewWebRouter.newSearch),
             icon: const Icon(Icons.travel_explore,
                 color: QiratTheme.darkOnSurface),
           ),
@@ -189,7 +202,7 @@ class _ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => context.go(NewWebRouter.newProductDetails, extra: product),
+      onTap: () => context.push(NewWebRouter.newProductDetails, extra: product),
       child: Container(
         decoration: BoxDecoration(
           color: QiratTheme.darkSurface,

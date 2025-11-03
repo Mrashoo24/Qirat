@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../../../core/theme/qirat_theme.dart';
 import '../../../../core/responsive/responsive_helper.dart';
+import '../../../../domain/entities/product/product.dart';
 
 /// Animated Product Circle Widget
 /// Features:
@@ -11,9 +12,9 @@ import '../../../../core/responsive/responsive_helper.dart';
 /// - Product image on the right side
 /// - Add to cart button on top right
 class AnimatedProductCircleWidget extends StatefulWidget {
-  final List<ProductHighlight> products;
-  final Function(ProductHighlight)? onProductTap;
-  final Function(ProductHighlight)? onAddToCart;
+  final List<Product> products;
+  final Function(Product)? onProductTap;
+  final Function(Product)? onAddToCart;
   final Duration animationDuration;
   final Duration switchDuration;
 
@@ -287,14 +288,14 @@ class _AnimatedProductCircleWidgetState
                       child: Container(
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          image: product.imageUrl != null
+                          image: product.images.isNotEmpty
                               ? DecorationImage(
-                                  image: NetworkImage(product.imageUrl!),
+                                  image: NetworkImage(product.images.last),
                                   fit: BoxFit.cover,
                                 )
                               : null,
                         ),
-                        child: product.imageUrl == null
+                        child: product.images.isNotEmpty
                             ? Icon(
                                 Icons.batch_prediction_outlined,
                                 color: index == _currentIndex
@@ -332,7 +333,7 @@ class _AnimatedProductCircleWidgetState
   }
 
   Widget _buildMobileProductDisplay(
-      ProductHighlight currentProduct, bool isMobile) {
+      Product currentProduct, bool isMobile) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -345,14 +346,14 @@ class _AnimatedProductCircleWidgetState
             borderRadius: BorderRadius.circular(20),
             color: QiratTheme.darkSurface,
             border: Border.all(color: QiratTheme.qiratGold.withOpacity(0.3)),
-            image: currentProduct.imageUrl != null
+            image: currentProduct.images.last != null
                 ? DecorationImage(
-                    image: NetworkImage(currentProduct.imageUrl!),
+                    image: NetworkImage(currentProduct.images.last!),
                     fit: BoxFit.cover,
                   )
                 : null,
           ),
-          child: currentProduct.imageUrl == null
+          child: currentProduct.images.last == null
               ? Center(
                   child: Icon(
                     Icons.batch_prediction_outlined,
@@ -392,17 +393,17 @@ class _AnimatedProductCircleWidgetState
         Row(
           children: [
             Text(
-              '₹${currentProduct.price}',
+              '₹${currentProduct.priceTags.first.price}',
               style: QiratTheme.titleLarge.copyWith(
                 color: QiratTheme.qiratGold,
                 fontWeight: FontWeight.bold,
                 fontSize: 20,
               ),
             ),
-            if (currentProduct.originalPrice != null) ...[
+            if (currentProduct.priceTags.first.price != null) ...[
               const SizedBox(width: 12),
               Text(
-                '₹${currentProduct.originalPrice}',
+                '₹${currentProduct.priceTags.first.price}',
                 style: QiratTheme.bodyMedium.copyWith(
                   color: QiratTheme.textMuted,
                   decoration: TextDecoration.lineThrough,
@@ -410,20 +411,20 @@ class _AnimatedProductCircleWidgetState
               ),
             ],
             const Spacer(),
-            if (currentProduct.rating != null) ...[
-              Icon(
-                Icons.star,
-                color: QiratTheme.qiratGold,
-                size: 16,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                '${currentProduct.rating}',
-                style: QiratTheme.bodyMedium.copyWith(
-                  color: QiratTheme.darkOnSurface,
-                ),
-              ),
-            ],
+            // if (currentProduct.rating != null) ...[
+            //   Icon(
+            //     Icons.star,
+            //     color: QiratTheme.qiratGold,
+            //     size: 16,
+            //   ),
+            //   const SizedBox(width: 4),
+            //   Text(
+            //     '${currentProduct.rating}',
+            //     style: QiratTheme.bodyMedium.copyWith(
+            //       color: QiratTheme.darkOnSurface,
+            //     ),
+            //   ),
+            // ],
           ],
         ),
 
@@ -462,7 +463,7 @@ class _AnimatedProductCircleWidgetState
   }
 
   Widget _buildDesktopProductDisplay(
-      ProductHighlight currentProduct, bool isMobile) {
+      Product currentProduct, bool isMobile) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -474,7 +475,7 @@ class _AnimatedProductCircleWidgetState
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // Badge for featured/new products
-              if (currentProduct.isFeatured || currentProduct.isNew)
+              // if (currentProduct.isFeatured || currentProduct.isNew)
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -484,7 +485,8 @@ class _AnimatedProductCircleWidgetState
                     border: Border.all(color: QiratTheme.qiratGold),
                   ),
                   child: Text(
-                    currentProduct.isFeatured ? 'FEATURED' : 'NEW',
+                    // currentProduct.isFeatured ? 'FEATURED' :
+                    'NEW',
                     style: QiratTheme.bodyMedium.copyWith(
                       color: QiratTheme.qiratGold,
                       fontWeight: FontWeight.bold,
@@ -509,16 +511,16 @@ class _AnimatedProductCircleWidgetState
               const SizedBox(height: 8),
 
               // Category
-              if (currentProduct.category != null)
-                Text(
-                  currentProduct.category!.toUpperCase(),
-                  style: QiratTheme.bodyMedium.copyWith(
-                    color: QiratTheme.qiratGold.withOpacity(0.7),
-                    fontSize: 14,
-                    letterSpacing: 2,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+              // if (currentProduct.category != null)
+              //   Text(
+              //     currentProduct.category!.toUpperCase(),
+              //     style: QiratTheme.bodyMedium.copyWith(
+              //       color: QiratTheme.qiratGold.withOpacity(0.7),
+              //       fontSize: 14,
+              //       letterSpacing: 2,
+              //       fontWeight: FontWeight.w500,
+              //     ),
+              //   ),
 
               const SizedBox(height: 16),
 
@@ -555,17 +557,17 @@ class _AnimatedProductCircleWidgetState
                       Row(
                         children: [
                           Text(
-                            '₹${currentProduct.price}',
+                            '₹${currentProduct.priceTags.first.price}',
                             style: QiratTheme.titleLarge.copyWith(
                               color: QiratTheme.qiratGold,
                               fontWeight: FontWeight.bold,
                               fontSize: 28,
                             ),
                           ),
-                          if (currentProduct.originalPrice != null) ...[
+                          if (currentProduct.priceTags != null) ...[
                             const SizedBox(width: 12),
                             Text(
-                              '₹${currentProduct.originalPrice}',
+                              '₹${currentProduct.priceTags.first.price}',
                               style: QiratTheme.bodyMedium.copyWith(
                                 color: QiratTheme.textMuted,
                                 decoration: TextDecoration.lineThrough,
@@ -579,7 +581,7 @@ class _AnimatedProductCircleWidgetState
                   ),
                   const SizedBox(width: 40),
                   // Rating
-                  if (currentProduct.rating != null)
+                  // if (currentProduct.rating != null)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -601,7 +603,7 @@ class _AnimatedProductCircleWidgetState
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              '${currentProduct.rating}/5.0',
+                              '${math.Random(5).nextInt(5)}/5.0',
                               style: QiratTheme.titleLarge.copyWith(
                                 color: QiratTheme.darkOnSurface,
                                 fontSize: 20,
@@ -686,14 +688,14 @@ class _AnimatedProductCircleWidgetState
                   offset: const Offset(0, 8),
                 ),
               ],
-              image: currentProduct.imageUrl != null
+              image: currentProduct.images.last != null
                   ? DecorationImage(
-                      image: NetworkImage(currentProduct.imageUrl!),
+                      image: NetworkImage(currentProduct.images.last!),
                       fit: BoxFit.cover,
                     )
                   : null,
             ),
-            child: currentProduct.imageUrl == null
+            child: currentProduct.images.last == null
                 ? Center(
                     child: Icon(
                       Icons.batch_prediction_outlined,

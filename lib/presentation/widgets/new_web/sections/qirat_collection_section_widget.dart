@@ -8,13 +8,14 @@ import '../common/animated_product_circle_widget.dart';
 class QiratCollectionSectionWidget extends StatelessWidget {
   final VoidCallback? onViewAllTap;
   final Function(Product)? onProductTap;
-  final Function(String)? onAddToCart;
+  final Function(Product, String)? onAddToCart;
+  final List<Product> products;
 
   const QiratCollectionSectionWidget({
     Key? key,
     this.onViewAllTap,
     this.onProductTap,
-    this.onAddToCart,
+    this.onAddToCart, required  this.products,
   }) : super(key: key);
 
   @override
@@ -62,12 +63,12 @@ class QiratCollectionSectionWidget extends StatelessWidget {
 
               // Animated Product Circle
               AnimatedProductCircleWidget(
-                products: _getSampleProducts(),
+                products:products,
                 onProductTap: (product) {
-                  // onProductTap?.call(product);
+                   onProductTap?.call(product);
                 },
                 onAddToCart: (product) {
-                  onAddToCart?.call(product.id);
+                  onAddToCart?.call(product, product.priceTags.first.id);
                 },
               ),
 

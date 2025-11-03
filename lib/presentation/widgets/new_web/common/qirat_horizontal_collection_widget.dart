@@ -158,7 +158,7 @@ class QiratHorizontalCollectionWidget extends StatelessWidget {
 
   Widget _buildProductCard(Product product, bool isMobile) {
     final cardWidth = isMobile ? 280.0 : 320.0;
-    final imageHeight = isMobile ? 160.0 : 200.0;
+    final imageHeight = isMobile ? 180.0 : 200.0;
     final cardPadding = isMobile ? 16.0 : 24.0;
     final titleSize = isMobile ? 20.0 : 24.0;
 
@@ -205,17 +205,17 @@ class QiratHorizontalCollectionWidget extends StatelessWidget {
 
             const SizedBox(height: 8),
 
-            // Product Category
-            if (product.categories.isNotEmpty)
-              Text(
-                product.categories.first,
-                style: TextStyle(
-                  fontSize: isMobile ? 13 : 14,
-                  fontStyle: FontStyle.italic,
-                  color: QiratTheme.textSecondary,
-                  fontFamily: 'Inter',
-                ),
-              ),
+            // // Product Category
+            // if (product.categories.isNotEmpty)
+            //   Text(
+            //     product.categories.first,
+            //     style: TextStyle(
+            //       fontSize: isMobile ? 13 : 14,
+            //       fontStyle: FontStyle.italic,
+            //       color: QiratTheme.textSecondary,
+            //       fontFamily: 'Inter',
+            //     ),
+            //   ),
 
             const SizedBox(height: 12),
 
@@ -254,7 +254,7 @@ class QiratHorizontalCollectionWidget extends StatelessWidget {
         child: product.images.isNotEmpty
             ? Image.network(
                 product.images.first,
-                fit: BoxFit.cover,
+                fit: BoxFit.fill,
                 width: double.infinity,
                 errorBuilder: (context, error, stackTrace) =>
                     _buildPlaceholder(isMobile),

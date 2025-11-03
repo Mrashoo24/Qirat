@@ -168,7 +168,7 @@ class _SearchProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => context.go(NewWebRouter.newProductDetails, extra: product),
+      onTap: () => context.push(NewWebRouter.newProductDetails, extra: product),
       child: Container(
         decoration: BoxDecoration(
           color: QiratTheme.darkSurface,

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../../../core/router/new_web_router.dart';
 import '../../../../core/theme/qirat_theme.dart';
 import '../../../../core/responsive/responsive_helper.dart';
 
@@ -59,7 +62,8 @@ class QiratFooterSectionWidget extends StatelessWidget {
               ),
               const SizedBox(height: 32),
               ElevatedButton(
-                onPressed: onShopCollectionTap,
+                onPressed: onShopCollectionTap ??
+                    () => _defaultShopCollection(context),
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(
                     horizontal: ResponsiveHelper.responsive(
@@ -114,9 +118,9 @@ class QiratFooterSectionWidget extends StatelessWidget {
           child: ResponsiveBuilder(
             builder: (context, isMobile, isTablet, isDesktop) {
               if (isMobile) {
-                return _buildMobileFooterLinks();
+                return _buildMobileFooterLinks(context);
               } else {
-                return _buildDesktopFooterLinks();
+                return _buildDesktopFooterLinks(context);
               }
             },
           ),
@@ -125,7 +129,7 @@ class QiratFooterSectionWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildDesktopFooterLinks() {
+  Widget _buildDesktopFooterLinks(BuildContext context) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -158,34 +162,43 @@ class QiratFooterSectionWidget extends StatelessWidget {
 
         // Quick Links Column
         Expanded(
-          child: _buildLinkColumn('Quick Links', [
-            'Signature Scent Advisor',
-            'Returns & Exchange',
-            'FAQ',
-          ]),
+          child: _buildLinkColumn(
+              'Quick Links',
+              [
+                'Signature Scent Advisor',
+                'Returns & Exchange',
+                'FAQ',
+              ],
+              context),
         ),
 
         // Connect Column
         Expanded(
-          child: _buildLinkColumn('Connect', [
-            'Instagram',
-            'WhatsApp',
-            'info@qirat.in',
-          ]),
+          child: _buildLinkColumn(
+              'Connect',
+              [
+                'Instagram',
+                'WhatsApp',
+                'care@qiratshop.in',
+              ],
+              context),
         ),
 
         // Legal Column
         Expanded(
-          child: _buildLinkColumn('Legal', [
-            'Privacy Policy',
-            'Terms of Service',
-          ]),
+          child: _buildLinkColumn(
+              'Legal',
+              [
+                'Privacy Policy',
+                'Terms of Service',
+              ],
+              context),
         ),
       ],
     );
   }
 
-  Widget _buildMobileFooterLinks() {
+  Widget _buildMobileFooterLinks(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -215,32 +228,42 @@ class QiratFooterSectionWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
-              child: _buildLinkColumn('Quick Links', [
-                'Signature Scent Advisor',
-                'Returns & Exchange',
-                'FAQ',
-              ]),
+              child: _buildLinkColumn(
+                  'Quick Links',
+                  [
+                    'Signature Scent Advisor',
+                    'Returns & Exchange',
+                    'FAQ',
+                  ],
+                  context),
             ),
             const SizedBox(width: 32),
             Expanded(
-              child: _buildLinkColumn('Connect', [
-                'Instagram',
-                'WhatsApp',
-                'info@qirat.in',
-              ]),
+              child: _buildLinkColumn(
+                  'Connect',
+                  [
+                    'Instagram',
+                    'WhatsApp',
+                    'care@qiratshop.in',
+                  ],
+                  context),
             ),
           ],
         ),
         const SizedBox(height: 24),
-        _buildLinkColumn('Legal', [
-          'Privacy Policy',
-          'Terms of Service',
-        ]),
+        _buildLinkColumn(
+            'Legal',
+            [
+              'Privacy Policy',
+              'Terms of Service',
+            ],
+            context),
       ],
     );
   }
 
-  Widget _buildLinkColumn(String title, List<String> links) {
+  Widget _buildLinkColumn(
+      String title, List<String> links, BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -257,7 +280,7 @@ class QiratFooterSectionWidget extends StatelessWidget {
         ...links.map((link) => Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: GestureDetector(
-                onTap: () => onLinkTap?.call(link),
+                onTap: () => _handleLinkTap(context, link),
                 child: Text(
                   link,
                   style: const TextStyle(
@@ -270,6 +293,95 @@ class QiratFooterSectionWidget extends StatelessWidget {
             )),
       ],
     );
+  }
+
+  void _defaultShopCollection(BuildContext context) {
+    // Navigate to Products as a sensible default
+    context.push(NewWebRouter.newProducts);
+  }
+
+  void _handleLinkTap(BuildContext context, String link) {
+    // Allow parent callback first (analytics, overrides)
+    onLinkTap?.call(link);
+
+    switch (link) {
+      case 'Privacy Policy':
+        context.push(NewWebRouter.newPrivacyPolicy);
+        break;
+      case 'Terms of Service':
+        context.push(NewWebRouter.newTerms);
+        break;
+      case 'Signature Scent Advisor':
+        // Route to search as an entry point; dedicated advisor modal lives on landing
+        context.push(NewWebRouter.newSearch);
+        break;
+      case 'Returns & Exchange':
+      case 'FAQ':
+        // Temporary mapping to Terms until dedicated pages exist
+        context.push(NewWebRouter.newTerms);
+        break;
+      case 'Instagram':
+        _openInstagram();
+        break;
+      case 'WhatsApp':
+        _openWhatsApp('9137029393');
+        break;
+      case 'info@qirat.in':
+        _openEmail('info@qirat.in');
+        break;
+      default:
+        // External items like Instagram/WhatsApp/email can be handled by parent via onLinkTap
+        break;
+    }
+  }
+
+  // External link helpers
+  Future<void> _openInstagram() async {
+    final uri = Uri.parse('https://www.instagram.com/qirat_attar');
+    await _launchExternal(uri);
+  }
+
+  Future<void> _openWhatsApp(String rawNumber) async {
+    // Assume India if no country code provided
+    final phone = _formatPhone(rawNumber);
+    final uri = Uri.parse('https://wa.me/$phone');
+    await _launchExternal(uri);
+  }
+
+  Future<void> _openEmail(String email) async {
+    final uri = Uri(
+      scheme: 'mailto',
+      path: email,
+      query: _encodeQueryParameters(<String, String>{
+        'subject': 'Support',
+      }),
+    );
+    await _launchExternal(uri);
+  }
+
+  String _formatPhone(String raw) {
+    var n = raw.replaceAll(RegExp(r'[^0-9+]'), '');
+    if (n.startsWith('+')) return n.substring(1);
+    if (n.length == 10) return '91$n';
+    return n; // Already includes country code digits
+  }
+
+  String? _encodeQueryParameters(Map<String, String> params) {
+    return params.entries
+        .map((e) =>
+            '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+        .join('&');
+  }
+
+  Future<void> _launchExternal(Uri uri) async {
+    try {
+      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+        // Fallback to in-app browser if external fails
+        await launchUrl(uri, mode: LaunchMode.platformDefault);
+      }
+    } catch (_) {
+      // Silently ignore launcher errors
+    }
   }
 
   Widget _buildCopyright(BuildContext context) {

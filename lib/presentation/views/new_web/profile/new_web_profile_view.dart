@@ -39,7 +39,7 @@ class NewWebProfileView extends StatelessWidget {
                   icon: Icons.location_on_outlined,
                   title: 'Delivery Information',
                   subtitle: 'Manage your addresses',
-                  onTap: () => context.goNamed(NewWebRouter.newDeliveryInfo),
+                  onTap: () => context.pushNamed(NewWebRouter.newDeliveryInfo),
                 ),
                 BlocBuilder<UserBloc, UserState>(
                   builder: (context, state) {
@@ -48,13 +48,12 @@ class NewWebProfileView extends StatelessWidget {
                         icon: Icons.receipt_long_outlined,
                         title: 'Orders',
                         subtitle: 'View order history and status',
-                        onTap: () => context.goNamed(NewWebRouter.newOrders),
+                        onTap: () => context.pushNamed(NewWebRouter.newOrders),
                       );
                     }
                     return const SizedBox.shrink();
                   },
                 ),
-
 
                 // _SectionTile(
                 //   icon: Icons.favorite_border,
@@ -67,19 +66,19 @@ class NewWebProfileView extends StatelessWidget {
                   icon: Icons.privacy_tip_outlined,
                   title: 'Privacy Policy',
                   subtitle: 'Understand how we handle your data',
-                  onTap: () => context.goNamed(NewWebRouter.newPrivacyPolicy),
+                  onTap: () => context.pushNamed(NewWebRouter.newPrivacyPolicy),
                 ),
                 _SectionTile(
                   icon: Icons.description_outlined,
                   title: 'Terms of Service',
                   subtitle: 'Read our terms and conditions',
-                  onTap: () => context.goNamed(NewWebRouter.newTerms),
+                  onTap: () => context.pushNamed(NewWebRouter.newTerms),
                 ),
                 _SectionTile(
                   icon: Icons.delete_outline,
                   title: 'Delete Account',
                   subtitle: 'Learn how to request deletion',
-                  onTap: () => context.goNamed(NewWebRouter.newDeleteAccount),
+                  onTap: () => context.pushNamed(NewWebRouter.newDeleteAccount),
                 ),
                 const Divider(color: QiratTheme.borderDark, height: 24),
                 BlocBuilder<UserBloc, UserState>(

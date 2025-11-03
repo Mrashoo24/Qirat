@@ -130,7 +130,7 @@ class NewWebCheckoutView extends StatelessWidget {
                             top: 0,
                             child: IconButton(
                               onPressed: () {
-                               context.go(NewWebRouter.newDeliveryInfo);
+                                context.push(NewWebRouter.newDeliveryInfo);
                               },
                               icon: const Icon(
                                 Icons.edit,

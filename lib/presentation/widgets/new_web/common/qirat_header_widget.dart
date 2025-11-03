@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/responsive/responsive_helper.dart';
 import '../../../../core/router/new_web_router.dart';
 import '../../../../core/theme/qirat_theme.dart';
+import '../../../../domain/entities/category/category.dart';
 import '../../../blocs/cart/cart_bloc.dart';
 import '../../../blocs/category/category_bloc.dart';
 import '../../../blocs/delivery_info/delivery_info_fetch/delivery_info_fetch_cubit.dart';
@@ -15,10 +16,12 @@ class QiratHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
   final bool showShadow;
   final VoidCallback? onCartTap;
   final VoidCallback? onMenuTap;
+  final bool showBackButton;
 
   const QiratHeaderWidget({
     Key? key,
     this.showShadow = true,
+    this.showBackButton = true,
     this.onCartTap,
     this.onMenuTap,
   }) : super(key: key);
@@ -59,32 +62,32 @@ class QiratHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
   }
 
   Widget _buildMobileLayout(BuildContext context) {
-    final ishome =
-        GoRouter.of(context).routerDelegate.currentConfiguration.fullPath ==
-            NewWebRouter.newHome;
+    final ishome = showBackButton == false;
     return Row(
       children: [
         // Back button (always visible on mobile)
-        ishome ? SizedBox() :  IconButton(
-          tooltip: 'Back',
-          onPressed: ishome
-              ? null
-              : () {
-                  if (Navigator.canPop(context)) {
-                    context.pop();
-                  } else {
-                    context.go(NewWebRouter.newHome);
-                  }
-                },
-          icon: const Icon(Icons.arrow_back_ios_new,
-              color: QiratTheme.darkOnSurface, size: 22),
-        ),
+        ishome
+            ? SizedBox()
+            : IconButton(
+                tooltip: 'Back',
+                onPressed: ishome
+                    ? null
+                    : () {
+                        if (Navigator.canPop(context)) {
+                          context.pop();
+                        } else {
+                          context.go(NewWebRouter.newHome);
+                        }
+                      },
+                icon: const Icon(Icons.arrow_back_ios_new,
+                    color: QiratTheme.darkOnSurface, size: 22),
+              ),
         const SizedBox(width: 4),
         // Clickable logo -> Home
         _buildLogoButton(context),
         const Spacer(),
         IconButton(
-          onPressed: () => context.go(NewWebRouter.newSearch),
+          onPressed: () => context.push(NewWebRouter.newSearch),
           icon: const Icon(Icons.search,
               color: QiratTheme.darkOnSurface, size: 24),
         ),
@@ -106,13 +109,13 @@ class QiratHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
         _buildNavigation(context),
         const SizedBox(width: 32),
         IconButton(
-          onPressed: () => context.go(NewWebRouter.newSearch),
+          onPressed: () => context.push(NewWebRouter.newSearch),
           icon: const Icon(Icons.search,
               color: QiratTheme.darkOnSurface, size: 24),
         ),
         _buildCartButton(context),
         IconButton(
-          onPressed: () => context.go(NewWebRouter.newProfile),
+          onPressed: () => context.push(NewWebRouter.newProfile),
           icon: const Icon(Icons.person,
               color: QiratTheme.darkOnSurface, size: 24),
         ),
@@ -217,10 +220,10 @@ class QiratHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
           position: PopupMenuPosition.under,
           onSelected: (i) {
             if (i == -1) {
-              context.go(NewWebRouter.newProducts);
+              context.push(NewWebRouter.newProducts);
             } else {
               final cat = categories[i];
-              context.go(NewWebRouter.newProducts, extra: {'category': cat});
+              context.push(NewWebRouter.newProducts, extra: {'category': cat});
             }
           },
           itemBuilder: (ctx) => [
@@ -275,7 +278,8 @@ class QiratHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
           clipBehavior: Clip.none,
           children: [
             IconButton(
-              onPressed: () => context.go(NewWebRouter.newCart),
+              tooltip: 'Cart',
+              onPressed: () => context.push(NewWebRouter.newCart),
               icon: const Icon(
                 Icons.shopping_bag_outlined,
                 color: QiratTheme.darkOnSurface,
@@ -388,7 +392,7 @@ class QiratHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
                                   title: 'Sign In',
                                   onTap: () {
                                     Navigator.of(ctx).pop();
-                                    parentContext.go(NewWebRouter.newSignIn);
+                                    parentContext.push(NewWebRouter.newSignIn);
                                   },
                                 ),
                               _buildSideTile(
@@ -404,12 +408,12 @@ class QiratHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
                                 title: 'Products',
                                 onTap: () {
                                   Navigator.of(ctx).pop();
-                                  parentContext.go(NewWebRouter.newProducts);
+                                  parentContext.push(NewWebRouter.newProducts);
                                 },
                               ),
                               BlocBuilder<CategoryBloc, CategoryState>(
                                 builder: (context, catState) {
-                                  final cats = (catState is CategoryLoaded ||
+                                  List<Category>  cats = (catState is CategoryLoaded ||
                                           catState is CategoryCacheLoaded)
                                       ? catState.categories
                                       : const [];
@@ -439,9 +443,10 @@ class QiratHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
                                                 title: c.name,
                                                 onTap: () {
                                                   Navigator.of(ctx).pop();
-                                                  parentContext.go(
-                                                      NewWebRouter.newProducts,
-                                                      extra: {'category': c});
+                                                  parentContext.push(
+                                                    NewWebRouter.newProducts,
+                                                    extra: {'category': c},
+                                                  );
                                                 },
                                               )),
                                       if (cats.length > 10)
@@ -465,7 +470,7 @@ class QiratHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
                                 title: 'Search',
                                 onTap: () {
                                   Navigator.of(ctx).pop();
-                                  parentContext.go(NewWebRouter.newSearch);
+                                  parentContext.push(NewWebRouter.newSearch);
                                 },
                               ),
                               if (userState is UserLogged)
@@ -474,7 +479,7 @@ class QiratHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
                                   title: 'Orders',
                                   onTap: () {
                                     Navigator.of(ctx).pop();
-                                    parentContext.go(NewWebRouter.newOrders);
+                                    parentContext.push(NewWebRouter.newOrders);
                                   },
                                 ),
                               if (userState is UserLogged)
@@ -484,7 +489,7 @@ class QiratHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
                                   onTap: () {
                                     Navigator.of(ctx).pop();
                                     parentContext
-                                        .go(NewWebRouter.newDeliveryInfo);
+                                        .push(NewWebRouter.newDeliveryInfo);
                                   },
                                 ),
                               _buildSideTile(
@@ -493,7 +498,7 @@ class QiratHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
                                 onTap: () {
                                   Navigator.of(ctx).pop();
                                   parentContext
-                                      .go(NewWebRouter.newPrivacyPolicy);
+                                      .push(NewWebRouter.newPrivacyPolicy);
                                 },
                               ),
                               _buildSideTile(
@@ -501,7 +506,7 @@ class QiratHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
                                 title: 'Terms & Conditions',
                                 onTap: () {
                                   Navigator.of(ctx).pop();
-                                  parentContext.go(NewWebRouter.newTerms);
+                                  parentContext.push(NewWebRouter.newTerms);
                                 },
                               ),
                               _buildSideTile(
@@ -510,7 +515,7 @@ class QiratHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
                                 onTap: () {
                                   Navigator.of(ctx).pop();
                                   parentContext
-                                      .go(NewWebRouter.newDeleteAccount);
+                                      .push(NewWebRouter.newDeleteAccount);
                                 },
                               ),
                               const Divider(color: QiratTheme.borderDark),

@@ -8,7 +8,6 @@ import 'package:oktoast/oktoast.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'core/constant/strings.dart';
-import 'core/router/app_router.dart';
 import 'core/router/new_web_router.dart';
 import 'core/theme/app_theme.dart';
 import 'domain/usecases/product/get_product_usecase.dart';
@@ -24,6 +23,7 @@ import 'presentation/blocs/home/navbar_cubit.dart';
 import 'presentation/blocs/order/order_fetch/order_fetch_cubit.dart';
 import 'presentation/blocs/product/product_bloc.dart';
 import 'presentation/blocs/user/user_bloc.dart';
+import 'core/services/config_service.dart';
 
 Future<void> main() async {
   // Error handling for the app
@@ -36,6 +36,8 @@ Future<void> main() async {
     );
 
     await di.init();
+    // Initialize Remote Config (with safe defaults)
+    await di.sl<ConfigService>().init();
     runApp(const MyApp());
     configLoading();
     FirebaseAnalytics.instance.logEvent(
@@ -69,7 +71,8 @@ class MyApp extends StatelessWidget {
             ..add(const GetProducts(FilterProductParams())),
         ),
         BlocProvider(
-          create: (context) => di.sl<CategoryBloc>()..add(const GetCategories()),
+          create: (context) =>
+              di.sl<CategoryBloc>()..add(const GetCategories()),
         ),
         BlocProvider(
           create: (context) => di.sl<CartBloc>()..add(const GetCart()),
@@ -81,7 +84,8 @@ class MyApp extends StatelessWidget {
           create: (context) => di.sl<DeliveryInfoActionCubit>(),
         ),
         BlocProvider(
-          create: (context) => di.sl<DeliveryInfoFetchCubit>()..fetchDeliveryInfo(),
+          create: (context) =>
+              di.sl<DeliveryInfoFetchCubit>()..fetchDeliveryInfo(),
         ),
         BlocProvider(
           create: (context) => di.sl<OrderFetchCubit>()..getOrders(),

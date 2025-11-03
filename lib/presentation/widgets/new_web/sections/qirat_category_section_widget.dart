@@ -10,6 +10,7 @@ class QiratCategorySectionWidget extends StatefulWidget {
   final Function(Category)? onCategoryTap;
   final VoidCallback? onViewAllTap;
 
+
   const QiratCategorySectionWidget({
     Key? key,
     required this.categories,
@@ -217,7 +218,7 @@ class _QiratCategorySectionWidgetState
           imageUrl.isNotEmpty
               ? Image.network(
                   imageUrl,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.fill,
                   errorBuilder: (context, error, stackTrace) =>
                       _buildPlaceholderImage(isMobile),
                   loadingBuilder: (context, child, loadingProgress) {

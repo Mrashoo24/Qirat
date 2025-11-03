@@ -74,19 +74,21 @@ class NewWebCartView extends StatelessWidget {
                                         Icons.remove_circle_outline,
                                         color: QiratTheme.qiratGold),
                                     onPressed: () {
-                                      var state = context.read<UserBloc>().state;
+                                      var state =
+                                          context.read<UserBloc>().state;
                                       var uid = "1";
                                       if (state is UserLogged) {
                                         uid = state.user.id;
                                       }
                                       if (it.quantity < 1) {
-                                        context.read<CartBloc>().add(RemoveProduct(
-                                            cartItem: CartItem(
-                                                id: it!.id,
-                                                product: it!.product,
-                                                priceTag: it!.priceTag,
-                                                quantity: it?.quantity ?? 1,
-                                                uid: uid)));
+                                        context.read<CartBloc>().add(
+                                            RemoveProduct(
+                                                cartItem: CartItem(
+                                                    id: it!.id,
+                                                    product: it!.product,
+                                                    priceTag: it!.priceTag,
+                                                    quantity: it?.quantity ?? 1,
+                                                    uid: uid)));
                                       } else {
                                         context.read<CartBloc>().add(AddProduct(
                                             cartItem: CartItem(
@@ -94,7 +96,7 @@ class NewWebCartView extends StatelessWidget {
                                                 product: it!.product,
                                                 priceTag: it!.priceTag,
                                                 quantity:
-                                                (it?.quantity ?? 1) - 1,
+                                                    (it?.quantity ?? 1) - 1,
                                                 uid: uid)));
                                       }
                                     },
@@ -103,24 +105,24 @@ class NewWebCartView extends StatelessWidget {
                                       style:
                                           const TextStyle(fontFamily: 'Inter')),
                                   IconButton(
-                                    icon: const Icon(Icons.add_circle_outline,
-                                        color: QiratTheme.qiratGold),
-                                    onPressed: (){
-                                      var state = context.read<UserBloc>().state;
-                                      var uid = "1";
-                                      if (state is UserLogged) {
-                                        uid = state.user.id;
-                                      }
-                                      context.read<CartBloc>().add(AddProduct(
-                                          cartItem: CartItem(
-                                              id: it!.id,
-                                              product: it!.product,
-                                              priceTag: it!.priceTag,
-                                              quantity:
-                                              (it?.quantity ?? 1) + 1,
-                                              uid: uid)));
-                                    }
-                                  ),
+                                      icon: const Icon(Icons.add_circle_outline,
+                                          color: QiratTheme.qiratGold),
+                                      onPressed: () {
+                                        var state =
+                                            context.read<UserBloc>().state;
+                                        var uid = "1";
+                                        if (state is UserLogged) {
+                                          uid = state.user.id;
+                                        }
+                                        context.read<CartBloc>().add(AddProduct(
+                                            cartItem: CartItem(
+                                                id: it!.id,
+                                                product: it!.product,
+                                                priceTag: it!.priceTag,
+                                                quantity:
+                                                    (it?.quantity ?? 1) + 1,
+                                                uid: uid)));
+                                      }),
                                 ],
                               ),
                             ),
@@ -141,7 +143,10 @@ class NewWebCartView extends StatelessWidget {
                               )),
                         ),
                         ElevatedButton(
-                          onPressed: () => context.go(NewWebRouter.newCheckout),
+                          onPressed: () => context.pushNamed(
+                            NewWebRouter.newCheckout,
+                            extra: items, // pass current cart
+                          ),
                           child: const Text('Proceed to Checkout'),
                         ),
                       ],

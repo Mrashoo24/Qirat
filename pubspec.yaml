@@ -45,7 +45,7 @@ dependencies:
   flutter_bloc: ^8.1.5
   get_it: ^7.6.7
 
-  http: ^0.13.6
+  http: ^1.5.0
   equatable: ^2.0.5
   dartz: ^0.10.1
   internet_connection_checker: ^1.0.0+1
@@ -60,14 +60,14 @@ dependencies:
   flutter_easyloading: ^3.0.5
 
   #Firebase
-  firebase_core: ^3.4.0
-  firebase_auth: ^5.2.0
-  firebase_messaging: ^15.1.0
-  firebase_analytics: ^11.3.0
-  firebase_crashlytics: ^4.1.0
-  firebase_remote_config: ^5.1.0
-  firebase_performance: ^0.10.0+5
-  cloud_firestore: ^5.3.0
+  firebase_core:
+  firebase_auth: ^6.1.2
+  firebase_messaging: ^16.0.4
+  firebase_analytics: ^12.0.4
+  firebase_crashlytics: ^5.0.4
+  firebase_remote_config: ^6.1.1
+  firebase_performance:
+  cloud_firestore:
   google_sign_in: ^6.2.1
   url_launcher: ^6.3.2
   flutter_local_notifications: ^17.2.3

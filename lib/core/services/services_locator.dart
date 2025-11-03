@@ -9,6 +9,7 @@ import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_performance/firebase_performance.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
@@ -66,22 +67,28 @@ import '../../presentation/blocs/order/order_fetch/order_fetch_cubit.dart';
 import '../../presentation/blocs/product/product_bloc.dart';
 import '../../presentation/blocs/user/user_bloc.dart';
 import '../network/network_info.dart';
+import 'config_service.dart';
 
 final sl = GetIt.instance;
 
 Future<void> init() async {
   //Features - Product
 
-
   //Firebase
   sl.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
   sl.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
   sl.registerLazySingleton<FirebaseAnalytics>(() => FirebaseAnalytics.instance);
-  sl.registerLazySingleton<FirebaseCrashlytics>(() => FirebaseCrashlytics.instance);
-  sl.registerLazySingleton<FirebasePerformance>(() => FirebasePerformance.instance);
+  sl.registerLazySingleton<FirebaseCrashlytics>(
+      () => FirebaseCrashlytics.instance);
+  sl.registerLazySingleton<FirebasePerformance>(
+      () => FirebasePerformance.instance);
+  sl.registerLazySingleton<FirebaseRemoteConfig>(
+      () => FirebaseRemoteConfig.instance);
 
-  sl.registerLazySingleton<FirebaseService>(() => FirebaseService(firebaseAuth: sl<FirebaseAuth>(), firestore: sl<FirebaseFirestore>()));
-
+  sl.registerLazySingleton<FirebaseService>(() => FirebaseService(
+      firebaseAuth: sl<FirebaseAuth>(), firestore: sl<FirebaseFirestore>()));
+  sl.registerLazySingleton<ConfigService>(
+      () => ConfigService(sl<FirebaseRemoteConfig>()));
 
   // Bloc
   sl.registerFactory(
@@ -258,5 +265,4 @@ Future<void> init() async {
   sl.registerLazySingleton(() => secureStorage);
   sl.registerLazySingleton(() => http.Client());
   sl.registerLazySingleton(() => InternetConnectionChecker());
-
 }
