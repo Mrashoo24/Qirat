@@ -171,9 +171,10 @@ class QiratHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
         const SizedBox(width: 32),
         _buildCategoriesMenu(context),
         const SizedBox(width: 32),
-        _buildNavItem('Our Story', false),
-        const SizedBox(width: 32),
-        _buildNavItem('Contact', false),
+        _buildNavItem('Our Story', false,
+            onTap: () => context.push(NewWebRouter.newOurStory)),
+        // const SizedBox(width: 32),
+        // _buildNavItem('Contact', false),
       ],
     );
   }
@@ -401,6 +402,14 @@ class QiratHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
                                 onTap: () {
                                   Navigator.of(ctx).pop();
                                   parentContext.go(NewWebRouter.newHome);
+                                },
+                              ),
+                              _buildSideTile(
+                                icon: Icons.account_tree,
+                                title: 'Our Story',
+                                onTap: () {
+                                  Navigator.of(ctx).pop();
+                                  parentContext.push(NewWebRouter.newOurStory);
                                 },
                               ),
                               _buildSideTile(

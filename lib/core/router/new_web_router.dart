@@ -19,6 +19,7 @@ import '../../presentation/views/new_web/auth/new_web_signin_view.dart';
 import '../../presentation/views/new_web/static/new_web_privacy_view.dart';
 import '../../presentation/views/new_web/static/new_web_terms_view.dart';
 import '../../presentation/views/new_web/static/new_web_delete_account_view.dart';
+import '../../presentation/views/new_web/story/new_web_our_story_view.dart';
 
 // TODO: Uncomment these imports when implementing the actual views
 // import '../../../domain/entities/product/product.dart';
@@ -42,6 +43,7 @@ class NewWebRouter {
   static const String newPrivacyPolicy = '/new-privacy';
   static const String newTerms = '/new-terms';
   static const String newDeleteAccount = '/new-delete-account';
+  static const String newOurStory = '/new-our-story';
 
   // Authentication routes (new design)
   static const String newSignIn = '/new-sign-in';
@@ -158,7 +160,6 @@ final GoRouter newWebRouter = GoRouter(
       path: NewWebRouter.newDeleteAccount,
       builder: (context, state) => const NewWebDeleteAccountView(),
     ),
-    // Auth placeholders (can reuse old views if needed)
     GoRoute(
       name: NewWebRouter.newSignIn,
       path: NewWebRouter.newSignIn,
@@ -170,11 +171,15 @@ final GoRouter newWebRouter = GoRouter(
       builder: (context, state) =>
           const Scaffold(body: Center(child: Text('Sign Up'))),
     ),
-
     GoRoute(
       path: NewWebRouter.newDeliveryInfo,
       name: NewWebRouter.newDeliveryInfo,
       builder: (context, state) => DeliveryInfoViewNew(),
+    ),
+    GoRoute(
+      name: NewWebRouter.newOurStory,
+      path: NewWebRouter.newOurStory,
+      builder: (context, state) => const NewWebOurStoryView(),
     )
   ],
   // Error handling
