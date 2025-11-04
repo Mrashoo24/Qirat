@@ -235,7 +235,8 @@ class _NewWebLandingPageViewState extends State<NewWebLandingPageView> {
                       builder: (context, categoryState) {
                         if (categoryState is CategoryLoaded ||
                             categoryState is CategoryCacheLoaded) {
-                          final heroId = di.sl<ConfigService>().featured_collection_id;
+                          final heroId =
+                              di.sl<ConfigService>().featured_collection_id;
 
                           final promotionCategories = categoryState.categories
                               .where((c) => c.id == heroId)
@@ -485,18 +486,17 @@ class _NewWebLandingPageViewState extends State<NewWebLandingPageView> {
     }
   }
 
-
   void _handleViewAllProductsTap() {
     final targetCategoryId = di.sl<ConfigService>().featured_collection_id;
     Category? category;
     final catState = context.read<CategoryBloc>().state;
     if (catState is CategoryLoaded) {
       final matches =
-      catState.categories.where((c) => c.id == targetCategoryId).toList();
+          catState.categories.where((c) => c.id == targetCategoryId).toList();
       if (matches.isNotEmpty) category = matches.first;
     } else if (catState is CategoryCacheLoaded) {
       final matches =
-      catState.categories.where((c) => c.id == targetCategoryId).toList();
+          catState.categories.where((c) => c.id == targetCategoryId).toList();
       if (matches.isNotEmpty) category = matches.first;
     }
 
@@ -519,11 +519,11 @@ class _NewWebLandingPageViewState extends State<NewWebLandingPageView> {
     final catState = context.read<CategoryBloc>().state;
     if (catState is CategoryLoaded) {
       final matches =
-      catState.categories.where((c) => c.id == targetCategoryId).toList();
+          catState.categories.where((c) => c.id == targetCategoryId).toList();
       if (matches.isNotEmpty) category = matches.first;
     } else if (catState is CategoryCacheLoaded) {
       final matches =
-      catState.categories.where((c) => c.id == targetCategoryId).toList();
+          catState.categories.where((c) => c.id == targetCategoryId).toList();
       if (matches.isNotEmpty) category = matches.first;
     }
 
@@ -540,16 +540,12 @@ class _NewWebLandingPageViewState extends State<NewWebLandingPageView> {
     }
   }
 
-
   void _handleProductTap(Product product) {
     context.push(NewWebRouter.newProductDetails, extra: product);
   }
 
-
   void _handleShopCollectionTap() {
-
-      context.push(NewWebRouter.newProducts);
-
+    context.push(NewWebRouter.newProducts);
   }
 
   void _handleFooterLinkTap(String linkName) {
@@ -558,17 +554,61 @@ class _NewWebLandingPageViewState extends State<NewWebLandingPageView> {
   }
 
   void _handleProductRecommendation(String attarName) {
-    // TODO: Navigate to specific product page
-    debugPrint('Product recommendation: $attarName');
+// Navigate to the recommended product from the live ProductBloc list
+    final name = attarName.trim();
+    if (name.isEmpty) return;
 
-    // Show success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Navigating to $attarName product page...'),
-        backgroundColor: QiratTheme.qiratGold,
-        behavior: SnackBarBehavior.floating,
-      ),
+    final state = context.read<ProductBloc>().state;
+    final products = state.products;
+
+    if (products.isEmpty) {
+// Trigger load and inform the user
+      context.read<ProductBloc>().add(const GetProducts(FilterProductParams()));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Loading products… please try again in a moment.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    Product? found;
+
+// Exact match (case-insensitive)
+    final exact = products.where(
+      (p) => p.name.trim().toLowerCase() == name.toLowerCase(),
     );
+    if (exact.isNotEmpty) {
+      found = exact.first;
+    } else {
+// Starts-with, then contains
+      found = products.firstWhere(
+        (p) => p.name.toLowerCase().startsWith(name.toLowerCase()),
+        orElse: () => products.firstWhere(
+          (p) => p.name.toLowerCase().contains(name.toLowerCase()),
+          orElse: () => products.first,
+        ),
+      );
+    }
+
+    if (found != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Navigating to ${found.name}…'),
+          backgroundColor: QiratTheme.qiratGold,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      context.push(NewWebRouter.newProductDetails, extra: found);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Could not find "$attarName" in our catalog.'),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
   }
 
   void _handleAddToCart(Product product, String priceTagId) {

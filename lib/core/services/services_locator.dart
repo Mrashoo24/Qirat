@@ -68,7 +68,12 @@ import '../../presentation/blocs/product/product_bloc.dart';
 import '../../presentation/blocs/user/user_bloc.dart';
 import '../network/network_info.dart';
 import 'config_service.dart';
-
+import '../../domain/entities/ai/recommendation.dart'; // optional
+import '../../domain/repositories/ai_repository.dart';
+import '../../domain/usecases/ai/recommend_attar_usecase.dart';
+import '../../data/data_sources/remote/ai_remote_data_source.dart';
+import '../../data/repositories/ai_repository_impl.dart';
+import '../services/gemini_client.dart';
 final sl = GetIt.instance;
 
 Future<void> init() async {
@@ -265,4 +270,11 @@ Future<void> init() async {
   sl.registerLazySingleton(() => secureStorage);
   sl.registerLazySingleton(() => http.Client());
   sl.registerLazySingleton(() => InternetConnectionChecker());
+
+    // AI / Gemini
+  sl.registerLazySingleton<GeminiClient>(() => GeminiClient());
+  sl.registerLazySingleton<AiRemoteDataSource>(() => AiRemoteDataSourceImpl(sl<GeminiClient>()));
+  sl.registerLazySingleton<AiRepository>(() => AiRepositoryImpl(remote: sl<AiRemoteDataSource>()));
+  sl.registerLazySingleton<RecommendAttarUseCase>(() => RecommendAttarUseCase(sl<AiRepository>()));
+
 }

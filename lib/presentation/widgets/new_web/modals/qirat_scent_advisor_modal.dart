@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/qirat_theme.dart';
 import '../../../../core/responsive/responsive_helper.dart';
+import '../../../../domain/usecases/ai/recommend_attar_usecase.dart';
+import '../../../../core/services/services_locator.dart';
+import '../../../blocs/product/product_bloc.dart';
 
 /// Signature Scent Advisor Modal Widget
 class QiratScentAdvisorModal extends StatefulWidget {
@@ -24,6 +28,15 @@ class _QiratScentAdvisorModalState extends State<QiratScentAdvisorModal> {
   bool _showError = false;
   String _recommendedAttar = '';
   String _justification = '';
+
+  @override
+  void initState() {
+    super.initState();
+    // Rebuild on text changes so the CTA enables/disables live
+    _controller.addListener(() {
+      if (mounted) setState(() {});
+    });
+  }
 
   @override
   void dispose() {
@@ -129,14 +142,16 @@ class _QiratScentAdvisorModalState extends State<QiratScentAdvisorModal> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (!_showRecommendation) ...[
-          _buildInputSection(),
+          _isLoading ? _buildLoadingIndicator() : _buildInputSection(),
         ] else ...[
           _buildRecommendationSection(),
         ],
-        if (_isLoading) ...[
-          const SizedBox(height: 24),
-          _buildLoadingIndicator(),
-        ],
+
+        // if (_isLoading) ...[
+        //   const SizedBox(height: 24),
+        //   _buildLoadingIndicator(),
+        // ],
+
         if (_showError) ...[
           const SizedBox(height: 24),
           _buildErrorBox(),
@@ -161,6 +176,11 @@ class _QiratScentAdvisorModalState extends State<QiratScentAdvisorModal> {
         TextField(
           controller: _controller,
           maxLines: 4,
+          onSubmitted: (_) {
+            if (_controller.text.trim().isNotEmpty && !_isLoading) {
+              _generateRecommendation();
+            }
+          },
           decoration: const InputDecoration(
             hintText:
                 "E.g., 'A confident scent for a first date,' or 'Calm and earthy for a quiet evening at home.'",
@@ -300,7 +320,7 @@ class _QiratScentAdvisorModalState extends State<QiratScentAdvisorModal> {
     );
   }
 
-  void _generateRecommendation() async {
+  Future<void> _generateRecommendation() async {
     final query = _controller.text.trim();
     if (query.isEmpty) return;
 
@@ -310,19 +330,38 @@ class _QiratScentAdvisorModalState extends State<QiratScentAdvisorModal> {
     });
 
     try {
-      // Simulate API call delay
-      await Future.delayed(const Duration(seconds: 2));
+      // Live catalog from ProductBloc (all products, no mock, no extra filters)
+      final catalog = context.read<ProductBloc>().state.products;
 
-      // Mock recommendation logic - In real implementation, this would call your Gemini API
-      final recommendations = _getMockRecommendations();
-      final selectedRecommendation = recommendations[
-          query.toLowerCase().hashCode % recommendations.length];
+      if (catalog.isEmpty) {
+        setState(() {
+          _isLoading = false;
+          _showError = true;
+        });
+        return;
+      }
+
+      final usecase = sl.get<RecommendAttarUseCase>();
+      final result =
+          await usecase(RecommendParams(prompt: query, catalog: catalog));
+
+      result.fold((_) {
+        // Failure: fallback to a live product from catalog (first in-stock, otherwise first)
+        final fallback = catalog.firstWhere(
+          (p) => p.priceTags.isNotEmpty,
+          orElse: () => catalog.first,
+        );
+        _recommendedAttar = fallback.name;
+        _justification =
+            'Based on your preferences and availability, ${fallback.name} is the closest match from our live collection.';
+      }, (recommendation) {
+        _recommendedAttar = recommendation.attarName;
+        _justification = recommendation.justification;
+      });
 
       setState(() {
         _isLoading = false;
         _showRecommendation = true;
-        _recommendedAttar = selectedRecommendation['name']!;
-        _justification = selectedRecommendation['justification']!;
       });
     } catch (e) {
       setState(() {
@@ -332,38 +371,8 @@ class _QiratScentAdvisorModalState extends State<QiratScentAdvisorModal> {
     }
   }
 
+  // Remove mock hard-coded products; optional helper retained only if needed elsewhere
   List<Map<String, String>> _getMockRecommendations() {
-    return [
-      {
-        'name': 'Mawj',
-        'justification':
-            'Mawj\'s aquatic freshness and energetic projection make it perfect for building confidence. Its sea salt and mint notes provide an invigorating aura that thrives in dynamic environments.',
-      },
-      {
-        'name': 'Sahar',
-        'justification':
-            'Sahar\'s gentle floral composition with white musk creates a serene, uplifting presence. Its soft, powdery notes are ideal for calm, intimate moments and daily grace.',
-      },
-      {
-        'name': 'Moss Aura',
-        'justification':
-            'Moss Aura\'s earthy vetiver and oakmoss blend offers grounding stability and focus. Perfect for those seeking a connection to nature and centered mindfulness.',
-      },
-      {
-        'name': 'Honey Lush',
-        'justification':
-            'Honey Lush combines warm honey nectar with vanilla for ultimate comfort and intimacy. Its cozy luxury makes it perfect for romantic and inviting atmospheres.',
-      },
-      {
-        'name': 'Oud Majestic',
-        'justification':
-            'Oud Majestic delivers commanding presence with its medium oud and cardamom blend. Ideal for making powerful statements and exuding confident authority.',
-      },
-      {
-        'name': 'Rubaie Rose',
-        'justification':
-            'Rubaie Rose\'s classic Indian rose with saffron embodies timeless elegance and sophistication. Perfect for traditional occasions and enduring romantic expressions.',
-      },
-    ];
+    return const []; // No mock entries; live catalog is used instead
   }
 }

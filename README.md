@@ -74,22 +74,80 @@ We hope this Flutter-TDD-Clean-Architecture-E-Commerce-App serves as a valuable 
 
 ### Installation
 
-1. Clone the repo
-   ```sh
-   git clone https://github.com/Sameera-Perera/Flutter-TDD-Clean-Architecture-E-Commerce-App.git
-   ```
-2. Install packages
-   ```sh
-   flutter pub get
-   ```
-3. Run app
-   ```sh
-   flutter run lib/main.dart
-   ```
-4. Run test
-   ```sh
-   flutter test
-   ```
+Android Studio
+
+A) Run/Debug (device/emulator or Chrome)
+
+Edit Configurations… → select your Flutter app config.
+Additional run args:
+Debug/staging: --dart-define-from-file=.env.debug.json
+Release-like run: --release --dart-define-from-file=.env.release.json
+Select device (Android/Chrome) and Run. The app will see kGeminiApiKey from String.fromEnvironment('GEMINI_API_KEY').
+B) Build APK/AAB via UI
+You have three options:
+
+Option 1: Custom “Flutter command” run config
+
+Edit Configurations… → + → Flutter.
+Name: Build APK (Release).
+In “Additional run args”, put the full command sequence:
+build apk --release --dart-define-from-file=.env.release.json
+Run this configuration to produce the APK. Do a second one for appbundle if you need AAB:
+build appbundle --release --dart-define-from-file=.env.release.json
+Option 2: Gradle task with dart-defines (no Flutter CLI)
+
+Open the Gradle tool window → Run configuration: Execute Gradle Task.
+Task: app:assembleRelease
+Arguments: -Pdart-defines=R0VNSU5JX0FQSV9LRVk9WUVPVVJfUFJPRFVDVElPTl9LRVk=
+That base64 string is base64 of GEMINI_API_KEY=YOUR_PRODUCTION_KEY.
+For multiple defines, join multiple base64-encoded pairs with commas:
+-Pdart-defines=BASE64(KEY1=VAL1),BASE64(KEY2=VAL2)
+This passes DART_DEFINES to the Flutter Gradle plugin, which injects them into the build.
+Option 3: Terminal inside Android Studio
+
+Use the built-in terminal and run:
+flutter build apk --release --dart-define-from-file=.env.release.json
+Same result, but fully controlled.
+Notes
+
+Option 1 is the most “Flutter-native” in the IDE. Option 2 is useful if you’re building purely via Gradle tasks.
+Keep .env*.json out of Git (already ignored).
+For debug device runs, prefer Option A; for packaged artifacts, prefer Option 1 or 3.
+Xcode (Archive)
+
+Flutter for iOS reads defines from the DART_DEFINES environment variable during build. Each define must be base64-encoded as KEY=VALUE and multiple entries are comma-separated.
+
+Open Runner.xcworkspace in Xcode.
+Product → Scheme → Edit Scheme…
+Select both Run and Archive actions and set these:
+Environment Variables:
+Name: DART_DEFINES
+Value: base64(GEMINI_API_KEY=YOUR_PRODUCTION_KEY)
+Example (single define):
+R0VNSU5JX0FQSV9LRVk9WU9VUl9QUk9EVUNUSU9OX0tFWQ==
+For multiple defines, join with commas:
+BASE64(KEY1=VAL1),BASE64(KEY2=VAL2)
+Close and Product → Archive. The resulting IPA uses the provided key.
+Tip: If you use different keys for Debug vs Release
+
+Create separate Schemes or set different DART_DEFINES in the Scheme’s Run (Debug) vs Archive (Release) actions.
+Or add per-configuration xcconfig variables and a pre-build script to compose DART_DEFINES from those.
+Web builds in IDE
+
+Android Studio Run to Chrome:
+Same as Android Run/Debug: Additional run args → --dart-define-from-file=.env.debug.json
+For release web builds, either:
+Create a “Flutter command” run config:
+build web --release --dart-define-from-file=.env.release.json
+Or use the terminal inside the IDE to run the command above.
+Runtime code reminder
+
+Read the key using:
+const String kGeminiApiKey = String.fromEnvironment('GEMINI_API_KEY', defaultValue: '');
+Ensure your Gemini client reads this at startup and disables the feature or shows a helpful message if empty.
+Security note
+
+Client-side keys (Web/Android/iOS) can be extracted. If you need strong protection, place the Gemini call server-side (e.g., Firebase Functions) and keep the key off the client entirely. You can keep your current client flow and switch just the transport to your function without changing UI.
 For help getting started with Flutter, view our online
 [documentation](https://flutter.io/).
 
