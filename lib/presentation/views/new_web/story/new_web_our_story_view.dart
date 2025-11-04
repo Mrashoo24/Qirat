@@ -57,7 +57,7 @@ class _NewWebOurStoryViewState extends State<NewWebOurStoryView> {
                       body:
                           "We do not believe in shortcuts. Our process is a deliberate rejection of mass-market methods.\n\nEvery attar we release is the culmination of meticulous effort and patience:\n\n• Sourcing Excellence: Our blenders travel across regions to secure the finest Sandalwood Oil, Rose Absolutes, and rare natural musks. We never compromise on the origin or grade of our raw materials.\n\n• 100% Alcohol-Free: This is our foundational promise. Unlike alcohol-based perfumes that evaporate quickly, our pure oil essences are designed to meld with your skin's natural warmth, creating a personalized, rich, and evolving aura that is gentle on the skin.\n\n• Concentration over Volume: The deep, concentrated nature of our attars guarantees performance. Our scents don't just last; they intensify and gain character as the day progresses, a crucial advantage in the dynamic Indian climate.",
                       imageAlt:
-                          "[Image Placeholder: A stylized, clean shot of a lab or distillation column.]",
+                          "assets/other_images/qirat_persons.png",
                     ),
                     const SizedBox(height: 24),
 
@@ -270,12 +270,11 @@ class _MediaCard extends StatelessWidget {
           ),
         ),
         alignment: Alignment.center,
-        child: Text(
-          alt,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-            color: QiratTheme.textSecondary,
-            fontFamily: 'Inter',
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Image.asset(
+            alt,
+            fit: BoxFit.fill,
           ),
         ),
       ),

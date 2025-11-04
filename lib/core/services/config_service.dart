@@ -20,6 +20,11 @@ class ConfigService {
     defaultValue: 'Ke69nY39reTuYGt5upKI',
   );
 
+  static const String _logoUrl = String.fromEnvironment(
+    'LOGO_URL',
+    defaultValue: 'https://firebasestorage.googleapis.com/v0/b/qiratperfumes.appspot.com/o/qiratgoldicon.png?alt=media&token=724b9ddc-aa3c-4ad3-b016-f761fad8049b',
+  );
+
   ConfigService(this._rc);
 
   Future<void> init() async {
@@ -34,6 +39,7 @@ class ConfigService {
       'hero_category_id': _defaultHeroCategoryId,
       'premium_category_id': _defaultPremiumCategoryId,
       'featured_collection_id': 'default_featured_collection_id',
+      'logo_url': _logoUrl,
     });
 
     try {
@@ -41,6 +47,7 @@ class ConfigService {
       debugPrint('[RemoteConfig] fetchAndActivate activated=$activated');
       debugPrint('[RemoteConfig] hero_category_id=' + heroCategoryId);
       debugPrint('[RemoteConfig] premium_category_id=' + premiumCategoryId);
+      debugPrint('[RemoteConfig] logourl=' + logoUrl);
     } catch (e) {
       debugPrint('[RemoteConfig] fetch error: $e');
       // Swallow errors; fallbacks remain active
@@ -64,6 +71,11 @@ class ConfigService {
     if (id.isEmpty) return _default_featured_collection_id;
     return id;
   }
+  String get logoUrl {
+    final url = _rc.getString('logo_url');
+    if (url.isEmpty) return _logoUrl;
+    return url;
+  }
 
   /// Force-refresh Remote Config (use during testing to bypass cache intervals)
   Future<void> refreshNow() async {
@@ -76,6 +88,7 @@ class ConfigService {
       debugPrint('[RemoteConfig] refreshNow activated=$activated');
       debugPrint('[RemoteConfig] hero_category_id=' + heroCategoryId);
       debugPrint('[RemoteConfig] premium_category_id=' + premiumCategoryId);
+      debugPrint('[RemoteConfig] logourl=' + logoUrl);
     } catch (e) {
       debugPrint('[RemoteConfig] refreshNow error: $e');
     }

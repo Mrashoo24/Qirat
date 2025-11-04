@@ -1,8 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/responsive/responsive_helper.dart';
 import '../../../../core/router/new_web_router.dart';
+import '../../../../core/services/config_service.dart';
+import '../../../../core/services/services_locator.dart';
 import '../../../../core/theme/qirat_theme.dart';
 import '../../../../domain/entities/category/category.dart';
 import '../../../blocs/cart/cart_bloc.dart';
@@ -10,6 +13,7 @@ import '../../../blocs/category/category_bloc.dart';
 import '../../../blocs/delivery_info/delivery_info_fetch/delivery_info_fetch_cubit.dart';
 import '../../../blocs/order/order_fetch/order_fetch_cubit.dart';
 import '../../../blocs/user/user_bloc.dart';
+
 
 /// Fixed Header Navigation Bar for Qirat Website
 class QiratHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
@@ -123,32 +127,56 @@ class QiratHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  Widget _buildLogo() {
-    return RichText(
-      text: const TextSpan(
-        children: [
-          TextSpan(
-            text: 'Qirat',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: QiratTheme.qiratGold,
-              fontFamily: 'Inter',
-              letterSpacing: 1.2,
-            ),
+Widget _buildLogo() {
+  final logoUrl =
+     sl<ConfigService>().featured_collection_id;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(6),
+          child: CachedNetworkImage(
+            imageUrl: logoUrl, // TODO: set your network logo URL. If empty/invalid, asset fallback will show.
+            width: 100,
+            height: 100,
+            fit: BoxFit.contain,
+            placeholder: (context, url) =>
+                Image.asset('assets/icons/qiratgoldicon.png', width: 100, height: 100),
+            errorWidget: (context, url, error) =>
+                Image.asset('assets/icons/qiratgoldicon.png', width: 100, height: 100),
           ),
-          TextSpan(
-            text: ' Attars',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: QiratTheme.darkOnSurface,
-              fontFamily: 'Inter',
-              letterSpacing: 1.2,
-            ),
-          ),
-        ],
-      ),
+        ),
+        const SizedBox(width: 8),
+        // Align(
+        //   alignment: A,
+        //   child: RichText(
+        //     text: const TextSpan(
+        //       children: [
+        //         // TextSpan(
+        //         //   text: 'Attars',
+        //         //   style: TextStyle(
+        //         //     fontSize: 24,
+        //         //     fontWeight: FontWeight.bold,
+        //         //     color: QiratTheme.qiratGold,
+        //         //     fontFamily: 'Inter',
+        //         //     letterSpacing: 1.2,
+        //         //   ),
+        //         // ),
+        //         TextSpan(
+        //           text: 'Attars & Perfumes',
+        //           style: TextStyle(
+        //             fontSize: 14,
+        //             fontWeight: FontWeight.bold,
+        //             color: QiratTheme.darkOnSurface,
+        //             fontFamily: 'Inter',
+        //             letterSpacing: 1.2,
+        //           ),
+        //         ),
+        //       ],
+        //     ),
+        //   ),
+        // ),
+      ],
     );
   }
 
@@ -210,6 +238,15 @@ class QiratHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
             (state is CategoryLoaded || state is CategoryCacheLoaded)
                 ? state.categories
                 : const [];
+
+        if(categories.isNotEmpty) {
+          categories.sort((a, b) {
+            final aMain = a.location!.toLowerCase().contains('main') ? 0 : 1;
+            final bMain = b.location!.toLowerCase().contains('main') ? 0 : 1;
+            if (aMain != bMain) return aMain - bMain;
+            return a.location!.compareTo(b.location!);
+          });
+        }
 
         return PopupMenuButton<int>(
           tooltip: 'Products',
@@ -426,6 +463,14 @@ class QiratHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
                                           catState is CategoryCacheLoaded)
                                       ? catState.categories
                                       : const [];
+
+                                  cats.sort((a, b) {
+                                    final aMain = a.location!.toLowerCase().contains('main') ? 0 : 1;
+                                    final bMain = b.location!.toLowerCase().contains('main') ? 0 : 1;
+                                    if (aMain != bMain) return aMain - bMain;
+                                    return a.location!.compareTo(b.location!);
+                                  });
+
                                   if (cats.isEmpty)
                                     return const SizedBox.shrink();
                                   return Column(

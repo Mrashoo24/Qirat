@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 /// Based on the HTML template design: Black background with Gold accents
 class QiratTheme {
   // Brand Colors - Qirat Gold & Black
-  static const Color qiratGold = Color(0xFFF4C042);
+    static const Color qiratGold = Color(0xFFF4C042);
   static const Color qiratBlack = Color(0xFF0A0A0A);
   static const Color qiratGoldVariant = Color(0xFFE6B73A);
 
