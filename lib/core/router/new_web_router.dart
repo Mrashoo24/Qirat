@@ -30,20 +30,20 @@ import '../../presentation/views/new_web/story/new_web_our_story_view.dart';
 /// Keeps existing routes separate to avoid conflicts
 class NewWebRouter {
   // New Web Routes
-  static const String newHome = '/new-home';
-  static const String newProducts = '/new-products';
-  static const String newProductDetails = '/new-product-details';
-  static const String newCart = '/new-cart';
-  static const String newCheckout = '/new-checkout';
-  static const String newProfile = '/new-profile';
-  static const String newSearch = '/new-search';
-  static const String newCategories = '/new-categories';
-  static const String newOrders = '/new-orders';
-  static const String newWishlist = '/new-wishlist';
-  static const String newPrivacyPolicy = '/new-privacy';
-  static const String newTerms = '/new-terms';
-  static const String newDeleteAccount = '/new-delete-account';
-  static const String newOurStory = '/new-our-story';
+  static const String newHome = '/home';
+  static const String newProducts = '/products';
+  static const String newProductDetails = '/product-details';
+  static const String newCart = '/cart';
+  static const String newCheckout = '/checkout';
+  static const String newProfile = '/profile';
+  static const String newSearch = '/search';
+  static const String newCategories = '/categories';
+  static const String newOrders = '/orders';
+  static const String newWishlist = '/wishlist';
+  static const String newPrivacyPolicy = '/privacy';
+  static const String newTerms = '/terms';
+  static const String newDeleteAccount = '/delete-account';
+  static const String newOurStory = '/our-story';
 
   // Authentication routes (new design)
   static const String newSignIn = '/new-sign-in';
