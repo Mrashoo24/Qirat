@@ -1,4 +1,5 @@
 import 'package:eshop/core/router/new_web_router.dart';
+import 'package:eshop/data/models/product/product_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -42,7 +43,7 @@ class NewWebProductDetailsLoader extends StatelessWidget {
 
         final product = products.firstWhere(
           (p) => p.id == productId,
-          orElse: () =>  Product(
+          orElse: () =>  ProductModel(
             id: '',
             name: '',
             description: '',

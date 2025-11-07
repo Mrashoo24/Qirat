@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 
@@ -22,7 +23,8 @@ class ConfigService {
 
   static const String _logoUrl = String.fromEnvironment(
     'LOGO_URL',
-    defaultValue: 'https://firebasestorage.googleapis.com/v0/b/qiratperfumes.appspot.com/o/qiratgoldicon.png?alt=media&token=724b9ddc-aa3c-4ad3-b016-f761fad8049b',
+    defaultValue:
+        'https://firebasestorage.googleapis.com/v0/b/qiratperfumes.appspot.com/o/qiratgoldicon.png?alt=media&token=724b9ddc-aa3c-4ad3-b016-f761fad8049b',
   );
 
   ConfigService(this._rc);
@@ -40,6 +42,8 @@ class ConfigService {
       'premium_category_id': _defaultPremiumCategoryId,
       'featured_collection_id': 'default_featured_collection_id',
       'logo_url': _logoUrl,
+      // JSON array of objects: [{"imageUrl":"https://...","route":"/product-details?id=..."}, ...]
+      'promo_banners': '[]',
     });
 
     try {
@@ -71,6 +75,7 @@ class ConfigService {
     if (id.isEmpty) return _default_featured_collection_id;
     return id;
   }
+
   String get logoUrl {
     final url = _rc.getString('logo_url');
     if (url.isEmpty) return _logoUrl;
@@ -92,5 +97,23 @@ class ConfigService {
     } catch (e) {
       debugPrint('[RemoteConfig] refreshNow error: $e');
     }
+  }
+
+  /// Promotional banners from Remote Config.
+  /// Expects key 'promo_banners' to be a JSON array of objects like:
+  /// [{"imageUrl":"https://...","route":"/products?categoryId=..."}]
+  List<Map<String, dynamic>> get promoBanners {
+    try {
+      final raw = _rc.getString('promo_banners');
+      if (raw.isEmpty) return const [];
+      final decoded = jsonDecode(raw);
+      if (decoded is List) {
+        return decoded
+            .whereType<Map>()
+            .map((e) => e.map((k, v) => MapEntry(k.toString(), v)))
+            .toList();
+      }
+    } catch (_) {}
+    return const [];
   }
 }

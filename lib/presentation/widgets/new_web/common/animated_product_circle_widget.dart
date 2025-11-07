@@ -41,6 +41,18 @@ class _AnimatedProductCircleWidgetState
 
   int _currentIndex = 0;
   bool _isAnimating = false;
+  final math.Random _rand = math.Random();
+
+  // Safely get the first non-empty image URL or null
+  String? _firstImageUrl(Product p) {
+    try {
+      for (final u in p.images) {
+        // Handles null/empty strings defensively if model ever allows them
+        if ((u).toString().trim().isNotEmpty) return u;
+      }
+    } catch (_) {}
+    return null;
+  }
 
   @override
   void initState() {
@@ -69,6 +81,12 @@ class _AnimatedProductCircleWidgetState
 
   void _startAutoSwitch() {
     _switchTimer = Timer.periodic(widget.switchDuration, (timer) {
+      if (!mounted) return; // extra safety on web
+      if (widget.products.isEmpty) return; // nothing to rotate
+      if (_currentIndex >= widget.products.length) {
+        // Clamp index if product list shrank
+        setState(() => _currentIndex = 0);
+      }
       if (!_isAnimating) {
         _switchToNext();
       }
@@ -77,6 +95,9 @@ class _AnimatedProductCircleWidgetState
 
   void _switchToNext() {
     if (widget.products.isEmpty) return;
+    if (_currentIndex >= widget.products.length) {
+      _currentIndex = 0; // clamp defensively
+    }
 
     setState(() {
       _isAnimating = true;
@@ -100,6 +121,7 @@ class _AnimatedProductCircleWidgetState
 
   void _selectProduct(int index) {
     if (_isAnimating || index == _currentIndex) return;
+    if (index < 0 || index >= widget.products.length) return; // out of range
 
     setState(() {
       _isAnimating = true;
@@ -125,6 +147,14 @@ class _AnimatedProductCircleWidgetState
     _fadeController.dispose();
     _pulseController.dispose();
     super.dispose();
+  }
+
+  // Safely get currently selected product or null
+  Product? _currentProduct() {
+    if (widget.products.isEmpty) return null;
+    if (_currentIndex < 0 || _currentIndex >= widget.products.length)
+      return null;
+    return widget.products[_currentIndex];
   }
 
   @override
@@ -247,6 +277,7 @@ class _AnimatedProductCircleWidgetState
             final index = entry.key;
             final product = entry.value;
             final angle = (2 * math.pi / widget.products.length) * index;
+            final imageUrl = _firstImageUrl(product);
 
             return AnimatedBuilder(
               animation: _rotationController,
@@ -288,14 +319,14 @@ class _AnimatedProductCircleWidgetState
                       child: Container(
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          image: product.images.isNotEmpty
+                          image: imageUrl != null
                               ? DecorationImage(
-                                  image: NetworkImage(product.images.last),
+                                  image: NetworkImage(imageUrl),
                                   fit: BoxFit.cover,
                                 )
                               : null,
                         ),
-                        child: product.images.isNotEmpty
+                        child: imageUrl != null
                             ? Icon(
                                 Icons.batch_prediction_outlined,
                                 color: index == _currentIndex
@@ -317,7 +348,10 @@ class _AnimatedProductCircleWidgetState
   }
 
   Widget _buildProductDisplay(BuildContext context, bool isMobile) {
-    final currentProduct = widget.products[_currentIndex];
+    final currentProduct = _currentProduct();
+    if (currentProduct == null) {
+      return const SizedBox.shrink();
+    }
 
     return AnimatedBuilder(
       animation: _fadeController,
@@ -332,8 +366,8 @@ class _AnimatedProductCircleWidgetState
     );
   }
 
-  Widget _buildMobileProductDisplay(
-      Product currentProduct, bool isMobile) {
+  Widget _buildMobileProductDisplay(Product currentProduct, bool isMobile) {
+    final imageUrl = _firstImageUrl(currentProduct);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -346,14 +380,14 @@ class _AnimatedProductCircleWidgetState
             borderRadius: BorderRadius.circular(20),
             color: QiratTheme.darkSurface,
             border: Border.all(color: QiratTheme.qiratGold.withOpacity(0.3)),
-            image: currentProduct.images.last != null
+            image: imageUrl != null
                 ? DecorationImage(
-                    image: NetworkImage(currentProduct.images.last!),
+                    image: NetworkImage(imageUrl),
                     fit: BoxFit.cover,
                   )
                 : null,
           ),
-          child: currentProduct.images.last == null
+          child: imageUrl == null
               ? Center(
                   child: Icon(
                     Icons.batch_prediction_outlined,
@@ -392,24 +426,15 @@ class _AnimatedProductCircleWidgetState
         // Price and Rating
         Row(
           children: [
-            Text(
-              '₹${currentProduct.priceTags.first.price}',
-              style: QiratTheme.titleLarge.copyWith(
-                color: QiratTheme.qiratGold,
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-              ),
-            ),
-            if (currentProduct.priceTags.first.price != null) ...[
-              const SizedBox(width: 12),
+            if (currentProduct.priceTags.isNotEmpty)
               Text(
                 '₹${currentProduct.priceTags.first.price}',
-                style: QiratTheme.bodyMedium.copyWith(
-                  color: QiratTheme.textMuted,
-                  decoration: TextDecoration.lineThrough,
+                style: QiratTheme.titleLarge.copyWith(
+                  color: QiratTheme.qiratGold,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
                 ),
               ),
-            ],
             const Spacer(),
             // if (currentProduct.rating != null) ...[
             //   Icon(
@@ -462,8 +487,8 @@ class _AnimatedProductCircleWidgetState
     );
   }
 
-  Widget _buildDesktopProductDisplay(
-      Product currentProduct, bool isMobile) {
+  Widget _buildDesktopProductDisplay(Product currentProduct, bool isMobile) {
+    final imageUrl = _firstImageUrl(currentProduct);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -476,25 +501,25 @@ class _AnimatedProductCircleWidgetState
             children: [
               // Badge for featured/new products
               // if (currentProduct.isFeatured || currentProduct.isNew)
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: QiratTheme.qiratGold.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: QiratTheme.qiratGold),
-                  ),
-                  child: Text(
-                    // currentProduct.isFeatured ? 'FEATURED' :
-                    'NEW',
-                    style: QiratTheme.bodyMedium.copyWith(
-                      color: QiratTheme.qiratGold,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12,
-                      letterSpacing: 1.5,
-                    ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: QiratTheme.qiratGold.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: QiratTheme.qiratGold),
+                ),
+                child: Text(
+                  // currentProduct.isFeatured ? 'FEATURED' :
+                  'NEW',
+                  style: QiratTheme.bodyMedium.copyWith(
+                    color: QiratTheme.qiratGold,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                    letterSpacing: 1.5,
                   ),
                 ),
+              ),
 
               const SizedBox(height: 16),
 
@@ -556,25 +581,15 @@ class _AnimatedProductCircleWidgetState
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          Text(
-                            '₹${currentProduct.priceTags.first.price}',
-                            style: QiratTheme.titleLarge.copyWith(
-                              color: QiratTheme.qiratGold,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 28,
-                            ),
-                          ),
-                          if (currentProduct.priceTags != null) ...[
-                            const SizedBox(width: 12),
+                          if (currentProduct.priceTags.isNotEmpty)
                             Text(
                               '₹${currentProduct.priceTags.first.price}',
-                              style: QiratTheme.bodyMedium.copyWith(
-                                color: QiratTheme.textMuted,
-                                decoration: TextDecoration.lineThrough,
-                                fontSize: 18,
+                              style: QiratTheme.titleLarge.copyWith(
+                                color: QiratTheme.qiratGold,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 28,
                               ),
                             ),
-                          ],
                         ],
                       ),
                     ],
@@ -582,38 +597,38 @@ class _AnimatedProductCircleWidgetState
                   const SizedBox(width: 40),
                   // Rating
                   // if (currentProduct.rating != null)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'RATING',
-                          style: QiratTheme.bodyMedium.copyWith(
-                            color: QiratTheme.textSecondary,
-                            fontSize: 12,
-                            letterSpacing: 1.5,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'RATING',
+                        style: QiratTheme.bodyMedium.copyWith(
+                          color: QiratTheme.textSecondary,
+                          fontSize: 12,
+                          letterSpacing: 1.5,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.star,
+                            color: QiratTheme.qiratGold,
+                            size: 24,
                           ),
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.star,
-                              color: QiratTheme.qiratGold,
-                              size: 24,
+                          const SizedBox(width: 8),
+                          Text(
+                            '${_rand.nextInt(5)}/5.0',
+                            style: QiratTheme.titleLarge.copyWith(
+                              color: QiratTheme.darkOnSurface,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
                             ),
-                            const SizedBox(width: 8),
-                            Text(
-                              '${math.Random(5).nextInt(5)}/5.0',
-                              style: QiratTheme.titleLarge.copyWith(
-                                color: QiratTheme.darkOnSurface,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ],
               ),
 
@@ -688,14 +703,14 @@ class _AnimatedProductCircleWidgetState
                   offset: const Offset(0, 8),
                 ),
               ],
-              image: currentProduct.images.last != null
+              image: imageUrl != null
                   ? DecorationImage(
-                      image: NetworkImage(currentProduct.images.last!),
+                      image: NetworkImage(imageUrl),
                       fit: BoxFit.cover,
                     )
                   : null,
             ),
-            child: currentProduct.images.last == null
+            child: imageUrl == null
                 ? Center(
                     child: Icon(
                       Icons.batch_prediction_outlined,
@@ -732,8 +747,10 @@ class _AnimatedProductCircleWidgetState
               ],
             ),
             child: IconButton(
-              onPressed: () =>
-                  widget.onAddToCart?.call(widget.products[_currentIndex]),
+              onPressed: () {
+                final p = _currentProduct();
+                if (p != null) widget.onAddToCart?.call(p);
+              },
               icon: const Icon(
                 Icons.add_shopping_cart,
                 color: QiratTheme.qiratBlack,

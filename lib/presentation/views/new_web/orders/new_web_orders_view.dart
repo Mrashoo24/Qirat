@@ -22,6 +22,7 @@ class NewWebOrdersView extends StatelessWidget {
             }
             if (state is OrderFetchSuccess) {
               final orders = state.orders;
+              orders.sort((a, b) => b.date.compareTo(a.date));
               if (orders.isEmpty) {
                 return const Center(
                     child: Text('No orders yet',

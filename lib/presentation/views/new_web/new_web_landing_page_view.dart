@@ -24,6 +24,9 @@ import '../../blocs/cart/cart_bloc.dart';
 import '../../../domain/entities/cart/cart_item.dart';
 import '../../../core/services/services_locator.dart' as di;
 import '../../../core/services/config_service.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:collection/collection.dart';
+import 'dart:async';
 
 /// New Web Landing Page - Complete Qirat website experience
 class NewWebLandingPageView extends StatefulWidget {
@@ -186,6 +189,10 @@ class _NewWebLandingPageViewState extends State<NewWebLandingPageView> {
                     onMenuTap: _handleMenuTap,
                   ),
                 ),
+
+                // Promo Carousel Section (from Remote Config)
+                SliverToBoxAdapter(
+                    child: _PromoCarousel(onTapBanner: _handleBannerTap)),
 
                 // Page Content
                 SliverList(
@@ -592,23 +599,15 @@ class _NewWebLandingPageViewState extends State<NewWebLandingPageView> {
       );
     }
 
-    if (found != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Navigating to ${found.name}…'),
-          backgroundColor: QiratTheme.qiratGold,
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-      context.push(NewWebRouter.newProductDetails, extra: found);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Could not find "$attarName" in our catalog.'),
-          behavior: SnackBarBehavior.floating,
-        ),
-      );
-    }
+    // 'found' will always be resolved by the fallbacks above; navigate directly
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Navigating to ${found.name}…'),
+        backgroundColor: QiratTheme.qiratGold,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+    context.push(NewWebRouter.newProductDetails, extra: found);
   }
 
   void _handleAddToCart(Product product, String priceTagId) {
@@ -654,5 +653,202 @@ class _NewWebLandingPageViewState extends State<NewWebLandingPageView> {
 
   void _handleViewAllCategories() {
     context.push(NewWebRouter.newCategories);
+  }
+
+  void _handleBannerTap(String route) {
+    if (route.isEmpty) return;
+    // Support absolute internal routes or query param based navigation.
+    final uri = Uri.tryParse(route);
+    if (uri == null) return;
+    // If route matches known named paths, push directly.
+    final path = uri.path;
+    if (path == NewWebRouter.newProductDetails) {
+      final id = uri.queryParameters['id'] ?? uri.queryParameters['prodid'];
+      if (id != null) {
+        context.push(NewWebRouter.newProductDetails, extra: {'id': id});
+        return;
+      }
+    }
+    if (path == NewWebRouter.newProducts) {
+      final catId =
+          uri.queryParameters['categoryId'] ?? uri.queryParameters['catid'];
+      if (catId != null) {
+        context.push(NewWebRouter.newProducts, extra: {'categoryId': catId});
+        return;
+      }
+      context.push(NewWebRouter.newProducts);
+      return;
+    }
+    // Fallback: attempt go to path directly
+    context.push(route);
+  }
+}
+
+/// Promo carousel widget using Remote Config banners.
+class _PromoCarousel extends StatefulWidget {
+  final void Function(String route) onTapBanner;
+  const _PromoCarousel({required this.onTapBanner});
+  @override
+  State<_PromoCarousel> createState() => _PromoCarouselState();
+}
+
+class _PromoCarouselState extends State<_PromoCarousel> {
+  late final List<Map<String, dynamic>> _banners;
+  int _currentIndex = 0;
+  final CarouselController _carouselController = CarouselController();
+  Timer? _autoTimer;
+  @override
+  void initState() {
+    super.initState();
+    _banners = di.sl<ConfigService>().promoBanners;
+    // Auto-rotate every 5 seconds when we have multiple banners
+    if (_banners.length > 1) {
+      _autoTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+        if (!mounted) return;
+        setState(() {
+          _currentIndex = (_currentIndex + 1) % _banners.length;
+        });
+        // Advance carousel to next item
+        try {
+          _carouselController.animateToItem(_currentIndex);
+        } catch (_) {
+          // If jumpToItem isn't available for this Flutter version, ignore.
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _autoTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_banners.isEmpty) return const SizedBox.shrink();
+    final maxW = ResponsiveHelper.getContentMaxWidth(context);
+    // 21:9 aspect enforced by AspectRatio below; height now derived from width so explicit height variable removed.
+    final screenW = MediaQuery.of(context).size.width;
+    final contentW = screenW <= maxW ? screenW : maxW;
+    final itemWidth = contentW * 0.9;
+    return Padding(
+      padding: ResponsiveHelper.getResponsivePadding(context)
+          .copyWith(top: 8, bottom: 24),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: maxW),
+          child: Column(
+            children: [
+              // Maintain 21:9 by wrapping in AspectRatio; height scales with width
+              AspectRatio(
+                aspectRatio: 21 / 9,
+                child: CarouselView(
+                  controller: _carouselController,
+                  scrollDirection: Axis.horizontal,
+                  itemSnapping: true,
+                  itemExtent: itemWidth,
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  onTap: (i) {
+                    final route = _banners[i]['route']?.toString() ?? '';
+                    widget.onTapBanner(route);
+                  },
+                  children: List.generate(_banners.length, (index) {
+                    final banner = _banners[index];
+                    final imageUrl = banner['imageUrl']?.toString() ?? '';
+                    return AnimatedPadding(
+                      duration: const Duration(milliseconds: 350),
+                      curve: Curves.easeOut,
+                      padding: EdgeInsets.symmetric(
+                        vertical: index == _currentIndex ? 0 : 12,
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            CachedNetworkImage(
+                              imageUrl: imageUrl,
+                              fit: BoxFit.fill,
+                              placeholder: (c, _) => Container(
+                                color: QiratTheme.darkSurfaceVariant,
+                                alignment: Alignment.center,
+                                child: const CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: QiratTheme.qiratGold,
+                                ),
+                              ),
+                              errorWidget: (c, _, __) => Container(
+                                color: Colors.black12,
+                                alignment: Alignment.center,
+                                child: const Icon(Icons.broken_image,
+                                    color: QiratTheme.textMuted),
+                              ),
+                            ),
+                            Positioned(
+                              right: 0,
+                              bottom: 0,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 6),
+                                decoration: const BoxDecoration(
+                                  color: Colors.black54,
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(12),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.touch_app,
+                                        size: 16, color: QiratTheme.qiratGold),
+                                    const SizedBox(width: 6),
+                                    const Text(
+                                      'Explore',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontFamily: 'Inter',
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+              const SizedBox(height: 12),
+              _buildIndicators(),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildIndicators() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: _banners.mapIndexed((i, _) {
+        final active = i == _currentIndex;
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          height: 6,
+          width: active ? 24 : 10,
+          decoration: BoxDecoration(
+            color: active
+                ? QiratTheme.qiratGold
+                : QiratTheme.textMuted.withOpacity(0.4),
+            borderRadius: BorderRadius.circular(4),
+          ),
+        );
+      }).toList(),
+    );
   }
 }

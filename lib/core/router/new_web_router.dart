@@ -1,4 +1,5 @@
 import 'package:eshop/domain/entities/product/product.dart';
+import 'package:eshop/presentation/views/new_web/checkout/checkutv2.dart';
 import 'package:eshop/presentation/views/new_web/delivery_info/delivery_info_new.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -10,6 +11,7 @@ import '../../domain/entities/category/category.dart';
 import '../../presentation/views/new_web/product/new_web_product_details_view.dart';
 import '../../presentation/views/new_web/cart/new_web_cart_view.dart';
 import '../../presentation/views/new_web/checkout/new_web_checkout_view.dart';
+import '../../presentation/views/new_web/checkout/payment_return_view.dart';
 import '../../presentation/views/new_web/categories/new_web_categories_view.dart';
 import '../../presentation/views/new_web/orders/new_web_orders_view.dart';
 import '../../presentation/views/new_web/wishlist/new_web_wishlist_view.dart';
@@ -20,6 +22,10 @@ import '../../presentation/views/new_web/static/new_web_privacy_view.dart';
 import '../../presentation/views/new_web/static/new_web_terms_view.dart';
 import '../../presentation/views/new_web/static/new_web_delete_account_view.dart';
 import '../../presentation/views/new_web/story/new_web_our_story_view.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../presentation/blocs/order/order_add/order_add_cubit.dart';
+import '../../presentation/blocs/delivery_info/delivery_info_fetch/delivery_info_fetch_cubit.dart';
+import '../../core/services/services_locator.dart';
 
 // TODO: Uncomment these imports when implementing the actual views
 // import '../../../domain/entities/product/product.dart';
@@ -44,6 +50,7 @@ class NewWebRouter {
   static const String newTerms = '/terms';
   static const String newDeleteAccount = '/delete-account';
   static const String newOurStory = '/our-story';
+  static const String paymentReturn = '/payment-return';
 
   // Authentication routes (new design)
   static const String newSignIn = '/new-sign-in';
@@ -54,6 +61,8 @@ class NewWebRouter {
   static const String newDashboard = '/new-dashboard';
 
   static const newDeliveryInfo = '/new-delivery-info';
+
+  static const checkoutv2 = '/checkout-payment';
 }
 
 /// New GoRouter configuration for the redesigned web app
@@ -95,6 +104,9 @@ final GoRouter newWebRouter = GoRouter(
         if (extra is Product) {
           return NewWebProductDetailsView(product: extra);
         }
+        else if (extra is Map && extra['id'] is String) {
+          return NewWebProductDetailsLoader(productId: extra['id'].trim());
+        }
         final q = state.uri.queryParameters;
         final prodId = q['prodid'] ?? q['id'];
         if (prodId != null && prodId.trim().isNotEmpty) {
@@ -114,8 +126,16 @@ final GoRouter newWebRouter = GoRouter(
       name: NewWebRouter.newCheckout,
       path: NewWebRouter.newCheckout,
       builder: (context, state) {
-        final items = state.extra as List<CartItem>;
-        return NewWebCheckoutView(items: items);
+        final extra = state.extra;
+        if (extra is List<CartItem>) {
+          final items = state.extra as List<CartItem>;
+
+          return NewWebCheckoutView(items: items);
+        }
+
+        // No data -> go home
+        Future.microtask(() => context.go(NewWebRouter.newHome));
+        return const SizedBox.shrink();
       },
     ),
     GoRoute(
@@ -180,7 +200,23 @@ final GoRouter newWebRouter = GoRouter(
       name: NewWebRouter.newOurStory,
       path: NewWebRouter.newOurStory,
       builder: (context, state) => const NewWebOurStoryView(),
-    )
+    ),
+    // Cashfree payment return URL landing page for web
+    GoRoute(
+      name: NewWebRouter.paymentReturn,
+      path: NewWebRouter.paymentReturn,
+      builder: (context, state) => MultiBlocProvider(
+        providers: [
+          BlocProvider(create: (_) => sl<OrderAddCubit>()),
+          BlocProvider(create: (_) => sl<DeliveryInfoFetchCubit>()),
+        ],
+        child: const PaymentReturnView(),
+      ),
+    ),
+    GoRoute(
+        path: NewWebRouter.checkoutv2,
+        name: NewWebRouter.checkoutv2,
+        builder: (context, state) => const CheckoutViewV2())
   ],
   // Error handling
   errorBuilder: (context, state) {

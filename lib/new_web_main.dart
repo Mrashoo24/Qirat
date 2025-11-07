@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:eshop/presentation/widgets/new_web/common/qirat_horizontal_collection_widget.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -103,7 +104,8 @@ class NewWebTestApp extends StatelessWidget {
       ],
       child: OKToast(
           child: MaterialApp.router(
-        title: 'Qirat Attars - New Web UI',
+        title: 'Qirat',
+        scrollBehavior: const WebScrollBehavior(),
         debugShowCheckedModeBanner: false,
         theme: QiratTheme.darkTheme,
         routerConfig: newWebRouter,

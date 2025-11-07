@@ -46,52 +46,55 @@ class _QiratScentAdvisorModalState extends State<QiratScentAdvisorModal> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.black.withOpacity(0.9),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxWidth: ResponsiveHelper.responsive(
-              context: context,
-              mobile: MediaQuery.of(context).size.width * 0.9,
-              tablet: 600,
-              desktop: 700,
-            ),
-            maxHeight: MediaQuery.of(context).size.height * 0.8,
-          ),
-          child: Container(
-            margin: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: QiratTheme.darkBackground,
-              border: Border.all(
-                color: QiratTheme.goldBorder,
-                width: 1,
+    return Theme(
+      data: QiratTheme.darkTheme,
+      child: Material(
+        color: Colors.black.withOpacity(0.9),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: ResponsiveHelper.responsive(
+                context: context,
+                mobile: MediaQuery.of(context).size.width * 0.9,
+                tablet: 600,
+                desktop: 700,
               ),
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.5),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                ),
-              ],
+              maxHeight: MediaQuery.of(context).size.height * 0.8,
             ),
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: ResponsiveHelper.responsive(
-                  context: context,
-                  mobile: const EdgeInsets.all(24),
-                  tablet: const EdgeInsets.all(32),
-                  desktop: const EdgeInsets.all(40),
+            child: Container(
+              margin: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: QiratTheme.darkBackground,
+                border: Border.all(
+                  color: QiratTheme.goldBorder,
+                  width: 1,
                 ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildHeader(),
-                    const SizedBox(height: 24),
-                    _buildContent(),
-                  ],
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.5),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: ResponsiveHelper.responsive(
+                    context: context,
+                    mobile: const EdgeInsets.all(24),
+                    tablet: const EdgeInsets.all(32),
+                    desktop: const EdgeInsets.all(40),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildHeader(),
+                      const SizedBox(height: 24),
+                      _buildContent(),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -181,10 +184,25 @@ class _QiratScentAdvisorModalState extends State<QiratScentAdvisorModal> {
               _generateRecommendation();
             }
           },
-          decoration: const InputDecoration(
+          style: const TextStyle(color: QiratTheme.darkOnBackground),
+          decoration: InputDecoration(
             hintText:
-                "E.g., 'A confident scent for a first date,' or 'Calm and earthy for a quiet evening at home.'",
-            hintStyle: TextStyle(color: QiratTheme.textMuted),
+            "E.g., 'A confident scent for a first date,' or 'Calm and earthy for a quiet evening at home.'",
+            hintStyle: const TextStyle(color: QiratTheme.textSecondary),
+            filled: true,
+            fillColor: QiratTheme.darkSurfaceVariant,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: QiratTheme.goldBorder),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: QiratTheme.goldBorder),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: const BorderSide(color: QiratTheme.qiratGold),
+            ),
           ),
         ),
         const SizedBox(height: 24),

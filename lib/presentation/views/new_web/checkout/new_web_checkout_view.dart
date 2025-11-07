@@ -279,32 +279,33 @@ class NewWebCheckoutView extends StatelessWidget {
                           final selectedInfos = currentState.user.deliveryInfos
                               .where((e) => e.isSelected);
                           if (selectedInfos.isNotEmpty) {
-                            context.read<OrderAddCubit>().addOrder(
-                                  OrderDetails(
-                                    id: '',
-                                    orderItems: items
-                                        .map(
-                                          (item) => OrderItem(
-                                            id: '',
-                                            product: item.product,
-                                            priceTag: item.priceTag,
-                                            price: item.priceTag.price,
-                                            quantity: item.quantity,
-                                          ),
-                                        )
-                                        .toList(),
-                                    deliveryInfo: selectedInfos.first,
-                                    discount: 0,
-                                    uid: currentState.user.id,
-                                    total: CartCalculator.getTotal(items),
-                                    status: statuesPending,
-                                    info: '',
-                                    date: DateTime.now()
-                                        .toString()
-                                        .split('.')
-                                        .first,
-                                  ),
-                                );
+                            context.push(NewWebRouter.checkoutv2);
+                            // context.read<OrderAddCubit>().addOrder(
+                            //       OrderDetails(
+                            //         id: '',
+                            //         orderItems: items
+                            //             .map(
+                            //               (item) => OrderItem(
+                            //                 id: '',
+                            //                 product: item.product,
+                            //                 priceTag: item.priceTag,
+                            //                 price: item.priceTag.price,
+                            //                 quantity: item.quantity,
+                            //               ),
+                            //             )
+                            //             .toList(),
+                            //         deliveryInfo: selectedInfos.first,
+                            //         discount: 0,
+                            //         uid: currentState.user.id,
+                            //         total: CartCalculator.getTotal(items),
+                            //         status: statuesPending,
+                            //         info: '',
+                            //         date: DateTime.now()
+                            //             .toString()
+                            //             .split('.')
+                            //             .first,
+                            //       ),
+                            //     );
                           } else {
                             EasyLoading.showError(
                               'Error \nPlease select delivery add your delivery information',

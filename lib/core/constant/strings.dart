@@ -16,3 +16,6 @@ const String statuesPacked = "Packed";
 const String statuesOnDelivery = "On The Way";
 const String statuesDelivered = "Delivered";
 const String statuesCancelled = "Cancelled";
+
+const kbaseurl = 'https://asia-south1-qiratperfumes.cloudfunctions.net/cashfree-http';
+const kdomainurl = 'https://www.qiratshop.in';

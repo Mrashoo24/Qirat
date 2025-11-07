@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import '../../../../core/theme/qirat_theme.dart';
 import '../../../../core/responsive/responsive_helper.dart';
 import '../../../../domain/entities/product/product.dart';
@@ -140,16 +141,19 @@ class QiratHorizontalCollectionWidget extends StatelessWidget {
   Widget _buildProductShowcase(BuildContext context) {
     return ResponsiveBuilder(
       builder: (context, isMobile, isTablet, isDesktop) {
-        return SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 0),
-          child: Row(
-            children: products.map((product) {
-              return Padding(
-                padding: EdgeInsets.only(right: isMobile ? 16 : 32),
-                child: _buildProductCard(product, isMobile),
-              );
-            }).toList(),
+        final listHeight = isMobile ? 360.0 : 420.0;
+        return SizedBox(
+          height: listHeight,
+          child: ScrollConfiguration(
+            behavior: const WebScrollBehavior(),
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 0),
+              separatorBuilder: (_, __) => SizedBox(width: isMobile ? 16 : 32),
+              itemCount: products.length,
+              itemBuilder: (context, index) =>
+                  _buildProductCard(products[index], isMobile),
+            ),
           ),
         );
       },
@@ -205,34 +209,22 @@ class QiratHorizontalCollectionWidget extends StatelessWidget {
 
             const SizedBox(height: 8),
 
-            // // Product Category
-            // if (product.categories.isNotEmpty)
-            //   Text(
-            //     product.categories.first,
-            //     style: TextStyle(
-            //       fontSize: isMobile ? 13 : 14,
-            //       fontStyle: FontStyle.italic,
-            //       color: QiratTheme.textSecondary,
-            //       fontFamily: 'Inter',
-            //     ),
-            //   ),
-
             const SizedBox(height: 12),
 
             // Product Description
             Text(
               product.description,
               style: TextStyle(
-                fontSize: isMobile ? 12 : 14,
+                fontSize: isMobile ? 10 : 12,
                 color: QiratTheme.darkOnBackground,
                 fontFamily: 'Inter',
                 height: 1.4,
               ),
-              maxLines: 3,
+              maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 5),
 
             // Price and Add to Cart
             _buildPriceSection(product, isMobile),
@@ -323,7 +315,7 @@ class QiratHorizontalCollectionWidget extends StatelessWidget {
               child: Icon(
                 Icons.add_shopping_cart,
                 color: QiratTheme.qiratBlack,
-                size: isMobile ? 18 : 20,
+                size: isMobile ? 12 : 16,
               ),
             ),
           ),
@@ -370,4 +362,17 @@ class QiratHorizontalCollectionWidget extends StatelessWidget {
       ),
     );
   }
+}
+
+// Top-level custom scroll behavior (must be outside widget class)
+class WebScrollBehavior extends MaterialScrollBehavior {
+  const WebScrollBehavior();
+  @override
+  Set<PointerDeviceKind> get dragDevices => const {
+        PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
+        PointerDeviceKind.trackpad,
+        PointerDeviceKind.stylus,
+        PointerDeviceKind.invertedStylus,
+      };
 }

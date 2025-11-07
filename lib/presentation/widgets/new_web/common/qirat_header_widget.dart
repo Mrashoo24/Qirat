@@ -129,7 +129,7 @@ class QiratHeaderWidget extends StatelessWidget implements PreferredSizeWidget {
 
 Widget _buildLogo() {
   final logoUrl =
-     sl<ConfigService>().featured_collection_id;
+     sl<ConfigService>().logoUrl;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -464,12 +464,22 @@ Widget _buildLogo() {
                                       ? catState.categories
                                       : const [];
 
-                                  cats.sort((a, b) {
-                                    final aMain = a.location!.toLowerCase().contains('main') ? 0 : 1;
-                                    final bMain = b.location!.toLowerCase().contains('main') ? 0 : 1;
-                                    if (aMain != bMain) return aMain - bMain;
-                                    return a.location!.compareTo(b.location!);
-                                  });
+                                 if(cats.isNotEmpty) {
+                                    cats.sort((a, b) {
+                                      final aMain = a.location!
+                                              .toLowerCase()
+                                              .contains('main')
+                                          ? 0
+                                          : 1;
+                                      final bMain = b.location!
+                                              .toLowerCase()
+                                              .contains('main')
+                                          ? 0
+                                          : 1;
+                                      if (aMain != bMain) return aMain - bMain;
+                                      return a.location!.compareTo(b.location!);
+                                    });
+                                  }
 
                                   if (cats.isEmpty)
                                     return const SizedBox.shrink();
@@ -477,6 +487,7 @@ Widget _buildLogo() {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
+
                                       const Padding(
                                         padding: EdgeInsets.only(
                                             left: 12, top: 8, bottom: 4),

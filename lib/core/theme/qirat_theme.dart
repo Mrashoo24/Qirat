@@ -104,7 +104,7 @@ class QiratTheme {
       ),
 
       // Card Theme
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 4,
         color: darkSurface,
         shadowColor: Colors.black.withOpacity(0.3),
@@ -290,7 +290,7 @@ class QiratTheme {
       ),
 
       // Card Theme
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 2,
         color: lightSurface,
         shadowColor: Colors.black.withOpacity(0.1),

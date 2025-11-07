@@ -1,11 +1,7 @@
-import 'dart:convert';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:eshop/data/firebase/firebase_services.dart';
-import 'package:http/http.dart' as http;
 
 import '../../../../core/error/exceptions.dart';
-import '../../../core/constant/strings.dart';
 import '../../models/cart/cart_item_model.dart';
 
 abstract class CartRemoteDataSource {
@@ -37,8 +33,9 @@ class CartRemoteDataSourceSourceImpl implements CartRemoteDataSource {
   Future<CartItemModel> deleteCart(CartItemModel cartItem, String token) async {
     try {
       await client.deleteDocument(
-          collectionPath: "cartlist",
-          documentId: cartItem.id.toString(),);
+        collectionPath: "cartlist",
+        documentId: cartItem.id.toString(),
+      );
 
       return cartItem;
     } catch (e) {
@@ -46,23 +43,24 @@ class CartRemoteDataSourceSourceImpl implements CartRemoteDataSource {
     }
   }
 
-
   @override
   Future<List<CartItemModel>> syncCart(
       List<CartItemModel> cart, String token) async {
-
     final WriteBatch batch = FirebaseFirestore.instance.batch();
     bool success = true;
 
     try {
       for (var element in cart) {
-        // Assume each cart element has a unique ID field
-        final DocumentReference docRef = FirebaseFirestore.instance
-            .collection("cartlist")
-            .doc(element.id,); // Using the cart element's 'id' for the document
+        // Use a stable document id. Fallback to derived id if missing
+        final String docId = (element.id == null || element.id!.isEmpty)
+            ? element.getCartId(token, element.product.id, element.priceTag.id)
+            : element.id!;
 
-        // Add each set operation to the batch
-        batch.set(docRef, element,SetOptions(merge: true));
+        final DocumentReference docRef =
+            FirebaseFirestore.instance.collection("cartlist").doc(docId);
+
+        // Firestore requires Map<String,dynamic> data, not a model instance
+        batch.set(docRef, element.toBodyJson(), SetOptions(merge: true));
       }
 
       // Commit the batch. If any operation fails, nothing will be committed.
@@ -80,13 +78,12 @@ class CartRemoteDataSourceSourceImpl implements CartRemoteDataSource {
     } else {
       throw ServerException();
     }
-
   }
 
   @override
   Future<List<CartItemModel>> getCart(String token) async {
     List<Map<String, dynamic>> val = await client.getAllDocuments(
-        collectionPath: "cartlist", arrayWhereConditions: {"uid": token});
+        collectionPath: "cartlist", isEqualTowhereConditions: {"uid": token});
 
     return cartItemModelListFromRemoteJson(val);
   }

@@ -37,5 +37,25 @@
         "destination": "/index.html"
       }
     ]
-  }
+  },
+  "functions": [
+    {
+      "source": "server/cashfree_function",
+      "codebase": "cashfree",
+      "runtime": "python313",
+      "endpoints": {
+        "cashfreeHttp": {
+          "entryPoint": "cashfree_http",
+          "region": "asia-south1",
+          "httpsTrigger": {},
+          "environmentVariables": {
+            "CASHFREE_ENV": "SANDBOX",
+            "CASHFREE_API_VERSION": "2025-01-01",
+            "ALLOWED_ORIGIN": "*"
+          },
+          "secrets": ["CASHFREE_CLIENT_ID", "CASHFREE_CLIENT_SECRET"]
+        }
+      }
+    }
+  ]
 }

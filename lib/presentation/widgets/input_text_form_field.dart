@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class InputTextFormField extends StatefulWidget {
   final TextEditingController controller;
@@ -11,6 +12,9 @@ class InputTextFormField extends StatefulWidget {
   final bool enable;
   final TextInputAction? textInputAction;
   final Function(String)? onFieldSubmitted;
+  final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
+  final Widget? prefix;
   const InputTextFormField({
     Key? key,
     required this.controller,
@@ -23,6 +27,9 @@ class InputTextFormField extends StatefulWidget {
     this.textInputAction,
     this.hintTextSize = 14,
     this.onFieldSubmitted,
+    this.keyboardType,
+    this.inputFormatters,
+    this.prefix,
   }) : super(key: key);
 
   @override
@@ -43,6 +50,8 @@ class _InputTextFormFieldState extends State<InputTextFormField> {
       enabled: widget.enable,
       textInputAction: widget.textInputAction,
       onFieldSubmitted: widget.onFieldSubmitted,
+      keyboardType: widget.keyboardType,
+      inputFormatters: widget.inputFormatters,
       decoration: InputDecoration(
         filled: true,
         hintText: widget.hint,
@@ -50,6 +59,7 @@ class _InputTextFormFieldState extends State<InputTextFormField> {
           fontSize: widget.hintTextSize,
         ),
         contentPadding: widget.contentPadding,
+        prefix: widget.prefix,
         suffixIcon: widget.isSecureField
             ? IconButton(
                 icon: Icon(
@@ -64,11 +74,11 @@ class _InputTextFormFieldState extends State<InputTextFormField> {
               )
             : null,
         border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12.0),
-            borderSide: const BorderSide(
-              color: Colors.transparent,
-              width: 0.0,
-            ),
+          borderRadius: BorderRadius.circular(12.0),
+          borderSide: const BorderSide(
+            color: Colors.transparent,
+            width: 0.0,
+          ),
         ),
       ),
     );

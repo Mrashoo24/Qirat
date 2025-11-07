@@ -33,6 +33,8 @@ class _NewWebOurStoryViewState extends State<NewWebOurStoryView> {
                 padding: EdgeInsets.fromLTRB(pad.left, 40, pad.right, 80),
                 child: Column(
                   children: [
+                    // Legal banner
+                    _LegalNameBanner(),
                     // Hero
                     _ParallaxHero(
                       title: "👑 Our Story: The Philosophy of Purity and Power",
@@ -56,8 +58,7 @@ class _NewWebOurStoryViewState extends State<NewWebOurStoryView> {
                           "The Craftsmanship: Time, Temperature, and Terroir",
                       body:
                           "We do not believe in shortcuts. Our process is a deliberate rejection of mass-market methods.\n\nEvery attar we release is the culmination of meticulous effort and patience:\n\n• Sourcing Excellence: Our blenders travel across regions to secure the finest Sandalwood Oil, Rose Absolutes, and rare natural musks. We never compromise on the origin or grade of our raw materials.\n\n• 100% Alcohol-Free: This is our foundational promise. Unlike alcohol-based perfumes that evaporate quickly, our pure oil essences are designed to meld with your skin's natural warmth, creating a personalized, rich, and evolving aura that is gentle on the skin.\n\n• Concentration over Volume: The deep, concentrated nature of our attars guarantees performance. Our scents don't just last; they intensify and gain character as the day progresses, a crucial advantage in the dynamic Indian climate.",
-                      imageAlt:
-                          "assets/other_images/qirat_persons.png",
+                      imageAlt: "assets/other_images/qirat_persons.png",
                     ),
                     const SizedBox(height: 24),
 
@@ -75,6 +76,9 @@ class _NewWebOurStoryViewState extends State<NewWebOurStoryView> {
                       onShop: () => context.push(NewWebRouter.newProducts),
                       onAdvisor: () => context.push(NewWebRouter.newSearch),
                     ),
+                    const SizedBox(height: 40),
+                    // Contact Us / Legal Section
+                    const _ContactUsSection(),
                   ],
                 ),
               ),
@@ -358,6 +362,145 @@ class _CtaCard extends StatelessWidget {
                 child: const Text("Signature Scent Advisor"),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Banner highlighting legal relationship
+class _LegalNameBanner extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      margin: const EdgeInsets.only(bottom: 18),
+      decoration: BoxDecoration(
+        color: QiratTheme.darkSurfaceVariant,
+        border: Border.all(color: QiratTheme.qiratGold, width: 1.2),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: const Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            'QIRAT is a brand of Qirat Enterprises',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: QiratTheme.qiratGold,
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w700,
+              fontSize: 16,
+              letterSpacing: 0.3,
+            ),
+          ),
+          SizedBox(height: 6),
+          Text(
+            'Legal Entity: Qirat Enterprises',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white,
+              fontFamily: 'Inter',
+              fontSize: 13,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Contact Us section including legal name for compliance
+class _ContactUsSection extends StatelessWidget {
+  const _ContactUsSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: QiratTheme.darkSurface,
+        border: Border.all(color: QiratTheme.goldBorder),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      padding: const EdgeInsets.fromLTRB(22, 24, 22, 26),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Contact Us',
+            style: TextStyle(
+              color: QiratTheme.qiratGold,
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w700,
+              fontSize: 18,
+            ),
+          ),
+          const SizedBox(height: 10),
+          const Text(
+            'Legal Name: Qirat Enterprises\n\nIf you have any inquiries, partnership interests, or require support related to your purchases, you can reach us through the channels below. We are committed to responding promptly and professionally.',
+            style: TextStyle(
+              color: QiratTheme.textSecondary,
+              fontFamily: 'Inter',
+              height: 1.5,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Wrap(
+            runSpacing: 12,
+            spacing: 28,
+            children: const [
+              _ContactLine(
+                label: 'Email',
+                value: 'care@qiratshop.in',
+              ),
+              _ContactLine(
+                label: 'Phone',
+                value: '+91 9137029393',
+              ),
+              _ContactLine(
+                label: 'Website',
+                value: 'qiratshop.in',
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ContactLine extends StatelessWidget {
+  final String label;
+  final String value;
+  const _ContactLine({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 300,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w600,
+              fontSize: 13,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: const TextStyle(
+              color: QiratTheme.textSecondary,
+              fontFamily: 'Inter',
+              fontSize: 12,
+            ),
           ),
         ],
       ),

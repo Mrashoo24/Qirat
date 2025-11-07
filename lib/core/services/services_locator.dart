@@ -66,6 +66,7 @@ import '../../presentation/blocs/order/order_add/order_add_cubit.dart';
 import '../../presentation/blocs/order/order_fetch/order_fetch_cubit.dart';
 import '../../presentation/blocs/product/product_bloc.dart';
 import '../../presentation/blocs/user/user_bloc.dart';
+import '../constant/strings.dart';
 import '../network/network_info.dart';
 import 'config_service.dart';
 import '../../domain/entities/ai/recommendation.dart'; // optional
@@ -74,6 +75,12 @@ import '../../domain/usecases/ai/recommend_attar_usecase.dart';
 import '../../data/data_sources/remote/ai_remote_data_source.dart';
 import '../../data/repositories/ai_repository_impl.dart';
 import '../services/gemini_client.dart';
+import '../../data/data_sources/remote/payment_remote_data_source.dart';
+import '../../data/repositories/payment_repository_impl.dart';
+import '../../domain/repositories/payment_repository.dart';
+import '../../domain/usecases/payment/create_cashfree_order_usecase.dart';
+
+
 final sl = GetIt.instance;
 
 Future<void> init() async {
@@ -276,5 +283,15 @@ Future<void> init() async {
   sl.registerLazySingleton<AiRemoteDataSource>(() => AiRemoteDataSourceImpl(sl<GeminiClient>()));
   sl.registerLazySingleton<AiRepository>(() => AiRepositoryImpl(remote: sl<AiRemoteDataSource>()));
   sl.registerLazySingleton<RecommendAttarUseCase>(() => RecommendAttarUseCase(sl<AiRepository>()));
+
+
+  // Payment (Cashfree)
+  sl.registerLazySingleton<PaymentRemoteDataSource>(() => PaymentRemoteDataSourceImpl(
+        httpClient: sl<http.Client>(),
+        baseUrl: kbaseurl,
+      ));
+  sl.registerLazySingleton<PaymentRepository>(() => PaymentRepositoryImpl(remote: sl<PaymentRemoteDataSource>()));
+  sl.registerLazySingleton<CreateCashfreeOrderUseCase>(() => CreateCashfreeOrderUseCase(sl<PaymentRepository>()));
+
 
 }
