@@ -50,7 +50,7 @@ The complete Qirat Attars landing page has been successfully converted from HTML
 ### **Option 1: Temporary Test Entry**
 ```bash
 # Run the new web UI in isolation
-flutter run -t lib/new_web_main.dart -d chrome
+flutter run -t lib/main.dart -d chrome
 ```
 
 ### **Option 2: Switch Main App** (when ready)

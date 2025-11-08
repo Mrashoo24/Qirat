@@ -1,24 +1,17 @@
 import 'dart:async';
 
-import 'package:eshop/presentation/widgets/new_web/common/qirat_horizontal_collection_widget.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:go_router/go_router.dart';
 import 'package:oktoast/oktoast.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'core/constant/strings.dart';
-import 'core/router/app_router.dart';
 import 'core/router/new_web_router.dart';
-import 'core/services/config_service.dart';
-import 'core/services/notification_service.dart';
 import 'core/theme/app_theme.dart';
-import 'core/theme/qirat_theme.dart';
 import 'domain/usecases/product/get_product_usecase.dart';
 import 'firebase_options.dart';
-import 'main.dart';
 import 'presentation/blocs/cart/cart_bloc.dart';
 import 'presentation/blocs/category/category_bloc.dart';
 import 'presentation/blocs/delivery_info/delivery_info_action/delivery_info_action_cubit.dart';
@@ -30,9 +23,7 @@ import 'presentation/blocs/home/navbar_cubit.dart';
 import 'presentation/blocs/order/order_fetch/order_fetch_cubit.dart';
 import 'presentation/blocs/product/product_bloc.dart';
 import 'presentation/blocs/user/user_bloc.dart';
-
-/// Entry point for testing the new web UI
-/// Use this temporarily to preview the new design
+import 'core/services/config_service.dart';
 
 Future<void> main() async {
   // Error handling for the app
@@ -47,9 +38,7 @@ Future<void> main() async {
     await di.init();
     // Initialize Remote Config (with safe defaults)
     await di.sl<ConfigService>().init();
-    GoRouter.optionURLReflectsImperativeAPIs = true;
-    // await NotificationService.initialize();
-    runApp(const NewWebTestApp());
+    runApp(const MyApp());
     configLoading();
     FirebaseAnalytics.instance.logEvent(
       name: "AppOpenedCustom",
@@ -64,8 +53,8 @@ Future<void> main() async {
   });
 }
 
-class NewWebTestApp extends StatelessWidget {
-  const NewWebTestApp({Key? key}) : super(key: key);
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -103,14 +92,32 @@ class NewWebTestApp extends StatelessWidget {
         ),
       ],
       child: OKToast(
-          child: MaterialApp.router(
-        title: 'Qirat',
-        scrollBehavior: const WebScrollBehavior(),
-        debugShowCheckedModeBanner: false,
-        theme: QiratTheme.darkTheme,
-        routerConfig: newWebRouter,
-        builder: EasyLoading.init(),
-      )),
+        child: MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          routerConfig: newWebRouter,
+          // initialRoute: AppRouter.home,
+          // onGenerateRoute: AppRouter.onGenerateRoute,
+          title: appTitle,
+          theme: AppTheme.lightTheme,
+          builder: EasyLoading.init(),
+        ),
+      ),
     );
   }
+}
+
+void configLoading() {
+  EasyLoading.instance
+    ..displayDuration = const Duration(milliseconds: 2500)
+    ..indicatorType = EasyLoadingIndicatorType.fadingCircle
+    ..loadingStyle = EasyLoadingStyle.custom
+    ..indicatorSize = 45.0
+    ..radius = 10.0
+    ..progressColor = Colors.white
+    ..backgroundColor = Colors.black
+    ..indicatorColor = Colors.white
+    ..textColor = Colors.white
+    ..userInteractions = false
+    ..maskType = EasyLoadingMaskType.black
+    ..dismissOnTap = true;
 }

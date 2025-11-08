@@ -80,7 +80,7 @@ FirebaseCrashlytics, FirebasePerformance
 ### Essential Commands
 ```bash
 flutter pub get                    # Dependencies
-flutter run lib/main.dart         # Run app  
+flutter run lib/main_old.dart         # Run app  
 flutter test                      # Run all tests
 flutter analyze                   # Static analysis
 flutter build web                 # Web build
