@@ -10,6 +10,11 @@ class QiratFooterSectionWidget extends StatelessWidget {
   final VoidCallback? onShopCollectionTap;
   final Function(String)? onLinkTap;
 
+  static const String _playStoreUrl =
+      'https://play.google.com/store/apps/details?id=com.ak.qiratshop';
+  static const String _appStoreUrl =
+      'https://apps.apple.com/us/app/qirat-attars-and-perfumes/id6736781517'; // placeholder
+
   const QiratFooterSectionWidget({
     Key? key,
     this.onShopCollectionTap,
@@ -194,6 +199,17 @@ class QiratFooterSectionWidget extends StatelessWidget {
               ],
               context),
         ),
+
+        // Get the App Column
+        Expanded(
+          child: _buildLinkColumn(
+              'Get the App',
+              [
+                'Android (Play Store)',
+                'iOS (App Store)',
+              ],
+              context),
+        ),
       ],
     );
   }
@@ -256,6 +272,15 @@ class QiratFooterSectionWidget extends StatelessWidget {
             [
               'Privacy Policy',
               'Terms of Service',
+            ],
+            context),
+
+        const SizedBox(height: 24),
+        _buildLinkColumn(
+            'Get the App',
+            [
+              'Android (Play Store)',
+              'iOS (App Store)',
             ],
             context),
       ],
@@ -329,6 +354,12 @@ class QiratFooterSectionWidget extends StatelessWidget {
       case 'info@qirat.in':
         _openEmail('info@qirat.in');
         break;
+      case 'Android (Play Store)':
+        _openPlayStore();
+        break;
+      case 'iOS (App Store)':
+        _openAppStore();
+        break;
       default:
         // External items like Instagram/WhatsApp/email can be handled by parent via onLinkTap
         break;
@@ -356,6 +387,16 @@ class QiratFooterSectionWidget extends StatelessWidget {
         'subject': 'Support',
       }),
     );
+    await _launchExternal(uri);
+  }
+
+  Future<void> _openPlayStore() async {
+    final uri = Uri.parse(_playStoreUrl);
+    await _launchExternal(uri);
+  }
+
+  Future<void> _openAppStore() async {
+    final uri = Uri.parse(_appStoreUrl);
     await _launchExternal(uri);
   }
 

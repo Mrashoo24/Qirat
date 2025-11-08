@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/qirat_theme.dart';
 import '../../../../core/responsive/responsive_helper.dart';
 import '../../../../core/router/new_web_router.dart';
@@ -41,6 +42,7 @@ class _NewWebOurStoryViewState extends State<NewWebOurStoryView> {
                       subtitle:
                           "The Qirat Commitment: Restoring Timeless Elegance",
                     ),
+
                     const SizedBox(height: 32),
 
                     // Section 1
@@ -79,6 +81,11 @@ class _NewWebOurStoryViewState extends State<NewWebOurStoryView> {
                     const SizedBox(height: 40),
                     // Contact Us / Legal Section
                     const _ContactUsSection(),
+
+                    const SizedBox(height: 32),
+
+                    // Download App Section
+                    const _DownloadAppSection(),
                   ],
                 ),
               ),
@@ -364,6 +371,149 @@ class _CtaCard extends StatelessWidget {
             ],
           ),
         ],
+      ),
+    );
+  }
+}
+
+// Big App Download Promotion Section
+class _DownloadAppSection extends StatelessWidget {
+  const _DownloadAppSection();
+
+  static const String _playStoreUrl =
+      'https://play.google.com/store/apps/details?id=com.ak.qiratshop';
+  static const String _appStoreUrl =
+      'https://apps.apple.com/us/app/qirat-attars-and-perfumes/id6736781517'; // placeholder
+
+  Future<void> _openUrl(String url) async {
+    try {
+        final uri = Uri.parse(url);
+        await _launchExternal(uri);
+
+    } catch (_) {}
+  }
+
+  Future<void> _launchExternal(Uri uri) async {
+    try {
+      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+        // Fallback to in-app browser if external fails
+        await launchUrl(uri, mode: LaunchMode.platformDefault);
+      }
+    } catch (_) {
+      // Silently ignore launcher errors
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isMobile = ResponsiveHelper.isMobile(context);
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: QiratTheme.darkSurfaceVariant,
+        border: Border.all(color: QiratTheme.qiratGold, width: 1.2),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: QiratTheme.qiratGold.withOpacity(0.08),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      padding: EdgeInsets.fromLTRB(24, 40, 24, 44),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            'Experience QIRAT On The Go',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: QiratTheme.qiratGold,
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w800,
+              fontSize: isMobile ? 24 : 32,
+            ),
+          ),
+          const SizedBox(height: 12),
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 700),
+            child: Text(
+              'Download our mobile app for faster checkout, personalized scent recommendations, order tracking and exclusive early access drops.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: QiratTheme.textSecondary,
+                fontFamily: 'Inter',
+                height: 1.5,
+                fontSize: isMobile ? 14 : 16,
+              ),
+            ),
+          ),
+          const SizedBox(height: 32),
+          Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 28,
+            runSpacing: 24,
+            children: [
+              _StoreBadge(
+                imagePath: 'assets/icons/googeplay.png',
+                label: 'Get it on Google Play',
+                onTap: () => _openUrl(_playStoreUrl),
+              ),
+              _StoreBadge(
+                imagePath: 'assets/icons/appstore.png',
+                label: 'Download on the App Store',
+                onTap: () => _openUrl(_appStoreUrl),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StoreBadge extends StatelessWidget {
+  final String imagePath;
+  final String label;
+  final VoidCallback onTap;
+  const _StoreBadge({
+    required this.imagePath,
+    required this.label,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isMobile = ResponsiveHelper.isMobile(context);
+    final width = isMobile ? 180.0 : 220.0;
+    final heeight = isMobile ? 50.0 : 90.0;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        width: width,
+        height: heeight,
+        decoration: BoxDecoration(
+          color: QiratTheme.darkSurface,
+          border: Border.all(color: QiratTheme.goldBorder),
+          borderRadius: BorderRadius.circular(14),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child:    ClipRRect(
+          borderRadius: BorderRadius.circular(14),
+          child: Image.asset(
+            imagePath,
+            fit: BoxFit.fill,
+          ),
+        ),
       ),
     );
   }
