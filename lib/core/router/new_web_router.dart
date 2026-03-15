@@ -18,6 +18,7 @@ import '../../presentation/views/new_web/wishlist/new_web_wishlist_view.dart';
 import '../../presentation/views/new_web/profile/new_web_profile_view.dart';
 import '../../presentation/views/new_web/search/new_web_search_view.dart';
 import '../../presentation/views/new_web/auth/new_web_signin_view.dart';
+import '../../core/analytics/app_analytics.dart';
 import '../../presentation/views/new_web/static/new_web_privacy_view.dart';
 import '../../presentation/views/new_web/static/new_web_terms_view.dart';
 import '../../presentation/views/new_web/static/new_web_delete_account_view.dart';
@@ -69,6 +70,7 @@ class NewWebRouter {
 /// This will be used once the new UI is complete
 final GoRouter newWebRouter = GoRouter(
   initialLocation: NewWebRouter.newHome,
+  observers: [_RouteAnalyticsObserver()],
   routes: [
     GoRoute(
       name: NewWebRouter.newHome,
@@ -103,8 +105,7 @@ final GoRouter newWebRouter = GoRouter(
         final extra = state.extra;
         if (extra is Product) {
           return NewWebProductDetailsView(product: extra);
-        }
-        else if (extra is Map && extra['id'] is String) {
+        } else if (extra is Map && extra['id'] is String) {
           return NewWebProductDetailsLoader(productId: extra['id'].trim());
         }
         final q = state.uri.queryParameters;
@@ -128,9 +129,16 @@ final GoRouter newWebRouter = GoRouter(
       builder: (context, state) {
         final extra = state.extra;
         if (extra is List<CartItem>) {
-          final items = state.extra as List<CartItem>;
-
-          return NewWebCheckoutView(items: items);
+          return NewWebCheckoutView(items: extra);
+        }
+        if (extra is Map) {
+          final rawItems = extra['items'];
+          if (rawItems is List<CartItem>) {
+            return NewWebCheckoutView(
+              items: rawItems,
+              source: (extra['source']?.toString() ?? 'cart').toLowerCase(),
+            );
+          }
         }
 
         // No data -> go home
@@ -183,7 +191,7 @@ final GoRouter newWebRouter = GoRouter(
     GoRoute(
       name: NewWebRouter.newSignIn,
       path: NewWebRouter.newSignIn,
-      builder: (context, state) => const NewWebSignInView(),
+      builder: (context, state) => NewWebSignInView(flowPayload: state.extra),
     ),
     GoRoute(
       name: NewWebRouter.newSignUp,
@@ -194,7 +202,8 @@ final GoRouter newWebRouter = GoRouter(
     GoRoute(
       path: NewWebRouter.newDeliveryInfo,
       name: NewWebRouter.newDeliveryInfo,
-      builder: (context, state) => DeliveryInfoViewNew(),
+      builder: (context, state) =>
+          DeliveryInfoViewNew(flowPayload: state.extra),
     ),
     GoRoute(
       name: NewWebRouter.newOurStory,
@@ -216,7 +225,19 @@ final GoRouter newWebRouter = GoRouter(
     GoRoute(
         path: NewWebRouter.checkoutv2,
         name: NewWebRouter.checkoutv2,
-        builder: (context, state) => const CheckoutViewV2())
+        builder: (context, state) {
+          final extra = state.extra;
+          if (extra is Map) {
+            final rawItems = extra['items'];
+            if (rawItems is List<CartItem>) {
+              return CheckoutViewV2(
+                checkoutItems: rawItems,
+                source: (extra['source']?.toString() ?? 'cart').toLowerCase(),
+              );
+            }
+          }
+          return const CheckoutViewV2();
+        })
   ],
   // Error handling
   errorBuilder: (context, state) {
@@ -247,3 +268,27 @@ final GoRouter newWebRouter = GoRouter(
     );
   },
 );
+
+class _RouteAnalyticsObserver extends NavigatorObserver {
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    _log(route);
+    super.didPush(route, previousRoute);
+  }
+
+  @override
+  void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
+    if (newRoute != null) {
+      _log(newRoute);
+    }
+    super.didReplace(newRoute: newRoute, oldRoute: oldRoute);
+  }
+
+  void _log(Route<dynamic> route) {
+    final routeName = route.settings.name;
+    final page = (routeName != null && routeName.isNotEmpty)
+        ? routeName
+        : route.runtimeType.toString();
+    AppAnalytics.logPageView(page, pageClass: route.runtimeType.toString());
+  }
+}

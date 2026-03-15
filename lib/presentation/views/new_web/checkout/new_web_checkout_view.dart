@@ -20,10 +20,16 @@ import '../../../blocs/order/order_add/order_add_cubit.dart';
 import '../../../widgets/input_form_button.dart';
 import '../../../widgets/outline_label_card.dart';
 import '../../../../core/services/services_locator.dart' as di;
+import '../../../../core/analytics/app_analytics.dart';
 
 class NewWebCheckoutView extends StatelessWidget {
   final List<CartItem> items;
-  const NewWebCheckoutView({Key? key, required this.items}) : super(key: key);
+  final String source;
+  const NewWebCheckoutView({
+    Key? key,
+    required this.items,
+    this.source = 'cart',
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -73,6 +79,20 @@ class NewWebCheckoutView extends StatelessWidget {
                               child: BlocBuilder<UserBloc, UserState>(
                                 builder: (context, state) {
                                   if (state is UserLogged) {
+                                    if (state.user.deliveryInfos.isEmpty) {
+                                      return Container(
+                                        height: 50,
+                                        padding: const EdgeInsets.only(
+                                          top: 20,
+                                          bottom: 8,
+                                          left: 4,
+                                        ),
+                                        child: const Text(
+                                          'Please select delivery information',
+                                        ),
+                                      );
+                                    }
+
                                     final selected =
                                         state.user.deliveryInfos.firstWhere(
                                       (e) => e.isSelected,
@@ -279,7 +299,13 @@ class NewWebCheckoutView extends StatelessWidget {
                           final selectedInfos = currentState.user.deliveryInfos
                               .where((e) => e.isSelected);
                           if (selectedInfos.isNotEmpty) {
-                            context.push(NewWebRouter.checkoutv2);
+                            context.push(
+                              NewWebRouter.checkoutv2,
+                              extra: {
+                                'source': source,
+                                'items': items,
+                              },
+                            );
                             // context.read<OrderAddCubit>().addOrder(
                             //       OrderDetails(
                             //         id: '',
@@ -307,13 +333,27 @@ class NewWebCheckoutView extends StatelessWidget {
                             //       ),
                             //     );
                           } else {
-                            EasyLoading.showError(
-                              'Error \nPlease select delivery add your delivery information',
+                            context.push(
+                              NewWebRouter.newDeliveryInfo,
+                              extra: {
+                                'flow': 'checkout',
+                                'source': source,
+                                'nextRoute': NewWebRouter.checkoutv2,
+                                'items': items,
+                              },
                             );
                           }
                         } else {
-                          EasyLoading.showError(
-                            'Error \nPlease select delivery add your delivery information',
+                          AppAnalytics.logAuthRequired(flow: 'checkout');
+                          context.pushNamed(
+                            NewWebRouter.newSignIn,
+                            extra: {
+                              'flow': 'checkout',
+                              'source': source,
+                              'nextRoute': NewWebRouter.checkoutv2,
+                              'requiresDelivery': true,
+                              'items': items,
+                            },
                           );
                         }
                       },

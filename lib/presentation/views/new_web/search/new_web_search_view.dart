@@ -10,6 +10,7 @@ import '../../../../domain/entities/product/product.dart';
 import '../../../../domain/entities/cart/cart_item.dart';
 import '../../../blocs/cart/cart_bloc.dart';
 import '../../../../domain/usecases/product/get_product_usecase.dart';
+import '../../../../core/analytics/app_analytics.dart';
 
 class NewWebSearchView extends StatefulWidget {
   final String query;
@@ -168,7 +169,13 @@ class _SearchProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => context.push(NewWebRouter.newProductDetails, extra: product),
+      onTap: () {
+        AppAnalytics.logProductClicked(
+          productId: product.id,
+          source: 'search_results',
+        );
+        context.push(NewWebRouter.newProductDetails, extra: product);
+      },
       child: Container(
         decoration: BoxDecoration(
           color: QiratTheme.darkSurface,
@@ -217,6 +224,11 @@ class _SearchProductCard extends StatelessWidget {
                   IconButton(
                     tooltip: 'Add to cart',
                     onPressed: () {
+                      AppAnalytics.logAddToCartClicked(
+                        productId: product.id,
+                        priceTagId: product.priceTags.first.id,
+                        source: 'search_results',
+                      );
                       context.read<CartBloc>().add(AddProduct(
                             cartItem: CartItem(
                               id: 'tmp-${product.id}-${product.priceTags.first.id}',

@@ -24,6 +24,7 @@ import '../../blocs/cart/cart_bloc.dart';
 import '../../../domain/entities/cart/cart_item.dart';
 import '../../../core/services/services_locator.dart' as di;
 import '../../../core/services/config_service.dart';
+import '../../../core/analytics/app_analytics.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:collection/collection.dart';
 import 'dart:async';
@@ -548,6 +549,10 @@ class _NewWebLandingPageViewState extends State<NewWebLandingPageView> {
   }
 
   void _handleProductTap(Product product) {
+    AppAnalytics.logProductClicked(
+      productId: product.id,
+      source: 'landing_page',
+    );
     context.push(NewWebRouter.newProductDetails, extra: product);
   }
 
@@ -618,6 +623,11 @@ class _NewWebLandingPageViewState extends State<NewWebLandingPageView> {
     );
 
     // Dispatch to CartBloc (use guest uid '1' if not logged)
+    AppAnalytics.logAddToCartClicked(
+      productId: product.id,
+      priceTagId: priceTag.id,
+      source: 'landing_page',
+    );
     context.read<CartBloc>().add(
           AddProduct(
             cartItem: CartItem(

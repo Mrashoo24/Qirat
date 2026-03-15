@@ -101,12 +101,12 @@ static const String searchView = "/searchView";
 /// 🚀 GoRouter Configuration
 final GoRouter router = GoRouter(
   routes: [
-    /// 🏠 Main Menu
-    GoRoute(
-      name: AppRouter.home,
-      path: '/',
-      builder: (context, state) => const MainView(),
-    ),
+    // /// 🏠 Main Menu
+    // GoRoute(
+    //   name: AppRouter.home,
+    //   path: '/',
+    //   builder: (context, state) => const MainView(),
+    // ),
 
     /// 🔐 Authentication
     GoRoute(

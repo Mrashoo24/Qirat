@@ -70,6 +70,8 @@ def cashfree_http(request: Request):
         client_id = os.getenv('CASHFREE_CLIENT_ID', '')
         client_secret = os.getenv('CASHFREE_CLIENT_SECRET', '')
         api_version = os.getenv('CASHFREE_API_VERSION', '2025-01-01')
+        
+        logging.info(f'Cashfree HTTP request: {client_secret} {client_id} in {env} env')
 
         if not client_id or not client_secret:
             return _error('Missing Cashfree client credentials', 500)

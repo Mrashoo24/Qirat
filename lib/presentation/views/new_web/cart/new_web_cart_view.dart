@@ -6,6 +6,7 @@ import '../../../../domain/entities/cart/cart_item.dart';
 import '../../../blocs/cart/cart_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/router/new_web_router.dart';
+import '../../../../core/analytics/app_analytics.dart';
 import '../../../blocs/user/user_bloc.dart';
 import '../../../widgets/new_web/common/qirat_header_widget.dart';
 
@@ -143,10 +144,19 @@ class NewWebCartView extends StatelessWidget {
                               )),
                         ),
                         ElevatedButton(
-                          onPressed: () => context.pushNamed(
-                            NewWebRouter.newCheckout,
-                            extra: items, // pass current cart
-                          ),
+                          onPressed: () {
+                            AppAnalytics.logCheckoutStarted(
+                              source: 'cart',
+                              itemCount: items.length,
+                            );
+                            context.pushNamed(
+                              NewWebRouter.newCheckout,
+                              extra: {
+                                'source': 'cart',
+                                'items': items,
+                              },
+                            );
+                          },
                           child: const Text('Proceed to Checkout'),
                         ),
                       ],

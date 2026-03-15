@@ -1,7 +1,7 @@
 import 'package:eshop/core/router/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'dart:html' as html;
+// import 'dart:html' as html;
 
 class TermsView extends StatelessWidget {
   final bool? showAppBar;
@@ -14,7 +14,7 @@ class TermsView extends StatelessWidget {
       appBar: AppBar(
         leading: showAppBar ?? false ? IconButton(onPressed: (){
           context.goNamed(AppRouter.home);
-          html.window.history.pushState(null, 'title', '/home}');
+          // html.window.history.pushState(null, 'title', '/home}');
         }, icon: Icon(Icons.arrow_back_ios)) : null,
         title: const Text("Terms and Conditions"),
         automaticallyImplyLeading: true,

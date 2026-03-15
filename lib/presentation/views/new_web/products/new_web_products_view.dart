@@ -12,6 +12,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/router/new_web_router.dart';
 import '../../../widgets/new_web/common/qirat_header_widget.dart';
 import '../../../../domain/usecases/product/get_product_usecase.dart';
+import '../../../../core/analytics/app_analytics.dart';
 
 class NewWebProductsView extends StatefulWidget {
   final Category? category;
@@ -202,7 +203,13 @@ class _ProductCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => context.push(NewWebRouter.newProductDetails, extra: product),
+      onTap: () {
+        AppAnalytics.logProductClicked(
+          productId: product.id,
+          source: 'products_grid',
+        );
+        context.push(NewWebRouter.newProductDetails, extra: product);
+      },
       child: Container(
         decoration: BoxDecoration(
           color: QiratTheme.darkSurface,
@@ -247,6 +254,11 @@ class _ProductCard extends StatelessWidget {
                   const Spacer(),
                   IconButton(
                     onPressed: () {
+                      AppAnalytics.logAddToCartClicked(
+                        productId: product.id,
+                        priceTagId: product.priceTags.first.id,
+                        source: 'products_grid',
+                      );
                       context.read<CartBloc>().add(AddProduct(
                             cartItem: CartItem(
                               id: 'tmp-${product.id}-${product.priceTags.first.id}',

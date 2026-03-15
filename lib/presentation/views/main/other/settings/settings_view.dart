@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:html' as html;
+// import 'dart:html' as html;
 
 import 'package:go_router/go_router.dart';
 
@@ -16,7 +16,7 @@ class PrivacyPolicyView extends StatelessWidget {
       appBar: AppBar(
         leading: showAppBar ?? false ? IconButton(onPressed: (){
           context.goNamed(AppRouter.home);
-          html.window.history.pushState(null, 'title', '/home}');
+          // html.window.history.pushState(null, 'title', '/home}');
         }, icon: Icon(Icons.arrow_back_ios)) : null,
         automaticallyImplyLeading: true,
         title: const Text("Privacy Policy"),

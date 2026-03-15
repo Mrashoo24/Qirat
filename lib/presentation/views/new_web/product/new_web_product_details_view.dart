@@ -23,10 +23,12 @@ import '../../../widgets/counterButton.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../data/firebase/firebase_services.dart';
 import '../../../../core/services/services_locator.dart';
+import '../../../../core/analytics/app_analytics.dart';
 
 class NewWebProductDetailsLoader extends StatelessWidget {
   final String productId;
-  const NewWebProductDetailsLoader({Key? key, required this.productId}) : super(key: key);
+  const NewWebProductDetailsLoader({Key? key, required this.productId})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +45,7 @@ class NewWebProductDetailsLoader extends StatelessWidget {
 
         final product = products.firstWhere(
           (p) => p.id == productId,
-          orElse: () =>  ProductModel(
+          orElse: () => ProductModel(
             id: '',
             name: '',
             description: '',
@@ -51,8 +53,10 @@ class NewWebProductDetailsLoader extends StatelessWidget {
             priceTags: [],
             categories: [],
             tags: [],
-            createdAt:DateTime.now(), // Safe placeholder if your entity allows null/adjust to your constructor
-            updatedAt: DateTime.now(), // Safe placeholder if your entity allows null/adjust to your constructor
+            createdAt: DateTime
+                .now(), // Safe placeholder if your entity allows null/adjust to your constructor
+            updatedAt: DateTime
+                .now(), // Safe placeholder if your entity allows null/adjust to your constructor
           ),
         );
 
@@ -87,6 +91,10 @@ class _NewWebProductDetailsViewState extends State<NewWebProductDetailsView> {
     _selected = widget.product.priceTags.isNotEmpty
         ? widget.product.priceTags.first
         : null;
+    AppAnalytics.logProductClicked(
+      productId: widget.product.id,
+      source: 'product_details',
+    );
     super.initState();
   }
 
@@ -318,12 +326,12 @@ class _NewWebProductDetailsViewState extends State<NewWebProductDetailsView> {
             children: widget.product.tags
                 .map((t) => Row(
                       mainAxisSize: MainAxisSize.min,
-                      children:  [
+                      children: [
                         Icon(Icons.circle,
                             size: 6, color: QiratTheme.qiratGold),
                         SizedBox(width: 6),
                         Text(
-                            widget.product.tags.isNotEmpty ? t : 'No Tags',
+                          widget.product.tags.isNotEmpty ? t : 'No Tags',
                           style: TextStyle(
                             color: QiratTheme.textSecondary,
                             fontFamily: 'Inter',
@@ -379,7 +387,8 @@ class _NewWebProductDetailsViewState extends State<NewWebProductDetailsView> {
           const Spacer(),
           SizedBox(
             width: 120,
-            child: currentCartItem == null ||  (currentCartItem.quantity).toInt() == 0
+            child: currentCartItem == null ||
+                    (currentCartItem.quantity).toInt() == 0
                 ? InputFormButton(
                     onClick: () {
                       if (_selected == null) return;
@@ -420,6 +429,11 @@ class _NewWebProductDetailsViewState extends State<NewWebProductDetailsView> {
                           'product': widget.product.id + (_selected?.id ?? ''),
                         });
                       } catch (_) {}
+                      AppAnalytics.logAddToCartClicked(
+                        productId: widget.product.id,
+                        priceTagId: _selected?.id ?? '',
+                        source: 'product_details',
+                      );
 
                       // Navigator.pop(context);
                     },
@@ -499,16 +513,26 @@ class _NewWebProductDetailsViewState extends State<NewWebProductDetailsView> {
                   uid = state.user.id;
                 }
 
+                AppAnalytics.logBuyNowClicked(
+                  productId: widget.product.id,
+                  priceTagId: _selected?.id ?? '',
+                );
+                AppAnalytics.logCheckoutStarted(
+                    source: 'buy_now', itemCount: 1);
+
                 context.pushNamed(
                   NewWebRouter.newCheckout,
-                  extra: [
-                    CartItem(
-                      product: widget.product,
-                      priceTag: _selected!,
-                      quantity: 1,
-                      uid: uid,
-                    ),
-                  ],
+                  extra: {
+                    'source': 'buy_now',
+                    'items': [
+                      CartItem(
+                        product: widget.product,
+                        priceTag: _selected!,
+                        quantity: 1,
+                        uid: uid,
+                      ),
+                    ],
+                  },
                 );
               },
               titleText: 'Buy',

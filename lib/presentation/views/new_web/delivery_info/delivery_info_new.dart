@@ -13,19 +13,48 @@ import '../../../../../core/theme/qirat_theme.dart';
 import '../../../widgets/delivery_info_card.dart';
 import '../../../widgets/input_form_button.dart';
 import '../../../widgets/input_text_form_field.dart';
+import '../../../../../domain/entities/cart/cart_item.dart';
+import '../../../../../core/analytics/app_analytics.dart';
 
 class DeliveryInfoViewNew extends StatefulWidget {
-  const DeliveryInfoViewNew({Key? key}) : super(key: key);
+  final Object? flowPayload;
+  const DeliveryInfoViewNew({Key? key, this.flowPayload}) : super(key: key);
 
   @override
   State<DeliveryInfoViewNew> createState() => _DeliveryInfoViewNewState();
 }
 
 class _DeliveryInfoViewNewState extends State<DeliveryInfoViewNew> {
+  bool _hasRedirected = false;
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<UserBloc, UserState>(
       listener: (context, state) {
+        if (_hasRedirected || state is! UserLogged) return;
+
+        final payload = widget.flowPayload;
+        if (payload is! Map) return;
+
+        final nextRoute = payload['nextRoute']?.toString();
+        if (nextRoute == null || nextRoute.isEmpty) return;
+
+        if (state.user.deliveryInfos.isNotEmpty) {
+          _hasRedirected = true;
+          final source =
+              (payload['source']?.toString() ?? 'cart').toLowerCase();
+          final rawItems = payload['items'];
+          final items = rawItems is List<CartItem> ? rawItems : <CartItem>[];
+
+          AppAnalytics.logAuthSuccessRedirect(destination: nextRoute);
+          context.go(
+            nextRoute,
+            extra: {
+              'source': source,
+              'items': items,
+            },
+          );
+        }
         // EasyLoading.dismiss();
         // if (state is UserLogged) {
         //   EasyLoading.show(status: 'Loading...');
@@ -96,7 +125,11 @@ class _DeliveryInfoViewNewState extends State<DeliveryInfoViewNew> {
                   backgroundColor: QiratTheme.qiratGold,
                   onPressed: () {
                     if (state is! UserLogged) {
-                      context.goNamed(NewWebRouter.newSignIn);
+                      AppAnalytics.logAuthRequired(flow: 'delivery_info');
+                      context.goNamed(
+                        NewWebRouter.newSignIn,
+                        extra: widget.flowPayload,
+                      );
                     } else {
                       showModalBottomSheet<void>(
                         context: context,
@@ -127,6 +160,15 @@ class _DeliveryInfoViewNewState extends State<DeliveryInfoViewNew> {
 
   void updateDeliveryInfo(
       UserModel userModel, BuildContext context, DeliveryInfo deliveryInfo) {
+    final payload = widget.flowPayload;
+    final source = payload is Map
+        ? (payload['source']?.toString() ?? 'profile').toLowerCase()
+        : 'profile';
+    AppAnalytics.logCheckoutAddressSelected(
+      deliveryInfoId: deliveryInfo.id,
+      source: source,
+    );
+
     // Update all other delivery infos in the list
     var updateDeliveryInfoList = userModel.deliveryInfos.map((element) {
       if (element.id == deliveryInfo.id) {
@@ -435,6 +477,11 @@ class _DeliveryInfoFormState extends State<DeliveryInfoForm> {
       zipCode: zipCode.text,
       contactNumber: '+${contactNumber.text.trim()}',
       isSelected: true, // The new delivery info is selected
+    );
+
+    AppAnalytics.logCheckoutAddressSelected(
+      deliveryInfoId: newDeliveryInfo.id,
+      source: 'delivery_info_form',
     );
 
     var isNewInfo = userModel.deliveryInfos

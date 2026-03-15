@@ -13,9 +13,12 @@ import '../../../blocs/home/navbar_cubit.dart';
 import '../../../widgets/new_web/common/qirat_header_widget.dart';
 import '../../../widgets/input_form_button.dart';
 import 'package:eshop/data/models/user/user_model.dart';
+import '../../../../domain/entities/cart/cart_item.dart';
+import '../../../../core/analytics/app_analytics.dart';
 
 class NewWebSignInView extends StatefulWidget {
-  const NewWebSignInView({Key? key}) : super(key: key);
+  final Object? flowPayload;
+  const NewWebSignInView({Key? key, this.flowPayload}) : super(key: key);
 
   @override
   State<NewWebSignInView> createState() => _NewWebSignInViewState();
@@ -34,7 +37,7 @@ class _NewWebSignInViewState extends State<NewWebSignInView> {
             try {
               context.read<NavbarCubit>().update(0);
             } catch (_) {}
-            context.goNamed(NewWebRouter.newHome);
+            _handlePostLoginRedirect(context, state);
           }
         },
         child: Scaffold(
@@ -125,5 +128,49 @@ class _NewWebSignInViewState extends State<NewWebSignInView> {
         ],
       ),
     );
+  }
+
+  void _handlePostLoginRedirect(BuildContext context, UserLogged state) {
+    final payload = widget.flowPayload;
+    if (payload is! Map) {
+      context.goNamed(NewWebRouter.newHome);
+      return;
+    }
+
+    final nextRoute = payload['nextRoute']?.toString();
+    final source = (payload['source']?.toString() ?? 'cart').toLowerCase();
+    final requiresDelivery = payload['requiresDelivery'] == true;
+    final rawItems = payload['items'];
+    final items = rawItems is List<CartItem> ? rawItems : <CartItem>[];
+
+    if (requiresDelivery && state.user.deliveryInfos.isEmpty) {
+      AppAnalytics.logAuthSuccessRedirect(
+          destination: NewWebRouter.newDeliveryInfo);
+      context.go(
+        NewWebRouter.newDeliveryInfo,
+        extra: {
+          'flow': 'checkout',
+          'source': source,
+          'nextRoute': nextRoute ?? NewWebRouter.checkoutv2,
+          'items': items,
+        },
+      );
+      return;
+    }
+
+    if (nextRoute != null && nextRoute.isNotEmpty) {
+      AppAnalytics.logAuthSuccessRedirect(destination: nextRoute);
+      context.go(
+        nextRoute,
+        extra: {
+          'source': source,
+          'items': items,
+        },
+      );
+      return;
+    }
+
+    AppAnalytics.logAuthSuccessRedirect(destination: NewWebRouter.newHome);
+    context.goNamed(NewWebRouter.newHome);
   }
 }

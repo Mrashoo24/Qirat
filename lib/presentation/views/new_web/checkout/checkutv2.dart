@@ -27,9 +27,16 @@ import '../../../blocs/cart/cart_bloc.dart';
 import '../../../blocs/user/user_bloc.dart';
 import '../../../blocs/order/order_add/order_add_cubit.dart';
 import '../../../blocs/delivery_info/delivery_info_fetch/delivery_info_fetch_cubit.dart';
+import '../../../../core/analytics/app_analytics.dart';
 
 class CheckoutViewV2 extends StatefulWidget {
-  const CheckoutViewV2({Key? key}) : super(key: key);
+  final List<CartItem>? checkoutItems;
+  final String source;
+  const CheckoutViewV2({
+    Key? key,
+    this.checkoutItems,
+    this.source = 'cart',
+  }) : super(key: key);
 
   @override
   State<CheckoutViewV2> createState() => _CheckoutViewV2State();
@@ -43,6 +50,9 @@ class _CheckoutViewV2State extends State<CheckoutViewV2> {
   List<CartItem>? _pendingItems;
   String? _pendingUid;
   DeliveryInfo? _selectedInfos;
+
+  String get _paymentMethodName => _mode == _PayMode.cod ? 'cod' : 'online';
+
   @override
   void initState() {
     super.initState();
@@ -57,15 +67,30 @@ class _CheckoutViewV2State extends State<CheckoutViewV2> {
         listener: (context, state) {
           EasyLoading.dismiss();
           print('state == ${state.toString()}');
+          final itemCount =
+              _effectiveItems(context.read<CartBloc>().state).length;
           if (state is OrderAddLoading) {
             EasyLoading.show(status: 'Placing order...');
           } else if (state is OrderAddSuccess) {
-            context.read<CartBloc>().add(const ClearCart());
+            AppAnalytics.logOrderPlacedSuccess(
+              paymentMethod: _paymentMethodName,
+              itemCount: itemCount,
+              source: widget.source,
+            );
+            if (widget.source != 'buy_now') {
+              context.read<CartBloc>().add(const ClearCart());
+            }
             context.go(
               NewWebRouter.newOrders,
             );
             EasyLoading.showSuccess('Order placed');
           } else if (state is OrderAddFail) {
+            AppAnalytics.logOrderPlacedFailed(
+              paymentMethod: _paymentMethodName,
+              itemCount: itemCount,
+              source: widget.source,
+              reason: 'order_add_failed',
+            );
             EasyLoading.showError('Failed to place order');
           }
         },
@@ -88,7 +113,7 @@ class _CheckoutViewV2State extends State<CheckoutViewV2> {
   Widget _buildBody(BuildContext context) {
     return BlocBuilder<CartBloc, CartState>(
       builder: (context, cartState) {
-        final items = cartState.cart;
+        final items = _effectiveItems(cartState);
         final total = CartCalculator.getTotal(items);
         return ListView(
           padding: const EdgeInsets.all(16),
@@ -115,7 +140,15 @@ class _CheckoutViewV2State extends State<CheckoutViewV2> {
                           value: _PayMode.online, label: Text('Online')),
                     ],
                     selected: {_mode},
-                    onSelectionChanged: (s) => setState(() => _mode = s.first),
+                    onSelectionChanged: (s) {
+                      final selectedMode = s.first;
+                      setState(() => _mode = selectedMode);
+                      AppAnalytics.logPaymentMethodSelected(
+                        paymentMethod:
+                            selectedMode == _PayMode.cod ? 'cod' : 'online',
+                        source: widget.source,
+                      );
+                    },
                     style: ButtonStyle(
                       foregroundColor: MaterialStateProperty.all(Colors.white),
                       backgroundColor: MaterialStateProperty.all(
@@ -196,6 +229,26 @@ class _CheckoutViewV2State extends State<CheckoutViewV2> {
                     final selected = currentState.user.deliveryInfos
                         .where((e) => e.isSelected);
 
+                    if (selected.isEmpty) {
+                      return const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Deliver To',
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: 'Inter',
+                                  fontWeight: FontWeight.w700)),
+                          SizedBox(height: 6),
+                          Text(
+                            'Please add/select a delivery address',
+                            style: TextStyle(
+                                color: QiratTheme.textSecondary,
+                                fontFamily: 'Inter'),
+                          ),
+                        ],
+                      );
+                    }
+
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -235,7 +288,7 @@ class _CheckoutViewV2State extends State<CheckoutViewV2> {
   Widget _buildBottomBar(BuildContext context) {
     return BlocBuilder<CartBloc, CartState>(
       builder: (context, cartState) {
-        final items = cartState.cart;
+        final items = _effectiveItems(cartState);
         final total = CartCalculator.getTotal(items).toDouble();
 
         return SafeArea(
@@ -256,6 +309,11 @@ class _CheckoutViewV2State extends State<CheckoutViewV2> {
                 ElevatedButton(
                   onPressed: () {
                     print('clicked');
+                    AppAnalytics.logOrderConfirmClicked(
+                      paymentMethod: _paymentMethodName,
+                      itemCount: items.length,
+                      source: widget.source,
+                    );
                     _onConfirm(context, items, total);
                   },
                   child: const Text('Confirm'),
@@ -272,12 +330,35 @@ class _CheckoutViewV2State extends State<CheckoutViewV2> {
       BuildContext context, List<CartItem> items, double total) async {
     final userState = context.read<UserBloc>().state;
     if (userState is! UserLogged) {
-      EasyLoading.showError('Please sign in first');
+      AppAnalytics.logAuthRequired(flow: 'checkout_payment');
+      context.pushNamed(
+        NewWebRouter.newSignIn,
+        extra: {
+          'flow': 'checkout',
+          'source': widget.source,
+          'nextRoute': NewWebRouter.checkoutv2,
+          'requiresDelivery': true,
+          'items': items,
+        },
+      );
       return;
     }
 
     final selectedInfos =
         userState.user.deliveryInfos.where((e) => e.isSelected);
+
+    if (selectedInfos.isEmpty) {
+      context.push(
+        NewWebRouter.newDeliveryInfo,
+        extra: {
+          'flow': 'checkout',
+          'source': widget.source,
+          'nextRoute': NewWebRouter.checkoutv2,
+          'items': items,
+        },
+      );
+      return;
+    }
 
     if (_mode == _PayMode.cod) {
       _placeOrder(
@@ -310,6 +391,12 @@ class _CheckoutViewV2State extends State<CheckoutViewV2> {
       ));
 
       await res.fold((_) async {
+        AppAnalytics.logOrderPlacedFailed(
+          paymentMethod: _paymentMethodName,
+          itemCount: items.length,
+          source: widget.source,
+          reason: 'payment_init_failed',
+        );
         EasyLoading.dismiss();
         EasyLoading.showError('Failed to init payment');
       }, (cfOrder) async {
@@ -334,6 +421,12 @@ class _CheckoutViewV2State extends State<CheckoutViewV2> {
         // Loader will be dismissed in callbacks
       });
     } catch (e) {
+      AppAnalytics.logOrderPlacedFailed(
+        paymentMethod: _paymentMethodName,
+        itemCount: items.length,
+        source: widget.source,
+        reason: 'payment_exception',
+      );
       EasyLoading.dismiss();
       EasyLoading.showError('Payment error');
     }
@@ -364,6 +457,13 @@ class _CheckoutViewV2State extends State<CheckoutViewV2> {
   }
 
   void _onPaymentError(CFErrorResponse errorResponse, String orderId) {
+    final itemCount = _pendingItems?.length ?? 0;
+    AppAnalytics.logOrderPlacedFailed(
+      paymentMethod: 'online',
+      itemCount: itemCount,
+      source: widget.source,
+      reason: errorResponse.getMessage() ?? 'payment_failed',
+    );
     EasyLoading.dismiss();
     final msg = errorResponse.getMessage() ?? 'Payment failed';
     EasyLoading.showError(msg);
@@ -395,7 +495,7 @@ class _CheckoutViewV2State extends State<CheckoutViewV2> {
   }
 
   Future<bool> _verifyPaymentWithServer(String orderId) async {
-    const baseUrl =kbaseurl;
+    const baseUrl = kbaseurl;
     try {
       final client = sl<http.Client>();
       final uri =
@@ -411,5 +511,12 @@ class _CheckoutViewV2State extends State<CheckoutViewV2> {
       }
     } catch (_) {}
     return false;
+  }
+
+  List<CartItem> _effectiveItems(CartState cartState) {
+    if (widget.checkoutItems != null && widget.checkoutItems!.isNotEmpty) {
+      return widget.checkoutItems!;
+    }
+    return cartState.cart;
   }
 }
